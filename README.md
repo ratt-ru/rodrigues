@@ -1,3 +1,5 @@
+![logo](./logo.jpg)
+
 ceiling-kat
 ===========
 
