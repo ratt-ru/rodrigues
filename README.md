@@ -1,4 +1,4 @@
-![logo](./logo.jpg)
+![logo](./logo_new.jpg)
 
 # ceiling-kat
 
