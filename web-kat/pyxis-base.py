@@ -29,8 +29,8 @@ imager.wprojplanes = 0
 imager.weight = "natural"
 imager.cachesize = "32000"
 imager.LWIMAGER_PATH = "lwimager" # 
-imager.DIRTY_IMAGE_Template = "${OUTFILE}.${imager.weight}${.<imager.robust}${.<imager.filter}.dirty.fits"
-imager.RESTORED_IMAGE_Template = "${OUTFILE}.${imager.weight}${.<imager.robust}${.<imager.filter}.restored.fits"
+imager.DIRTY_IMAGE_Template = "${OUTFILE}.${imager.weight}${.<imager.robust}${.<imager.filter}.spw${ms.SPWID}.dirty.fits"
+imager.RESTORED_IMAGE_Template = "${OUTFILE}.${imager.weight}${.<imager.robust}${.<imager.filter}.spw${ms.SPWID}.restored.fits"
 
 # destination directory: if MS is foo.MS, then directory is [OUTDIR]/plots-foo[-LABEL] 
 DESTDIR_Template = '${OUTDIR>/}plots-${MS:BASE}'
@@ -86,6 +86,44 @@ BASEFREQ = 1.4e+9
 STATSFILE_Template = "${OUTDIR>/}genstats.py"
 
 STATQUALS = ()
+
+TDLCONF = 'tdlconf.profiles'
+ADD_NOISE = False
+NOISE = None
+LSM = None
+CFG = 'meerkat_sims.cfg'
+def readCFG(cfg='$CFG'):
+  cfg_std = open(II(cfg))
+  params = {}
+  for line in cfg_std.readlines():
+    if line!='\n' or line.startswith('#')!=False:
+       key = line.split('=')[0]
+       val = line.split('=')[-1].split()[0]
+       params[key] = val
+  options = dict(ms_={},cr_={},im_={},dc_={})
+  for key in params.keys():
+   found = False
+   for item in options.keys():
+     if not found:
+      if key.startswith(item):
+        found=True
+        options[item][key.split(item)[-1]] = params[key]
+        del params[key]
+  if params['skytype'] == 'tiggerlsm': 
+    v.LSM = params['skyname']
+    v.TDLSEC = 'turbo-sim:own_lsm'
+  elif params['skytype'] == 'FITS' : v.FITS = params['skyname']
+  else : USING_SIAMESE = True
+  if params['add_noise'] == 'True' : NOISE = eval(params['vis_noise_std'])
+  v.MAKE_PSF = eval(params['make_psf_map'])
+  v.OUTPUT_TYPE = params['output']
+  v.COLUMN = params['column']
+  v.CLEAN = eval(params['clean'])
+  own_tdl = eval(params['upload_tdl'])
+  if own_tdl:
+    v.TDLCONF = params['tdlconf']
+    v.TDLSEC = params['tdlsection']
+  return options
 
 _SEFD = {}
 _SEFD['MKT'] = {'1b':831,'2':551}
@@ -303,33 +341,6 @@ def simnoise (noise=0,rowchunk=100000,skipnoise=False,addToCol=None,scale_noise=
   tab.close() 
 
 SKIPNOISE = False
-def swap_stokes_freq(fitsname):
-  hdu = pyfits.open(fitsname)[0]
-  hdr = hdu.header
-  data = hdu.data
-  if hdr['NAXIS']<4: 
-    warn('Editing fits file [$fitsname] to make it usable by the pipeline.')
-    hdr.update('CTYPE4','STOKES')
-    hdr.update('CDELT4',1)
-    hdr.update('CRVAL4',1)
-    hdr.update('CUNIT4','Jy/Pixel')
-    data.resize(1,*data.shape)
-  if hdr["CTYPE3"].startswith("FREQ"):
-    hdr0 = hdr.copy()
-    hdr.update("CTYPE3",hdr0["CTYPE4"])
-    hdr.update("CRVAL3",hdr0["CRVAL4"])
-    hdr.update("CDELT3",hdr0["CDELT4"])
-    try :hdr.update("CUNIT3",hdr0["CUNIT4"])
-    except KeyError: hdr.update('CUNIT3','Jy/Pixel    ')
-   #--------------------------
-    hdr.update("CTYPE4",hdr0["CTYPE3"])
-    hdr.update("CRVAL4",hdr0["CRVAL3"])
-    hdr.update("CDELT4",hdr0["CDELT3"])
-    try :hdr.update("CUNIT4",hdr0["CUNIT4"])
-    except KeyError: hdr.update('CUNIT4','Hz    ')
-    warn('Swapping FREQ and STOKES axes in the fits header [$fitsname]. This is a  MeqTrees uv-brick work arround.')
-    pyfits.writeto(fitsname,np.rollaxis(data,1),hdr,clobber=True)
-  return 0;
 
 def apply_rfi_flagging (rfihist='RFIdata/rfipc.cp'):
   """Applies random flagging based on baseline length. Flagging percentages are taken
@@ -437,7 +448,7 @@ def get_mslist(filename):
 define("MAKEMS_REDO",False,"if False, makems will omit existing MSs");
 define("MAKEMS_OUT","MS","place MSs in this subdirectory");
 
-def makems (conf="MeerKAT64",writeAutoCorr=True,hours=8,dtime=60,dec=-40,ra='0:0:0',freq0=1400e6,nchan=1,dfreq=3.9e3,nband=1,label='',start_time=None,shift=False):
+def makems (conf="MeerKAT64",writeAutoCorr=True,hours=8,dtime=60,dec=-40,ra='0:0:0',freq0=1400e6,nchan=1,dfreq=3.9e3,nband=1,label='',start_time=None,shift=False,start_freq=0.5):
   """Makes a MS given a Casa Table of itrf antenna positions 
   conf is e.g. SKA1REF or MeerKAT64 (antenna table $conf_ANTENNAS must exist)
   hours is total synthesis time, in hours
@@ -504,7 +515,7 @@ RightAscension=$ra
 StartTime=%s  # 19:00 is center
 MSName=$MSName
 NTimes=%d
-#TileSizeFreq=16"""%(freq0-(dfreq)*1.5,dfreq,start_time,(hours*3600)//dtime)));
+#TileSizeFreq=16"""%(freq0-(dfreq)*start_freq,dfreq,start_time,(hours*3600)//dtime)));
   info("creating $msname: ${hours}h synthesis, ${dtime}s integration, Dec=$dec, $nchan channels of %.4g kHz starting at %.4g MHz"%(dfreq/1e3,freq0/1e6));
   # run makems
   x.sh("/usr/bin/makems $conffile");
@@ -563,5 +574,58 @@ def flag_stepped_timeslot (step=3):
   frow = frow.reshape([nt,nb]);
   frow[::step,:] = True;
   tab.putcol("FLAG_ROW",frow.reshape((nr,)));
-
 document_globals(simcube,"SC*");
+
+def fitsInfo(fits):
+  hdr = pyfits.open(fits)[0].header
+  ra = hdr['CRVAL1'] 
+  dec = hdr['CRVAL2']
+  naxis = hdr['NAXIS']
+  if naxis>3: freq_ind = 3 if hdr['CTYPE3'].startswith('FREQ') else 4
+  else: 
+    freq_ind = 3
+    if hdr['CRTYPE3'].startswith('FREQ') is False: 
+       freq_axis = False
+       return (ra,dec),freq_axis,naxis
+  nchan = hdr['NAXIS%d'%freq_ind]
+  dfreq = hdr['CDELT%d'%freq_ind]
+  freq0 = hdr['CRVAL%d'%freq_ind] + hdr['CRPIX%d'%freq_ind]*dfreq
+  return (ra,dec),(freq0,dfreq,nchan),naxis
+
+def swap_stokes_freq(fitsname):
+  info('Checking STOKES and FREQ in FITS file, might need to swap these around.')
+  hdu = pyfits.open(fitsname)[0]
+  hdr = hdu.header
+  data = hdu.data
+  if hdr['NAXIS']<4: 
+    warn('Editing fits file [$fitsname] to make it usable by the pipeline.')
+    hdr.update('CTYPE4','STOKES')
+    hdr.update('CDELT4',1)
+    hdr.update('CRVAL4',1)
+    hdr.update('CUNIT4','Jy/Pixel')
+    data.resize(1,*data.shape)
+  if hdr["CTYPE3"].startswith("FREQ"):
+    hdr0 = hdr.copy()
+    hdr.update("CTYPE3",hdr0["CTYPE4"])
+    hdr.update("CRVAL3",hdr0["CRVAL4"])
+    hdr.update("CDELT3",hdr0["CDELT4"])
+    try :hdr.update("CUNIT3",hdr0["CUNIT4"])
+    except KeyError: hdr.update('CUNIT3','Jy/Pixel    ')
+   #--------------------------
+    hdr.update("CTYPE4",hdr0["CTYPE3"])
+    hdr.update("CRVAL4",hdr0["CRVAL3"])
+    hdr.update("CDELT4",hdr0["CDELT3"])
+    try :hdr.update("CUNIT4",hdr0["CUNIT3"])
+    except KeyError: hdr.update('CUNIT4','Hz    ')
+    warn('Swapping FREQ and STOKES axes in the fits header [$fitsname]. This is a  MeqTrees work arround.')
+    pyfits.writeto(fitsname,np.rollaxis(data,1),hdr,clobber=True)
+  return 0;
+
+
+def deg2hms(deg):
+  deg = deg * 24/360.
+  hrs = deg - deg%1
+  mins_tmp  = (deg - hrs)%1 * 60
+  mins = mins_tmp - mins_tmp%1
+  secs = (mins_tmp - mins)*60
+  return '%d:%d:%.2f'%(hrs,mins,secs)
