@@ -51,15 +51,18 @@ def make_sky(name, sources, phase_centre=[0,0], intensity_range=[0,1], emaj_rang
         print "# of point sources > total # of sources: reducing"
         num_point = sources
 
+    ra_random_adjust = np.random.normal(ra_d_opts[0],ra_d_opts[1],sources)
+    dec_random_adjust = np.random.normal(dec_d_opts[0],dec_d_opts[1],sources)
+
     # Manufacture location, extent and intensity for sources.
     for i in range(sources):
         sky["name"][i] = "S{}".format(i+1)
         sky["ra_m"][i], sky["ra_d"][i] = \
-            np.modf(phase_centre[0] + np.random.normal(ra_d_opts[0],ra_d_opts[1],1))
+            np.modf(phase_centre[0] + ra_random_adjust[i])
         sky["ra_m"][i] = sky["ra_m"][i]*60
         sky["dec_m"][i], sky["dec_d"][i] = \
-            np.modf(phase_centre[1] + np.random.normal(dec_d_opts[0],dec_d_opts[1],1))
-        sky["dec_m"][i] = sky["dec_m"][i]*60
+            np.modf(phase_centre[1] + dec_random_adjust[i])
+        sky["dec_m"][i] = abs(sky["dec_m"][i]*60)
         sky["i"][i] = intensity_range[0] + np.random.random(1)*(intensity_range[1]-intensity_range[0])
         if (only_point or (i<num_point)):
             continue
@@ -82,4 +85,4 @@ def make_sky(name, sources, phase_centre=[0,0], intensity_range=[0,1], emaj_rang
     model.close
 
 if __name__=="__main__":
-    make_sky("sky_model_50", sources=50, phase_centre=[30,0], num_point=38, ra_d_opts=[0,0.5], dec_d_opts=[0,0.5])
+    make_sky("sky_model_50", sources=50, phase_centre=[0,-30], num_point=38, ra_d_opts=[0,0.5], dec_d_opts=[0,0.5])
