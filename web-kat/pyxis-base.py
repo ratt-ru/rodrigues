@@ -29,8 +29,8 @@ imager.wprojplanes = 0
 imager.weight = "natural"
 imager.cachesize = "32000"
 imager.LWIMAGER_PATH = "lwimager" # 
-imager.DIRTY_IMAGE_Template = "${OUTFILE}.${imager.weight}${.<imager.robust}${.<imager.filter}.spw${ms.SPWID}.dirty.fits"
-imager.RESTORED_IMAGE_Template = "${OUTFILE}.${imager.weight}${.<imager.robust}${.<imager.filter}.spw${ms.SPWID}.restored.fits"
+imager.DIRTY_IMAGE_Template = "${OUTFILE}.${imager.weight}${.<imager.robust}${.<imager.filter}.dirty.fits"
+imager.RESTORED_IMAGE_Template = "${OUTFILE}.${imager.weight}${.<imager.robust}${.<imager.filter}.restored.fits"
 
 # destination directory: if MS is foo.MS, then directory is [OUTDIR]/plots-foo[-LABEL] 
 DESTDIR_Template = '${OUTDIR>/}plots-${MS:BASE}'
@@ -277,15 +277,20 @@ def measure_psf (psffile,arcsec_size=4,savefig=None,title=None):
   #print "Nominal resolution is %.2f by %.2f\""%(rx,ry)
   #print "Corresponding to a max baseline of",0.21/(r0/3600*math.pi/180)
 
-def compute_psf_and_noise (make_psf=True,noise=0,noise_map=True,scale_noise=1.0,add_noise=False,rowchunk=1000000,dirty=True,measure_sdl=False,**kw):
+def compute_psf_and_noise (make_psf=True,noise=0,noise_map=True,scale_noise=1.0,add_noise=False,rowchunk=1000000,dirty=True,measure_sdl=False,use_old_noise_map=False,**kw):
   info("weights are",*WEIGHTS.split(":"))
   for weight in WEIGHTS.split(":"):
     opts,weight_txt,quals = get_weight_opts(weight);
     opts.update(kw)
      # make PSF image
-    if make_psf:
+    if make_psf: 
       psfimage = II('$OUTFILE-$weight-psf.fits')
-      imager.make_image(dirty=dict(data="psf",cellsize='0.05arcsec',npix=1024),dirty_image=psfimage,**opts);
+      psf_opts = opts
+      if DBL_PSF:
+        try : psf_opts['npix'] = opts['npix']*2
+        except KeyError : psf_opts['npix'] = imager.npix * 2
+        info(' >>>>>>>>>> %d -- %d '%(imager.npix,psf_opts['npix']))
+      imager.make_image(dirty=dict(data="psf"),dirty_image=psfimage,**psf_opts);
       # make PSF cross-sections and measure FWHMs
       rx,ry = measure_psf(psfimage,
         arcsec_size = 10, #2.5**math.ceil(math.log(5*5)/math.log(5)),
@@ -298,7 +303,13 @@ def compute_psf_and_noise (make_psf=True,noise=0,noise_map=True,scale_noise=1.0,
       simnoise(rowchunk=rowchunk,scale_noise=scale_noise,noise=noise) 
      noiseimage = II('$OUTFILE-$weight-noise.fits')
      opts.update(kw)
-     imager.make_image(dirty=dirty,column='CORRECTED_DATA',dirty_image=noiseimage,**opts);
+     make_noise_map = False
+     if use_old_noise_map:
+       if os.path.exists(noiseimage): 
+         info('Using existing noise map: $noiseimage')
+       else: make_noise_map = True
+     if make_noise_map:
+       imager.make_image(dirty=dirty,column='MODEL_DATA',dirty_image=noiseimage,**opts);
      noise = pyfits.open(noiseimage)[0].data.std();
      info(">>>   rms pixel noise (%s) is %g uJy"%(weight_txt,noise*1e+6));
      _writestat("pixnoise",noise,*quals);
@@ -336,8 +347,8 @@ def simnoise (noise=0,rowchunk=100000,skipnoise=False,addToCol=None,scale_noise=
     if addToCol: 
        data+=colData[row0:(row0+nr)]
        info(" $addToCol + noise --> CORRECTED_DATA (rows $row0 to %d)"%(row0+nr-1))
-    else : info("Adding noise to CORRECTED_DATA (rows $row0 to %d)"%(row0+nr-1))
-    tab.putcol("CORRECTED_DATA",data,row0,nr);
+    else : info("Adding noise to MODEL_DATA (rows $row0 to %d)"%(row0+nr-1))
+    tab.putcol("MODEL_DATA",data,row0,nr);
   tab.close() 
 
 SKIPNOISE = False
