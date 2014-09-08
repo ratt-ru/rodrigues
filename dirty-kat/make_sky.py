@@ -1,4 +1,4 @@
-#/usr/bin/env python
+#!/usr/bin/env python
 import numpy as np
 
 def make_sky(name, sources, phase_centre=[0,0], intensity_range=[0,1], emaj_range=[0,5], emin_range=[0,5],
