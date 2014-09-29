@@ -22,10 +22,11 @@ def image(msname='$MS',lsmname='$LSM',use_imager='LWIMAGER',restore=False,option
   if restore : 
      #ms.copycol() # Copy content of DATA to CORRECTED_DATA if making clean map
      options['data'] = 'CORRECTED_DATA' # make sure to image corrected data
-#  ms.CHANRANGE = 0,9,1
-  imager.IMAGE_CHANNELIZE = 0
-  #temp = dict(nchan=5,img_nchan=5,chanstart=0,img_chanstart=0,chanstep=2,img_chanstep=2)
-  #options.update(temp)
+  if NCHAN>1 : 
+    start = 1
+    step = CHANNELIZE or NCHAN
+    temp = dict(nchan=NCHAN,img_nchan=(NCHAN-1)/step,chanstart=0,img_chanstart=1,chanstep=1,img_chanstep=step)
+  options.update(temp)
   imager.make_image(restore=restore,column=COLUMN,restore_lsm=False,**options)
 
 def make_psf(options={}):
@@ -50,11 +51,14 @@ def azishe(cfg='$CFG',make_image=True,psf='$MAKE_PSF'):
   #--------------------------------------------------------
   freq0 = eval(ms_opts['freq0'])
   nchan =  eval(ms_opts['nchan'])
-  #if nchan>1 : ms_opts['nchan'],shift = eval(ms_opts['nchan']) + 1,True
- # else: shift = False
-  makems(**ms_opts) # simulate empty MS
+  if nchan>1 : 
+   ms_opts['nchan'],shift = eval(ms_opts['nchan']) + 1,True
+   nchan +=1
+  else: shift = False
+  v.NCHAN = nchan
+  makems(shift=shift,**ms_opts) # simulate empty MS
   ms.CHANRANGE = 0,nchan-1,1
-  simulate(freq0=freq0)
+  #simulate(freq0=freq0)
   #imager.CHANNELIZE = 1
   restore = CLEAN
   if restore : 

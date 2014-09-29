@@ -89,6 +89,8 @@ STATQUALS = ()
 
 TDLCONF = 'tdlconf.profiles'
 CFG = 'meerkat_sims.cfg'
+CHANNELIZE = 0
+NCHAN = 1
 def readCFG(cfg='$CFG'):
   cfg_std = open(II(cfg))
   params = {}
@@ -124,6 +126,7 @@ def readCFG(cfg='$CFG'):
   if own_tdl:
     v.TDLCONF = params['tdlconf']
     v.TDLSEC = params['tdlsection']
+  v.CHANNELIZE = int(params['channelise'])
   return options
 
 _SEFD = {}
@@ -452,7 +455,7 @@ def get_mslist(filename):
 define("MAKEMS_REDO",False,"if False, makems will omit existing MSs");
 define("MAKEMS_OUT","MS","place MSs in this subdirectory");
 
-def makems (conf="MeerKAT64",writeAutoCorr=True,hours=8,dtime=60,dec=-40,ra='0:0:0',freq0=1400e6,nchan=1,dfreq=3.9e3,nband=1,label='',start_time=None,shift=False,start_freq=0.5):
+def makems (conf="MeerKAT64",writeAutoCorr=True,hours=8,dtime=60,dec=-40,ra='0:0:0',freq0=1400e6,nchan=1,dfreq=3.9e3,nband=1,label='',start_time=None,shift=False,start_freq=1.5):
   """Makes a MS given a Casa Table of itrf antenna positions 
   conf is e.g. SKA1REF or MeerKAT64 (antenna table $conf_ANTENNAS must exist)
   hours is total synthesis time, in hours
