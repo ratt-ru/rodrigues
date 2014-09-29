@@ -19,7 +19,7 @@ import std
 from Pyxis.ModSupport import *
 
 SIMSCRIPT = "turbo-sim.py"
-SIMJOB = "simulate"
+SIMJOB = "_tdl_job_1_simulate_MS"
 
 imager.npix = 512
 imager.cellsize = ".5arcsec"
@@ -88,18 +88,18 @@ STATSFILE_Template = "${OUTDIR>/}genstats.py"
 STATQUALS = ()
 
 TDLCONF = 'tdlconf.profiles'
-ADD_NOISE = False
-NOISE = None
-LSM = None
 CFG = 'meerkat_sims.cfg'
 def readCFG(cfg='$CFG'):
   cfg_std = open(II(cfg))
   params = {}
   for line in cfg_std.readlines():
-    if line!='\n' or line.startswith('#')!=False:
+    if not line.startswith('#'):
+       line = line.strip()
        key = line.split('=')[0]
-       val = line.split('=')[-1].split()[0]
-       params[key] = val
+       val = line.split('=')[-1]
+       if not line.endswith('='):
+         val = val.split(' ')[0]
+         params[key] = val
   options = dict(ms_={},cr_={},im_={},dc_={})
   for key in params.keys():
    found = False
@@ -112,12 +112,13 @@ def readCFG(cfg='$CFG'):
   if params['skytype'] == 'tiggerlsm': 
     v.LSM = params['skyname']
     v.TDLSEC = 'turbo-sim:own_lsm'
-  elif params['skytype'] == 'FITS' : v.FITS = params['skyname']
-  else : USING_SIAMESE = True
-  if params['add_noise'] == 'True' : NOISE = eval(params['vis_noise_std'])
-  v.MAKE_PSF = eval(params['make_psf_map'])
+  elif params['skytype'].upper() == 'FITS' : v.FITS = params['skyname']
+  else : v.USING_SIAMESE = True
+  if params['add_noise'] == 'True' : 
+    v.NOISE = None #eval(params['vis_noise_std'])
+  v.MAKE_PSF = eval(params['make_psf'])
   v.OUTPUT_TYPE = params['output']
-  v.COLUMN = params['column']
+  #v.COLUMN = params['column'].upper()
   v.CLEAN = eval(params['clean'])
   own_tdl = eval(params['upload_tdl'])
   if own_tdl:
@@ -299,6 +300,7 @@ def compute_psf_and_noise (make_psf=True,noise=0,noise_map=True,scale_noise=1.0,
       info(">>>   $weight: PSF FWHM $rx by $ry")
       _writestat("psf_fwhm",(rx,ry,(rx+ry)/2),*quals);
     if noise_map:
+     info(' >>> Making noise map')
      if add_noise:
       simnoise(rowchunk=rowchunk,scale_noise=scale_noise,noise=noise) 
      noiseimage = II('$OUTFILE-$weight-noise.fits')
@@ -331,7 +333,7 @@ def compute_psf_and_noise (make_psf=True,noise=0,noise_map=True,scale_noise=1.0,
       _writestat("sidelobes",rms,*quals);
   return noise
 
-def simnoise (noise=0,rowchunk=100000,skipnoise=False,addToCol=None,scale_noise=1.0):
+def simnoise (noise=0,rowchunk=100000,skipnoise=False,addToCol=None,scale_noise=1.0,column='MODEL_DATA'):
   conf = MS.split('_')[0]
   spwtab = ms.ms(subtable="SPECTRAL_WINDOW")
   freq0 = spwtab.getcol("CHAN_FREQ")[ms.SPWID,0]/1e6
@@ -347,8 +349,9 @@ def simnoise (noise=0,rowchunk=100000,skipnoise=False,addToCol=None,scale_noise=
     if addToCol: 
        data+=colData[row0:(row0+nr)]
        info(" $addToCol + noise --> CORRECTED_DATA (rows $row0 to %d)"%(row0+nr-1))
-    else : info("Adding noise to MODEL_DATA (rows $row0 to %d)"%(row0+nr-1))
-    tab.putcol("MODEL_DATA",data,row0,nr);
+       column = 'CORRECTED_DATA'
+    else : info("Adding noise to $column (rows $row0 to %d)"%(row0+nr-1))
+    tab.putcol(column,data,row0,nr);
   tab.close() 
 
 SKIPNOISE = False
@@ -419,16 +422,6 @@ def decompose_cube (image,freq0=1000,delta=1000):
     info("writing $out");
     ff.writeto(out,clobber=True);
   
-def cube2vis (image,freq0=1000,delta=1000,nchan=None,**kw):
-#  imager.LWIMAGER_PATH='lwimager'
-  decompose_cube(image,freq0,delta);
-  nchan = nchan or ms(MS,subtable="SPECTRAL_WINDOW").getcol("CHANNEL_WIDTH",0,1).size;
-  for i in range(nchan):
-    image = os.path.splitext(image)[0]+II("$i.fits");
-    ms.CHANRANGE = i;
-    # ms.CHANRANGE = i,i+1 if i<nchan-1 else i-1,i;
-    imager.predict_vis(image=image,channelize=1,copy=False,**kw);
-
 MSLIST_Template = '${OUTDIR>/}mslist.txt'
 DOALL = False
 def _addms(msname = "$MS"):
@@ -520,7 +513,7 @@ StepTime=$dtime
 NParts=1
 MSDesPath=.
 AntennaTableName=$anttab
-Declination=$dec.0.0
+Declination=${dec}.0.0
 NBands=$nband
 RightAscension=$ra
 StartTime=%s  # 19:00 is center
@@ -547,19 +540,17 @@ define("SCWEIGHTFOV","512arcsec","weight_fov for simcube");
 define("SCROBUST","","robustness parameter for simcube");
 define("SCTAPER",1,"taper for simcube, in arcsec. 0 for none");
 
-def simcube (cube,nchan=None,npix=4096,cellsize=".5arcsec",niter=100000,padding=1.5,threshold=".2mJy",predict=True,dirty=True,restore=False,noise=False,resume=False,label='cube',scale_noise=1.0,mixed=True,column='DATA',channelize=None):
-  v.LABEL = label
+def simcube (cube,nchan=None,npix=4096,cellsize=".5arcsec",niter=100000,padding=1.5,threshold=".2mJy",predict=True,dirty=False,restore=False,noise=0,resume=False,label=None,column='DATA',channelize=1,wprojplanes=0):
+  if label: v.LABEL = label
   tab = ms.ms(subtable='SPECTRAL_WINDOW')
   nchan = nchan or tab.getcol('NUM_CHAN')[0]
-#  nchan = nchan or pyfits.open(cube)[0].data.shape[0];
   ms.CHANRANGE = 0,nchan-1;
-  imager.wprojplanes = 0;
+  imager.wprojplanes = wprojplanes;
   imager.IMAGE_CHANNELIZE = 1;
   if predict:
-    imager.predict_vis(image=cube,channelize=1,padding=padding,copy=False,column=column);
-  if noise:
-    simnoise(addToCol='DATA',scale_noise=scale_noise,mixed=mixed)
-  imager.LWIMAGER_PATH = "lwimager" # ensure that the correct imager is used from this point onwards
+    imager.predict_vis(image=cube,padding=padding,copy=False,column=column);
+  if noise > 0:
+    simnoise(addToCol=column,noise=noise)
   if dirty:
    info('Weights are%s'%WEIGHTS)
    for weight in WEIGHTS.split(':'):
@@ -569,8 +560,6 @@ def simcube (cube,nchan=None,npix=4096,cellsize=".5arcsec",niter=100000,padding=
      model_image = II("${OUTFILE}-$weight.model.fits")
      residual_image = II("${OUTFILE}-$weight.residual.fits")
      restored_image = II("${OUTFILE}-$weight.restored.fits")
-     if channelize: channelize=1
-     else: opts.update(dict(nchan=nchan,chanstart=0,chanstep=1,img_nchan=1,img_chanstep=nchan,img_chanstart=0))
      imager.make_image(dirty=dirty,restore=restore,channelize=channelize,column=column if restore==False else "CORRECTED_DATA",dirty_image=dirty_image,model_image=model_image,residual_image=residual_image,restored_image=restored_image,**opts);
 
 def flag_stepped_timeslot (step=3):

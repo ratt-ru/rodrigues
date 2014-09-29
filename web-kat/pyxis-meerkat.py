@@ -2,22 +2,31 @@ MAKE_PSF = False
 mqt.MULTITHREAD = 8
 COLUMN = 'DATA'
 FITS = False
-CLEAN =True
+CLEAN = False
+LSM = None
+NOISE = None
 
 def simulate(lsmname='$LSM',tdlconf='$TDLCONF',section='$TDLSEC',freq0=1400e6,options={},**kw):
   """ Simulates visibilities into an MS """
   if LSM: 
     options['tiggerlsm.filename'] = LSM
   options['noise_stddev'] = NOISE or compute_vis_noise(sefd=get_sefd(freq0))
-  #options['ms_sel.output_column'] = COLUMN
+  options['ms_sel.output_column'] = COLUMN
+  if USING_SIAMESE : section = 'turbo-sim:default'
+  options['ms_sel.select_channels'] = 0
   mqt.msrun('turbo-sim.py',job='_tdl_job_1_simulate_MS',config=tdlconf,section=section,options=options)
 
 def image(msname='$MS',lsmname='$LSM',use_imager='LWIMAGER',restore=False,options={},**kw):
   """ Images MS"""
+  imager.cellsize = '1arcsec' 
   if restore : 
      #ms.copycol() # Copy content of DATA to CORRECTED_DATA if making clean map
      options['data'] = 'CORRECTED_DATA' # make sure to image corrected data
-  imager.make_image(restore=restore,restore_lsm=False,**options)
+#  ms.CHANRANGE = 0,9,1
+  imager.IMAGE_CHANNELIZE = 0
+  #temp = dict(nchan=5,img_nchan=5,chanstart=0,img_chanstart=0,chanstep=2,img_chanstep=2)
+  #options.update(temp)
+  imager.make_image(restore=restore,column=COLUMN,restore_lsm=False,**options)
 
 def make_psf(options={}):
   """ make PSF map"""
@@ -41,18 +50,19 @@ def azishe(cfg='$CFG',make_image=True,psf='$MAKE_PSF'):
   #--------------------------------------------------------
   freq0 = eval(ms_opts['freq0'])
   nchan =  eval(ms_opts['nchan'])
-  if nchan>1 : ms_opts['nchan'] = eval(ms_opts['nchan']) + 1
-  makems(shift=nchan>1,**ms_opts) # simulate empty MS
-  ms.CHANRANGE = 0,nchan,1
+  #if nchan>1 : ms_opts['nchan'],shift = eval(ms_opts['nchan']) + 1,True
+ # else: shift = False
+  makems(**ms_opts) # simulate empty MS
+  ms.CHANRANGE = 0,nchan-1,1
   simulate(freq0=freq0)
+  #imager.CHANNELIZE = 1
   restore = CLEAN
-  if restore : restore = clean_opts
-  if im_opts['img_chanstep'] == 'None' : im_opts['img_chanstep'] = ms_opts['nchan']
-  if clean_opts['operation'] != 'multiscale' : 
-    del clean_opts['nscales']
-    del clean_opts['usevector']
-  if nchan>1 : 
-    im_opts['chanstart'] = eval(im_opts['chanstart']) + 1
-    im_opts['img_chanstart'] = eval(im_opts['img_chanstart']) + 1
-  imager.weight = im_opts['weight']
+  if restore : 
+    restore = clean_opts
+    if clean_opts['operation'] != 'multiscale' : 
+      del clean_opts['nscales']
+      del clean_opts['usevector']
+  try : imager.weight = im_opts['weight']
+  except KeyError : imager.weight= 'uniform'
+  imager.wprojplanes = 128
   image(restore=restore,options=im_opts)

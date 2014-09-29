@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import numpy as np
 
-def make_sky(name, sources, phase_centre=[0,0], intensity_range=[0,1], emaj_range=[0,5], emin_range=[0,5],
-             pa_range=[0,360], ra_d_opts=[0,1], dec_d_opts=[0,1], only_point=False, only_gauss=False, num_point=0):
+def make_sky(name='sky_model_noname.txt', sources=10, phase_centre=[0,0], intensity_range=[0,1], emaj_range=[5,20], emin_range=[0,30],
+             pa_range=[0,360], ra_d_opts=[0,1], dec_d_opts=[0,1], only_point=False, only_gauss=False, num_point=0,to_tigger_lsm=False):
     """
     Create a .txt sky model.
 
@@ -24,8 +24,7 @@ def make_sky(name, sources, phase_centre=[0,0], intensity_range=[0,1], emaj_rang
     # Layout and formatting.
     parameters=["name","ra_d","ra_m","dec_d","dec_m","i","emaj_s","emin_s","pa_d"]
     formatting = "#format:" + "".join(" "+str(j) for j in parameters) + "\n"
-
-    model = open("{}.txt".format(name), "w")
+    model = open(name,'w')
     model.write(formatting)
 
     # Structure array.
@@ -84,6 +83,10 @@ def make_sky(name, sources, phase_centre=[0,0], intensity_range=[0,1], emaj_rang
     # Finish up and save.
     model.write(sky)
     model.close
+    if to_tigger_lsm: 
+      os.system('tigger-convert %s -f'%name)
+      name = name.replace('.txt','lsm.html')
+    return name
 
 if __name__=="__main__":
-    make_sky("sky_model_50", sources=50, phase_centre=[0,-30], num_point=38, ra_d_opts=[0,0.5], dec_d_opts=[0,0.5])
+    make_sky("sky_model_50", sources=100, phase_centre=[0,-30], num_point=60, ra_d_opts=[0,0.05], dec_d_opts=[0,0.05])
