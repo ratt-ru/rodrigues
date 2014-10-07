@@ -62,11 +62,17 @@ def simulate(conf='MeerKAT64',lsmfits='$LSMFITS',label=None,lsmcont='$LSMCONT',t
     else: restore = False
     ms.CHANRANGE = 0,nchan-1,1
     imager.IMAGE_CHANNELIZE = 1
-    imager.npix = 1024
-    imager.cellsize = '10arcsec'
-    imager.weight = 'natural'
+    imager.npix = 2048
+    imager.cellsize = '1arcsec'
+    imager.weight = 'uniform'
+    # options['weigh_fov'] = '
     imager.mode = 'channel'
     imager.make_image(dirty=True,restore=restore,column='CORRECTED_DATA',restore_lsm=False,**options)
+    # Run source finder[SoFiA]
+
+def reduce(pfct_cube=None,sim_cube=None,extract_srcs=True,flux=True,shape=True):
+  """ Runs source finder and generates some plots comparing input and simulated cube"""
+  
 
 SOFIA_CFG_Template = '${OUTFILE}sofia_conf.txt'
 SOFIA_PATH = '/home/makhathini/sofia/'
