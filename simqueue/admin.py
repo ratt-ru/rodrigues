@@ -1,3 +1,5 @@
 from django.contrib import admin
+from simqueue.models import Simulation
 
-# Register your models here.
+
+admin.site.register(Simulation)
