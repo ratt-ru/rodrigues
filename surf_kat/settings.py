@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'simqueue',
-
+    'djcelery',
     'debug_toolbar.apps.DebugToolbarConfig',
 )
 
@@ -50,6 +50,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
 
 ROOT_URLCONF = 'surf_kat.urls'
 
@@ -93,3 +94,8 @@ STATICFILES_DIRS = (
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
 )
+
+CELERY_ACCEPT_CONTENT = ['pickle', 'json']
+
+CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend'
+
