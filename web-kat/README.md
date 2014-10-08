@@ -1,4 +1,4 @@
-HIKAT Pipeline
+WEBKAT Pipeline
 =====
 
 Requires
