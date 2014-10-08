@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{%  block content %}
+
+<h2>MeerKAT Simulations</h2>
+
+
+<form method="post" action="">
+    <table>
+        {% csrf_token %}
+        {{ form }}
+    </table>
+    <input type="submit" value="Submit" />
+</form>
+
+
+
+{%  endblock %}
