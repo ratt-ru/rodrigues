@@ -28,7 +28,7 @@ def image(msname='$MS',lsmname='$LSM',use_imager='LWIMAGER',restore=False,option
     start = 1
     step = CHANNELIZE or NCHAN
     temp = dict(nchan=NCHAN,img_nchan=(NCHAN-1)/step,chanstart=0,img_chanstart=1,chanstep=1,img_chanstep=step)
-  options.update(temp)
+    options.update(temp)
   imager.make_image(restore=restore,column=COLUMN,restore_lsm=False,**options)
 
 def make_psf(options={}):
