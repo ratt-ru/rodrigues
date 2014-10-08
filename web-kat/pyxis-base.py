@@ -595,19 +595,38 @@ def fitsInfo(fits):
   freq0 = hdr['CRVAL%d'%freq_ind] + hdr['CRPIX%d'%freq_ind]*dfreq
   return (ra,dec),(freq0,dfreq,nchan),naxis
 
-def swap_stokes_freq(fitsname):
+def swap_stokes_freq(fitsname,freq2stokes=False):
   info('Checking STOKES and FREQ in FITS file, might need to swap these around.')
   hdu = pyfits.open(fitsname)[0]
   hdr = hdu.header
   data = hdu.data
   if hdr['NAXIS']<4: 
     warn('Editing fits file [$fitsname] to make it usable by the pipeline.')
+    isfreq = hdr['CTYPE3'].startswith('FREQ')
+    if not isfreq : abort('Fits header has frequency information')
     hdr.update('CTYPE4','STOKES')
     hdr.update('CDELT4',1)
     hdr.update('CRVAL4',1)
     hdr.update('CUNIT4','Jy/Pixel')
     data.resize(1,*data.shape)
-  if hdr["CTYPE3"].startswith("FREQ"):
+  if freq2stokes:
+    if hdr["CTYPE3"].startswith("FREQ") : return 0;
+    else:
+      hdr0 = hdr.copy()
+      hdr.update("CTYPE4",hdr0["CTYPE3"])
+      hdr.update("CRVAL4",hdr0["CRVAL3"])
+      hdr.update("CDELT4",hdr0["CDELT3"])
+      try :hdr.update("CUNIT4",hdr0["CUNIT3"])
+      except KeyError: hdr.update('CUNIT3','Hz    ')
+   #--------------------------
+      hdr.update("CTYPE3",hdr0["CTYPE4"])
+      hdr.update("CRVAL3",hdr0["CRVAL4"])
+      hdr.update("CDELT3",hdr0["CDELT4"])
+      try :hdr.update("CUNIT3",hdr0["CUNIT4"])
+      except KeyError: hdr.update('CUNIT4','Jy/Pixel    ')
+      warn('Swapping FREQ and STOKES axes in the fits header [$fitsname]. This is a SoFiA work arround.')
+      pyfits.writeto(fitsname,np.rollaxis(data,1),hdr,clobber=True)
+  elif hdr["CTYPE3"].startswith("FREQ"):
     hdr0 = hdr.copy()
     hdr.update("CTYPE3",hdr0["CTYPE4"])
     hdr.update("CRVAL3",hdr0["CRVAL4"])
@@ -632,3 +651,66 @@ def deg2hms(deg):
   mins = mins_tmp - mins_tmp%1
   secs = (mins_tmp - mins)*60
   return '%d:%d:%.2f'%(hrs,mins,secs)
+
+_SOFIA_DEFAULTS = {'steps': {'doFlag' : 'false',\
+'doSmooth' : 'flase',\
+'doScaleNoise' : 'false',\
+'doSCfind' : 'true',\
+'doThreshold' : 'false',\
+'doWavelet' : 'false',\
+'doCNHI' : 'false',\
+'doMerge' : 'true',\
+'doReliability' : 'true',\
+'doParameterise' : 'true',\
+'doWriteMask' : 'true',\
+'doWriteCat' : 'true',\
+'doMom0' : 'false',\
+'doMom1' : 'false',\
+'doCubelets' : 'false',\
+'doDebug' : 'false'},\
+'import': {'inFile' : '',\
+'weightsFile' : '',\
+'maskFile' : '',\
+'weightsFunction' : '',\
+'subcube' : [],\
+'subcubeMode' : 'wcs'},\
+'flag': {'regions' : []},\
+'smooth': {'kernel' : 'gaussian',\
+'edgeMode' : 'constant',\
+'kernelX' : 3.0,\
+'kernelY' : 3.0,\
+'kernelZ' : 3.0},\
+'scaleNoise': {'statistic' : 'mad',\
+'edgeX' : 0,\
+'edgeY' : 0,\
+'edgeZ' : 0},\
+'SCfind': {'threshold' : 4.0,\
+'sizeFilter' : 0.0,\
+'maskScaleXY' : 2.0,\
+'maskScaleZ' : 2.0,\
+'edgeMode' : 'constant',\
+'rmsMode' : 'negative',\
+'kernels' : [[ 0, 0, 0,'b'],[ 0, 0, 2,'b'],[ 0, 0, 4,'b'],[ 0, 0, 8,'b'],[ 0, 0,16,'b'],[ 3, 3, 0,'b'],[ 3, 3, 2,'b'],[ 3, 3, 4,'b'],[ 3, 3, 8,'b'],[ 3, 3,16,'b'],[ 6, 6, 0,'b'],[ 6, 6, 2,'b'],[ 6, 6, 4,'b'],[ 6, 6, 8,'b'],[ 6, 6,16,'b'],[ 9, 9, 0,'b'],[ 9, 9, 2,'b'],[ 9, 9, 4,'b'],[ 9, 9, 8,'b'],[ 9, 9,16,'b']],\
+'kernelUnit' : 'pixel',\
+'verbose':'true'},\
+'threshold': {'threshold' : 4.0,\
+'clipMethod' : 'relative',\
+'rmsMode' : 'std',\
+'verbose' : 'false'}, \
+'merge': {'mergeX' : 3,\
+'mergeY' : 3,\
+'mergeZ': 3,\
+'minSizeX' : 3,\
+'minSizeY' : 3,\
+'minSizeZ' : 2}, \
+'reliability': {'parSpace' : ['ftot','fmax','nrvox'],\
+'kernel' : [0.15,0.05,0.1],\
+'fMin' : 0.0,\
+'relThresh' : 0.9},\
+'parameters': {'fitBusyFunction': 'false', 'optimiseMask':'false'}, \
+'writeCat': {'basename' : '',\
+'writeASCII' : 'true',\
+'writeXML' : 'false',\
+'writeSQL' : 'false',\
+'parameters' : ['*']}}
+
