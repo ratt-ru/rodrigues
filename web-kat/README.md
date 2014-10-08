@@ -5,7 +5,7 @@ Requires
 -----
 A telescope antenna table [CASA Table; MeerKAT antenna table comes with the repo]
 An input fits file [find one at aretha:/home/makhathini/ska-sa/ceiling-kat/hi-kat/eds_skies/LADUMA_combined_0.02_0.04.fits]
-A configuration file for the simulation [an example file is provided as part of the repo; meerkat_sims.cg]
+A configuration file for the simulation [an example file is provided as part of the repo; webkat_default.cg]
 
 Note
 -----
