@@ -1,6 +1,6 @@
 from django.db.models import Model, CharField, FileField, BooleanField,\
-    FloatField, IntegerField, OneToOneField
-from djcelery.models import TaskState
+    FloatField, IntegerField, DateTimeField, TextField
+
 
 
 class Simulation(Model):
@@ -133,7 +133,10 @@ class Simulation(Model):
         (FINISHED, 'finished'),
     )
     state = CharField(choices=STATE_TYPES, max_length=1, default=SCHEDULED)
-    duration = FloatField(default=0)
+    started = DateTimeField(blank=True, null=True)
+    finished = DateTimeField(blank=True, null=True)
+    log = TextField(blank=True, null=True)
+
 
     def __str__(self):
         return self.name

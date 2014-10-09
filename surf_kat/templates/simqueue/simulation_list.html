@@ -17,7 +17,7 @@
         <tr>
             <td><a href="{%  url 'detail' simulation.id %}">{{ simulation.id }}</a></td>
             <td>{{ simulation.name }}</td>
-            <td><span class="label label-{{ simulation.get_state_display|status_label  }}">{{ simulation.get_state_display }}</span></td>
+            <td><a href="{%  url 'detail' simulation.id %}"><span class="label label-{{ simulation.get_state_display|status_label  }}">{{ simulation.get_state_display }}</span></a></span></td>
         </tr>
     {% endfor %}
 </table>

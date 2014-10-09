@@ -54,8 +54,10 @@ class Migration(migrations.Migration):
                 ('num_scales', models.FloatField(default=1)),
                 ('num_clean_iter', models.IntegerField(default=1, help_text=b'number of clean iterations')),
                 ('clean_threshold', models.FloatField(default=1, help_text=b'in mJy')),
-                ('state', models.CharField(default=b'S', max_length=1, choices=[(b'S', b'scheduled'), (b'T', b'stopped'), (b'A', b'aborted'), (b'C', b'crashed'), (b'F', b'finished')])),
-                ('duration', models.FloatField(default=0)),
+                ('state', models.CharField(default=b'S', max_length=1, choices=[(b'S', b'scheduled'), (b'R', b'running'), (b'T', b'stopped'), (b'A', b'aborted'), (b'C', b'crashed'), (b'F', b'finished')])),
+                ('started', models.DateTimeField(null=True, blank=True)),
+                ('finished', models.DateTimeField(null=True, blank=True)),
+                ('log', models.TextField(null=True, blank=True)),
             ],
             options={
             },
