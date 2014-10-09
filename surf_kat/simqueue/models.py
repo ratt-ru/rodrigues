@@ -1,5 +1,6 @@
 from django.db.models import Model, CharField, FileField, BooleanField,\
-    FloatField, IntegerField
+    FloatField, IntegerField, OneToOneField
+from djcelery.models import TaskState
 
 
 class Simulation(Model):
@@ -107,13 +108,32 @@ class Simulation(Model):
 
     # deconvolution settings
     cleaning = BooleanField(default=True)
-    Deconv_alg = CharField(choices=DECONV_TYPES, max_length=1, default='c')
+    Deconv_alg = CharField(choices=DECONV_TYPES, max_length=1, default='C')
     clean_scales = FloatField(default=1)
     num_scales = FloatField(default=1)
     num_clean_iter = IntegerField(help_text='number of clean iterations',
                                   default=1)
     clean_threshold = FloatField(help_text='in mJy',
                                  default=1)
+
+    # status of the task
+    SCHEDULED = 'S'
+    RUNNING = 'R'
+    STOPPED = 'T'
+    ABORTED = 'A'
+    CRASHED = 'C'
+    FINISHED = 'F'
+
+    STATE_TYPES = (
+        (SCHEDULED, 'scheduled'),
+        (RUNNING, 'running'),
+        (STOPPED, 'stopped'),
+        (ABORTED, 'aborted'),
+        (CRASHED, 'crashed'),
+        (FINISHED, 'finished'),
+    )
+    state = CharField(choices=STATE_TYPES, max_length=1, default=SCHEDULED)
+    duration = FloatField(default=0)
 
     def __str__(self):
         return self.name

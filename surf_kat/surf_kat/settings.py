@@ -36,8 +36,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'simqueue',
     'djcelery',
+    'simqueue',
     'debug_toolbar.apps.DebugToolbarConfig',
 )
 
@@ -98,4 +98,14 @@ TEMPLATE_DIRS = (
 CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 
 CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend'
+#CELERY_RESULT_BACKEND="database"
 
+
+import djcelery
+djcelery.setup_loader()
+
+
+ALLOWED_HOSTS = ['127.0.0.1']
+
+
+LOGIN_REDIRECT_URL = '/'

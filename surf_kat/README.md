@@ -1,7 +1,21 @@
 Django based simulation schedular
----------------------------------
+=================================
 
-https://github.com/ska-sa/ceiling-kat
+Installation
+------------
+
+install python libraries:
+
+    $ pip install -r requirements
+
+install:
+
+ * rabbitmq
 
 
-![Image](https://raw.github.com/ska-sa/surf_kat/master/static/surfkat2.jpg)
+run all in seperate terminals:
+
+ $ make syncdb
+ $ make amqp
+ $ make worker
+ $ make django

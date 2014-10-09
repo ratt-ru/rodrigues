@@ -12,3 +12,7 @@ amqp:
 
 django:
 	./manage.py runserver
+
+syncdb:
+    ./manage.py syncdb
+
