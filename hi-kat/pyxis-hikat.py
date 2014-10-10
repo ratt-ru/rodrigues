@@ -77,7 +77,7 @@ def reduce(pfct_cube=None,sim_cube=None,extract_srcs=True,flux=True,shape=True):
 SOFIA_CFG_Template = '${OUTFILE}sofia_conf.txt'
 SOFIA_PATH = '/home/makhathini/sofia/'
 
-def sofia_search(fitsname,sofia_conf=None,threshold=4,do_reliability=True,reliability=0.9,merge=3,options={}):
+def sofia_search(fitsname='${imager.RESTORED_IMAGE}',sofia_conf=None,threshold=4,do_reliability=True,reliability=0.9,merge=3,options={}):
   """ Runs SoFiA source finding pipeline. Only a few options are provided here. 
       For more eleborate settings add options (as you would in a SoFiA configuarion file) 
       via the [options] dictionary or provide a SoFiA configuration file via [sofia_conf]
@@ -90,7 +90,9 @@ def sofia_search(fitsname,sofia_conf=None,threshold=4,do_reliability=True,reliab
      merge : merge 
      options : extra options which will directly to sofia configuration file.
   """
-  if not os.path.exists(II(DESTDIR)): x.sh('mkdir -p DESTDIR')
+  fitsname = interpolate_locals('fitsname')
+  swap_stokes_freq(fitsname,freq2stokes=True)
+  if not os.path.exists(II(DESTDIR)): x.sh('mkdir -p $DESTDIR')
   if not sofia_conf:
     sofia_conf = II(SOFIA_CFG)
     #abort('>>>> $sofia_conf')
