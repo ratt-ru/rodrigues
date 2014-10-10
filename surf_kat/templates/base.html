@@ -1,0 +1,49 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <title>{%  block title %}Ceiling cat - watching you simulate{% endblock %}</title>
+</head>
+<body>
+
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Ceiling-KAT</a>
+        <ul class="nav navbar-nav">
+            <li><a href="{%  url 'list' %}">List</a></li>
+            <li><a href="{% url 'create' %}">Create</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            {% if user.is_authenticated %}
+                <li><a href="#">logged in as {{ user.username }}</a></li>
+                <li><a href="{% url 'logout' %}">Log out</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Log in</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    {% for message in messages %}
+        <div class="alert alert-success" role="alert">
+            <strong>{{ message.tags }}:</strong> {{ message }}
+        </div>
+    {% endfor %}
+
+
+    {%  block content %}Developer, you block overwrite content block{% endblock %}
+    <hr>
+    <div class="row text-center">
+        <img src="{% static "ceiling_small.png" %}" alt="surf kat"/>
+    </div>
+    </container>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+</body>
+</html>

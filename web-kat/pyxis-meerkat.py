@@ -1,3 +1,4 @@
+import ms,mqt,lsm,imager
 MAKE_PSF = False
 mqt.MULTITHREAD = 8
 COLUMN = 'DATA'
@@ -6,15 +7,16 @@ CLEAN = False
 LSM = None
 NOISE = None
 
-def simulate(lsmname='$LSM',tdlconf='$TDLCONF',section='$TDLSEC',freq0=1400e6,options={},**kw):
+def simulate(msname='$MS',lsmname='$LSM',tdlconf='$TDLCONF',section='$TDLSEC',freq0=1400e6,options={},**kw):
   """ Simulates visibilities into an MS """
+  v.MS,v.LSM = interpolate_locals('msname lsmname')
   if LSM: 
     options['tiggerlsm.filename'] = LSM
   options['noise_stddev'] = NOISE or compute_vis_noise(sefd=get_sefd(freq0))
   options['ms_sel.output_column'] = COLUMN
   if USING_SIAMESE : section = 'turbo-sim:default'
   options['ms_sel.select_channels'] = 0
-  mqt.msrun('turbo-sim.py',job='_tdl_job_1_simulate_MS',config=tdlconf,section=section,options=options)
+  mqt.run('turbo-sim.py',job='_tdl_job_1_simulate_MS',config=tdlconf,section=section,options=options)
 
 def image(msname='$MS',lsmname='$LSM',use_imager='LWIMAGER',restore=False,options={},**kw):
   """ Images MS"""
@@ -26,7 +28,7 @@ def image(msname='$MS',lsmname='$LSM',use_imager='LWIMAGER',restore=False,option
     start = 1
     step = CHANNELIZE or NCHAN
     temp = dict(nchan=NCHAN,img_nchan=(NCHAN-1)/step,chanstart=0,img_chanstart=1,chanstep=1,img_chanstep=step)
-  options.update(temp)
+    options.update(temp)
   imager.make_image(restore=restore,column=COLUMN,restore_lsm=False,**options)
 
 def make_psf(options={}):

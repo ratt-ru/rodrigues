@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{%  block content %}
+
+<h1>Details for simulation {{ simulation.id }}</h1>
+
+<ul>
+    <li><b>ID:</b> {{ simulation.id }}</li>
+    <li><b>name:</b> {{ simulation.name }}</li>
+    <li><b>log:</b> <div class="well" style="font-family:monospace;">{{ simulation.log|linebreaksbr }}</div></li>
+</ul>
+
+
+{%  endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{%  block content %}
+
+<h1>Create new simulation</h1>
+
+<form method="post" action="">
+    <table>
+        {% csrf_token %}
+        {{ form }}
+    </table>
+    <input type="submit" value="Submit" />
+</form>
+
+{%  endblock %}
