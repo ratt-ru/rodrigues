@@ -4,18 +4,9 @@ Django based simulation schedular
 Installation
 ------------
 
-install python libraries:
+Install fig & docker
 
-    $ pip install -r requirements
+run:
+  $ fig up
+  $ fig run web python manage.py syncdb
 
-install:
-
- * rabbitmq
-
-
-run all in seperate terminals:
-
- $ make syncdb
- $ make amqp
- $ make worker
- $ make django

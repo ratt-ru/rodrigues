@@ -1,0 +1,30 @@
+db:
+  image: postgres
+broker:
+  image: dockerfile/rabbitmq
+  ports:
+    - "5672:5672"
+    - "15672:15672"
+worker:
+ build: .
+ command: celery worker -A surf_kat
+ links:
+   - broker
+   - db
+ environment:
+   - DJANGO_SETTINGS_MODULE=surf_kat.settings.production
+   - C_FORCE_ROOT=true
+   - SECRET_KEY="doens't matter"
+web:
+  build: .
+  command: python /code/manage.py runserver 0.0.0.0:8000
+  ports:
+    - "8000:8000"
+  links:
+    - db
+    - broker
+  environment:
+    - DJANGO_SETTINGS_MODULE=surf_kat.settings.production
+    - SECRET_KEY="please change me"
+
+

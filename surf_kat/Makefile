@@ -1,5 +1,7 @@
 #!make
 
+export DJANGO_SETTINGS_MODULE=surf_kat.settings.development
+
 .PHONY: all worker
 
 all: worker
@@ -14,5 +16,5 @@ django:
 	./manage.py runserver
 
 syncdb:
-    ./manage.py syncdb
+	./manage.py --settings=surf_kat.settings.development syncdb
 
