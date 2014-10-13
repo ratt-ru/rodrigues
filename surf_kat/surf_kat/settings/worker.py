@@ -17,3 +17,6 @@ DATABASES = {
 }
 
 BROKER_URL = 'amqp://broker_1/'
+
+
+DOCKER_URI = 'unix://var/run/docker.sock'

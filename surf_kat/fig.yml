@@ -15,6 +15,9 @@ worker:
    - DJANGO_SETTINGS_MODULE=surf_kat.settings.worker
    - C_FORCE_ROOT=true
    - SECRET_KEY="doens't matter"
+ volumes:
+  - /var/run:/var/run
+  - /var/lib/docker:/var/lib/docker
 web:
   build: .
   command: python /code/manage.py runserver 0.0.0.0:8000

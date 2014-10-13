@@ -23,3 +23,5 @@ DATABASES = {
 BROKER_URL = 'amqp://broker_1/'
 ALLOWED_HOSTS = ['127.0.0.1']
 
+DOCKER_URI = 'unix://var/run/docker.sock'
+

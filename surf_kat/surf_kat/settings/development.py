@@ -20,3 +20,5 @@ BROKER_URL = 'amqp://'
 
 ALLOWED_HOSTS = ['127.0.0.1']
 
+
+DOCKER_URI = 'tcp://192.168.59.103:2375'

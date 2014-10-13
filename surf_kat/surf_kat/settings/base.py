@@ -69,5 +69,5 @@ LOGIN_REDIRECT_URL = '/'
 
 DOCKER_IMAGE = 'gijzelaerr/ceiling-kat'
 DOCKER_CMD = 'sh -c "cd /opt/ceiling-kat/web-kat && pyxis CFG=webkat_default.cfg azishe OUTDIR=/results"'
-DOCKER_URI = 'tcp://192.168.59.103:2375'
+
 
