@@ -39,7 +39,7 @@ def run_docker():
 def simulate(simulation_id):
     simulation = Simulation.objects.get(pk=simulation_id)
     simulation.state = simulation.RUNNING
-    simulation.started = datetime.now(timezone(settings.TIMEZONE))
+    simulation.started = datetime.now(timezone(settings.TIME_ZONE))
     simulation.save()
     logger.info('starting simulation %s' % simulation_id)
 
@@ -51,5 +51,5 @@ def simulate(simulation_id):
         simulation.state = simulation.FINISHED
 
     simulation.log = results.logs
-    simulation.finished = datetime.now(timezone(settings.TIMEZONE))
+    simulation.finished = datetime.now(timezone(settings.TIME_ZONE))
     simulation.save()
