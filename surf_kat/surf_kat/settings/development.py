@@ -1,6 +1,9 @@
-from base import *
+"""
+development settings
+"""
+from .base import *
 
-SECRET_KEY="something stupid"
+SECRET_KEY = "something stupid"
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

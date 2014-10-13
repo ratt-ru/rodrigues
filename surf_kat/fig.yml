@@ -7,12 +7,12 @@ broker:
     - "15672:15672"
 worker:
  build: .
- command: celery worker -A surf_kat
+ command: celery worker -A surf_kat -l INFO
  links:
    - broker
    - db
  environment:
-   - DJANGO_SETTINGS_MODULE=surf_kat.settings.production
+   - DJANGO_SETTINGS_MODULE=surf_kat.settings.worker
    - C_FORCE_ROOT=true
    - SECRET_KEY="doens't matter"
 web:
@@ -24,7 +24,7 @@ web:
     - db
     - broker
   environment:
-    - DJANGO_SETTINGS_MODULE=surf_kat.settings.production
+    - DJANGO_SETTINGS_MODULE=surf_kat.settings.container
     - SECRET_KEY="please change me"
 
 

@@ -3,3 +3,4 @@ celery>=3.1,<=3.2
 docker-py
 psycopg2
 django-debug-toolbar
+pytz

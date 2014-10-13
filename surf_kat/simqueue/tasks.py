@@ -1,11 +1,16 @@
 import logging
+from datetime import datetime
 from celery import shared_task
+from collections import namedtuple
+
+from pytz import timezone
 import docker
 from docker.errors import DockerException
-from datetime import datetime
 from django.conf import settings
+
 from simqueue.models import Simulation
-from collections import namedtuple
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -34,7 +39,7 @@ def run_docker():
 def simulate(simulation_id):
     simulation = Simulation.objects.get(pk=simulation_id)
     simulation.state = simulation.RUNNING
-    simulation.started = datetime.now()
+    simulation.started = datetime.now(timezone(settings.TIMEZONE))
     simulation.save()
     logger.info('starting simulation %s' % simulation_id)
 
@@ -46,5 +51,5 @@ def simulate(simulation_id):
         simulation.state = simulation.FINISHED
 
     simulation.log = results.logs
-    simulation.finished = datetime.now()
+    simulation.finished = datetime.now(timezone(settings.TIMEZONE))
     simulation.save()

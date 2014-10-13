@@ -1,4 +1,8 @@
-from base import *
+"""
+specific config for inside container
+"""
+
+from .base import *
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 

@@ -40,7 +40,7 @@ WSGI_APPLICATION = 'surf_kat.wsgi.application'
 LANGUAGE_CODE = 'en-us'
 
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Johannesburg'
 
 
 USE_I18N = True
