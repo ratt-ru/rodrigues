@@ -12,22 +12,29 @@ worker:
    - broker
    - db
  environment:
-   - DJANGO_SETTINGS_MODULE=surf_kat.settings.worker
+   - DJANGO_SETTINGS_MODULE=surf_kat.settings.container
    - C_FORCE_ROOT=true
    - SECRET_KEY="doens't matter"
  volumes:
   - /var/run:/var/run
   - /var/lib/docker:/var/lib/docker
-web:
+django:
   build: .
-  command: python /code/manage.py runserver 0.0.0.0:8000
-  ports:
-    - "8000:8000"
+  command: uwsgi --socket surf_kat.sock --module surf_kat.wsgi --chmod-socket=666
   links:
     - db
     - broker
   environment:
     - DJANGO_SETTINGS_MODULE=surf_kat.settings.container
     - SECRET_KEY="please change me"
-
+    - HOSTNAME="192.168.59.103"
+    - DEBUG=false
+  volumes:
+    - /code
+nginx:
+  build: nginx
+  volumes_from:
+    - django
+  ports:
+    - 80:80
 

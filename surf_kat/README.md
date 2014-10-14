@@ -6,7 +6,9 @@ Installation
 
 Install fig & docker
 
-run:
+open fig.yml and under django, environment set SECRET_KEY & HOSTNAME.
+
+and then run:
   $ fig up
-  $ fig run web python manage.py syncdb
+  $ fig run django python manage.py syncdb
 

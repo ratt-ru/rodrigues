@@ -6,9 +6,12 @@ from .base import *
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+DEBUG = False
 
+if os.environ.get('DEBUG', 'false').lower() == 'true':
+    DEBUG = True
+
+TEMPLATE_DEBUG = DEBUG
 
 DATABASES = {
     'default': {
@@ -21,7 +24,9 @@ DATABASES = {
 }
 
 BROKER_URL = 'amqp://broker_1/'
-ALLOWED_HOSTS = ['127.0.0.1']
+
+#ALLOWED_HOSTS = ['127.0.0.1', os.environ.get('HOSTNAME', '')]
+ALLOWED_HOSTS = ['*']
 
 DOCKER_URI = 'unix://var/run/docker.sock'
 

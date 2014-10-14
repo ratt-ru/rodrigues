@@ -18,3 +18,11 @@ django:
 syncdb:
 	./manage.py --settings=surf_kat.settings.development syncdb
 
+fig:
+	fig up
+
+fig_syncdb:
+	fig run django ./manage.py syncdb
+
+fig_restart:
+	fig stop && fig rm --force && fig build && fig up -d

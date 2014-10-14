@@ -54,6 +54,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = ( os.path.join(BASE_DIR, "static"),)
+STATIC_ROOT = os.path.join(BASE_DIR, "static_serve")
 
 
 TEMPLATE_DIRS = (
@@ -69,5 +70,4 @@ LOGIN_REDIRECT_URL = '/'
 
 DOCKER_IMAGE = 'gijzelaerr/ceiling-kat'
 DOCKER_CMD = 'sh -c "cd /opt/ceiling-kat/web-kat && pyxis CFG=webkat_default.cfg azishe OUTDIR=/results"'
-
 
