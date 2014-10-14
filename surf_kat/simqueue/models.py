@@ -137,6 +137,11 @@ class Simulation(Model):
     finished = DateTimeField(blank=True, null=True)
     log = TextField(blank=True, null=True)
 
-
     def __str__(self):
         return self.name
+
+    def config(self):
+        result = []
+        for field in self._meta.get_all_field_names():
+            result.append("%s=%s\n" % (field, getattr(self, field)))
+        return "".join(result)

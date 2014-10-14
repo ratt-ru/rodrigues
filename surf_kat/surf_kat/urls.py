@@ -11,6 +11,7 @@ create = url(r'^create/', SimulationCreate.as_view(), name='create')
 login = url(r'^accounts/login/$', login_view, name='login')
 logout = url(r'^accounts/logout/$', logout_view, name='logout')
 
+
 all_ = (admin, list_, create, detail, login, logout)
 
 urlpatterns = patterns('', *all_)

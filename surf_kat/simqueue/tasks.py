@@ -2,6 +2,8 @@ import logging
 from datetime import datetime
 from celery import shared_task
 from collections import namedtuple
+import tempfile
+from os import path
 
 from pytz import timezone
 import docker
@@ -17,12 +19,20 @@ logger = logging.getLogger(__name__)
 docker_status = namedtuple('DockerStatus', ['status', 'logs'])
 
 
-def run_docker():
+def run_docker(config):
     try:
+        tempdir = tempfile.mkdtemp()
         docker_client = docker.Client(settings.DOCKER_URI)
         container_id = docker_client.create_container(settings.DOCKER_IMAGE,
-                                                      settings.DOCKER_CMD)
-        docker_client.start(container_id)
+                                                      settings.DOCKER_CMD,
+                                                      volumes=['/results']
+                                                      )
+        docker_client.start(container_id, binds={tempdir: {'bind': '/results',
+                                                           'ro': False}})
+
+        config_file = open(path.join(tempdir, 'sims.cfg'), 'w')
+        config_file.write(config)
+        config_file.close()
 
         if docker_client.wait(container_id):
             logger.warning('simulation crashed')
@@ -43,7 +53,8 @@ def simulate(simulation_id):
     simulation.save()
     logger.info('starting simulation %s' % simulation_id)
 
-    results = run_docker()
+    config = simulation.config()
+    results = run_docker(config)
 
     if results.status:
         simulation.state = simulation.CRASHED
