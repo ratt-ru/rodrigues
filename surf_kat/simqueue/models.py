@@ -2,7 +2,6 @@ from django.db.models import Model, CharField, FileField, BooleanField,\
     FloatField, IntegerField, DateTimeField, TextField
 
 
-
 class Simulation(Model):
     SKY_TYPES = (
         ('T', 'Tigger LSM'),
@@ -145,3 +144,46 @@ class Simulation(Model):
         for field in self._meta.get_all_field_names():
             result.append("%s=%s\n" % (field, getattr(self, field)))
         return "".join(result)
+
+
+"""
+fields from PHP file:
+
+      <td><input type="text" name="username"></td>
+      <td><input type="e-mail" name="e-mail"></td>
+      <td><input type="file" name="skyname"></td>
+      <td><input type="file" name="tdlconf"></td>
+      <td><input type="text" name="tdlsection"></td>
+        <input type="number" name="vis_noise_std">
+      <td><input type="number" name="ms_hours"></td>
+      <td><input type="number" name="ms_dtime"></td>
+      <td><input type="text" name="ms_freq0">Hz</td>
+      <td><input type="text" name="ms_dfreq">Hz</td>
+      <td><input type="number" name="ms_nchan"></td>
+      <td><input type="number" name="ms_nband"></td>
+      <td><input type="number" name="ms_dec"></td>
+      <td><input type="number" name="ms_ra"></td>
+      <td><input type="text" name="ds_amp_phase_gains"></td>
+      <td><input type="text" name="ds_feed_angle"></td>
+      <td><input type="text" name="cr_amp_phase_gains"></td>
+      <td><input type="text" name="cr_pointing_error"></td>
+      <td><input type="text" name="cr_rfi"></td>
+      <td><input type="number" name="im_npix"></td>
+      <td><input type="number" name="im_pixel">arcseconds</td>
+      <td><input type="number" name="im_weight_fov">arcminutes</td>
+      <td><input type="text" name="im_taper"></td>
+      <td><input type="number" name="im_wprojplanes"></td>
+      <td><input type="number" name="im_spwid"></td>
+        <input name="im_nchan" type="number">
+      <td><input type="number" name="im_chanstart"></td>
+      <td><input type="number" name="im_chanstep"></td>
+      <td><input type="number" name="im_img_nchan"></td>
+      <td><input type="number" name="im_img_chanstart"></td>
+      <td><input type="number" name="im_img_chanstep"></td>
+      <td><input type="text" name="im_stokes"></td>
+      <td><input type="text" name="dc_usevector"></td>
+      <td><input type="number" name="dc_nscales"></td>
+      <td><input type="number" name="dc_niter"></td>
+      <td><input type="text" name="dc_threshold"></td>
+    <tr align="center"><td><input type="submit" name="submit"></td></tr>
+"""

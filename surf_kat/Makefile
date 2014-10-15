@@ -1,10 +1,15 @@
 #!make
 
+INSTANCE_NAME=ceiling-kat
+ZONE=europe-west1-a
+IMAGE=container-vm-v20140929
+MACHINE_TYPE=f1-micro
+
 export DJANGO_SETTINGS_MODULE=surf_kat.settings.development
 
-.PHONY: all worker
+.PHONY: all worker amqp django syncdb fig fig_syncdb fig_restart vm_create vm_delete vm_ssh vm_ip
 
-all: worker
+all:
 
 worker:
 	celery -A surf_kat worker -l info
@@ -16,7 +21,7 @@ django:
 	./manage.py runserver
 
 syncdb:
-	./manage.py --settings=surf_kat.settings.development syncdb
+	./manage.py syncdb
 
 fig:
 	fig up
@@ -26,3 +31,19 @@ fig_syncdb:
 
 fig_restart:
 	fig stop && fig rm --force && fig build && fig up -d
+
+vm_create:
+	gcloud compute instances create $(INSTANCE_NAME) \
+		--image ${IMAGE} \
+		--image-project google-containers \
+		--zone $(ZONE) \
+		--machine-type ${MACHINE_TYPE}
+
+vm_delete:
+	gcloud compute instances delete --zone $(ZONE) $(INSTANCE_NAME)
+
+vm_ssh:
+	gcloud compute ssh --zone $(ZONE) $(INSTANCE_NAME)
+
+vm_ip:
+	@gcloud compute instances describe ceiling-kat --zone europe-west1-a | grep natIP | awk '{ print $$2 }'
