@@ -15,14 +15,15 @@ install fig:
 checkout the git repo:
 
     * $ git clone https://github.com/ska-sa/ceiling-kat
-    * $ cd ceiling-kat/surf\_kat
+    * $ cd ceiling-kat/surf_kat
 
 open fig.yml and under django, environment set:
 
-    * SECRET\_KEY
+    * SECRET_KEY
     * HOSTNAME
 
 and then run:
+
     * $ fig up
     * $ fig run django python django-manage syncdb
 
