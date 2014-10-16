@@ -24,10 +24,20 @@ open fig.yml and under django, environment set:
 
 and then run:
 
-    $ fig up
-    $ fig run django python django-manage syncdb
+    $ fig up -d
+    $ fig run django python ./manage.py syncdb   # this will populate the database with empty tables
 
 And answer the questions. Yes, you want to create a superuser.
 
 This will start a webserver on port 80.
 
+
+Updating a deployed surf_kat
+----------------------------
+
+in the surf_kat folder run:
+
+    $ git pull
+    $ fig stop
+    $ fig up -d
+    $ fig run django python ./manage.py syncdb    # this will update the running database
