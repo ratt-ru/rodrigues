@@ -55,7 +55,7 @@ You need:
 
 Now to install the requirered libraries run inside the surf_kat folder:
 
-   $ pip3 install -r requirements.txt
+    $ pip3 install -r requirements.txt
    
 Now you are ready to start the pipeline. To start the django server you first need to populate the database:
 
