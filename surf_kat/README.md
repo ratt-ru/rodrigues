@@ -63,10 +63,10 @@ Now you are ready to start the pipeline. To start the django server you first ne
    
 Now you can run a development webserver using:
 
-   $ DJANGO_SETTINGS_MODULE=surf_kat.settings.development ./manage.py runserver
+    $ DJANGO_SETTINGS_MODULE=surf_kat.settings.development ./manage.py runserver
    
 To run the scheduled simulations you need to run a broker and celery worker:
 
-   $ make broker &
-   $ make worker $
+    $ make broker &
+    $ make worker &
    
