@@ -7,6 +7,7 @@ from os import path
 
 from pytz import timezone
 import docker
+from requests.exceptions import RequestException
 from docker.errors import DockerException
 from django.conf import settings
 
@@ -40,8 +41,9 @@ def run_docker(config):
         else:
             logger.info('simulate finished')
             status = False
-        return docker_status(status=status, logs=docker_client.logs(container_id))
-    except DockerException as e:
+        return docker_status(status=status,
+                             logs=docker_client.logs(container_id))
+    except (DockerException, RequestException) as e:
         return docker_status(status=1, logs=str(e))
 
 
