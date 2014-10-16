@@ -26,14 +26,26 @@ syncdb:
 migrations:
 	./manage.py makemigrations
 
-fig:
-	fig up
+git_pull:
+	git pull
+
+fig_up:
+	fig up -d
+
+fig_stop:
+	fig stop
+
+fig_build:
+	fig build
 
 fig_syncdb:
 	fig run django ./manage.py syncdb
 
-fig_restart:
+fig_REINITIALISE:
 	fig stop && fig rm --force && fig build && fig up -d
+
+fig_reload: git_pull fig_stop fig_build fig_up fig_syncdb
+	true
 
 vm_create:
 	gcloud compute instances create $(INSTANCE_NAME) \
