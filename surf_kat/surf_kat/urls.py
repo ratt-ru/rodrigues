@@ -1,17 +1,14 @@
+from django.core.urlresolvers import reverse_lazy
 from django.conf.urls import patterns, include, url
-from django.contrib import admin
-from simqueue.views import SimulationCreate, SimulationList, SimulationDetail
-from django.contrib.auth.views import login as login_view
-from django.contrib.auth.views import logout as logout_view
-
-admin = url(r'^admin/', include(admin.site.urls))
-list_ = url(r'^$', SimulationList.as_view(), name='list')
-detail = url(r'^(?P<pk>\d+)/$', SimulationDetail.as_view(), name='detail')
-create = url(r'^create/', SimulationCreate.as_view(), name='create')
-login = url(r'^accounts/login/$', login_view, name='login')
-logout = url(r'^accounts/logout/$', logout_view, name='logout')
+from django.contrib.auth.views import login, logout
+from django.views.generic import RedirectView
 
 
-all_ = (admin, list_, create, detail, login, logout)
+simqueue_url = url(r'^simqueue/', include('simqueue.urls'))
+login_url = url(r'^accounts/login/$', login, name='login')
+logout_url = url(r'^accounts/logout/$', logout, name='logout')
+root_url = url(r'$', RedirectView.as_view(url=reverse_lazy('list')),
+               name='root')
 
+all_ = (simqueue_url, login_url, logout_url, root_url)
 urlpatterns = patterns('', *all_)

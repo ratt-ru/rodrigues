@@ -14,7 +14,7 @@ all:
 worker:
 	celery -A surf_kat worker -l info
 
-amqp:
+broker:
 	rabbitmq-server
 
 django:
@@ -22,6 +22,9 @@ django:
 
 syncdb:
 	./manage.py syncdb
+
+migrations:
+	./manage.py makemigrations
 
 fig:
 	fig up

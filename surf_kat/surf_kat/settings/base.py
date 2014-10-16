@@ -68,6 +68,6 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 LOGIN_REDIRECT_URL = '/'
 
 
-DOCKER_IMAGE = 'gijzelaerr/surf-kat'
-DOCKER_CMD = '"cd /opt/ceiling-kat/web-kat && pyxis CFG=/results/sims.cfg azishe OUTDIR=/results"'
+DOCKER_IMAGE = 'gijzelaerr/ceiling-kat'
+DOCKER_CMD = 'sh -c "cd /opt/ceiling-kat/web-kat && pyxis CFG=/results/sims.cfg azishe OUTDIR=/results"'
 

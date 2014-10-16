@@ -1,15 +1,33 @@
 {% extends "base.html" %}
 
+{%  load status %}
+
 {%  block content %}
 
-<h1>Details for simulation {{ simulation.id }}</h1>
+    <h1>Details for simulation {{ simulation.id }}</h1>
 
-<ul>
-    <li><b>ID:</b> {{ simulation.id }}</li>
-    <li><b>name:</b> {{ simulation.name }}</li>
-    <li><b>log:</b> <div class="well" style="font-family:monospace;">{{ simulation.log|linebreaksbr }}</div></li>
-    <li><b>config file:</b> <div class="well" style="font-family:monospace;">{{ simulation.config|linebreaksbr }}</div></li>
-</ul>
+    <div class="row text-center">
+        <div class="btn-group">
+            <form>
+                {% csrf_token %}
+                <button type="submit" formmethod="post" formaction="{% url 'reschedule' simulation.id %}" class="btn btn-warning">Reschedule</button>
+
+                <a href="{% url 'detail' simulation.id %}"><button type="button" class="btn btn-info">Refresh</button></a>
+                <a href="{% url 'delete' simulation.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
+            </form>
+        </div>
+    </div>
+
+    <ul>
+        <li><b>ID:</b> {{ simulation.id }}</li>
+        <li><b>status:</b> <span class="label label-{{ simulation.get_state_display|status_label  }}">{{ simulation.get_state_display }}</span></li>
+        <li><b>celery task ID:</b>{{ simulation.task_id }}</li>
+        <li><b>start:</b> {{ simulation.started }}</li>
+        <li><b>finished:</b>{{ simulation.finished }}</li>
+        <li><b>name:</b> {{ simulation.name }}</li>
+        <li><b>log:</b> <div class="well" style="font-family:monospace;">{{ simulation.log|linebreaksbr }}</div></li>
+        <li><b>config file:</b> <div class="well" style="font-family:monospace;">{{ simulation.config|linebreaksbr }}</div></li>
+    </ul>
 
 
 {%  endblock %}

@@ -4,22 +4,37 @@
 
 {%  block content %}
 
-<h1>List of simulations</h1>
+    <h1>List of simulations</h1>
 
-<table class="table">
-    <tr>
-        <th>id</th>
-        <th>name</th>
-        <th>status</th>
-    </tr>
-
-    {% for simulation in object_list %}
+    <table class="table">
         <tr>
-            <td><a href="{%  url 'detail' simulation.id %}">{{ simulation.id }}</a></td>
-            <td>{{ simulation.name }}</td>
-            <td><a href="{%  url 'detail' simulation.id %}"><span class="label label-{{ simulation.get_state_display|status_label  }}">{{ simulation.get_state_display }}</span></a></span></td>
+            <th>id</th>
+            <th>name</th>
+            <th>status</th>
+            <th>actions</th>
         </tr>
-    {% endfor %}
-</table>
+
+        {% for simulation in object_list %}
+            <tr>
+                <td><a href="{%  url 'detail' simulation.id %}">{{ simulation.id }}</a></td>
+                <td>{{ simulation.name }}</td>
+                <td><a href="{%  url 'detail' simulation.id %}"><span class="label label-{{ simulation.get_state_display|status_label  }}">{{ simulation.get_state_display }}</span></a></td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'delete' simulation.id %}">
+                            <button type="button" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </a>
+                        <a href="{% url 'reschedule' simulation.id %}">
+                            <button type="button" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-repeat"></span>
+                            </button>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
 
 {%  endblock %}
