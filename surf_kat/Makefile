@@ -18,7 +18,7 @@ export DJANGO_SETTINGS_MODULE=surf_kat.settings.development
 all:
 
 worker:
-	python3 ./manage.py celery -A surf_kat worker -l info
+	python3 `which celery` -A surf_kat worker -l info
 
 broker:
 	rabbitmq-server
