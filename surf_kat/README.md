@@ -52,7 +52,7 @@ You need:
    * Python PIP (`$ sudo apt-get install python3-pip`)
    * RabbitMQ (`$ sudo apt-get install rabbitmq-server`)
    * docker (`$ sudo apt-get install docker.io`)
-   * postgres (`$ sudo apt-get install postgresql`)
+   * postgres (`$ sudo apt-get install postgresql postgresql-server-dev-all`)
 
 Now to install the requirered libraries run inside the surf_kat folder:
 
