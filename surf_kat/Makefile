@@ -1,9 +1,15 @@
 #!make
 
-INSTANCE_NAME=ceiling-kat
 ZONE=europe-west1-a
-IMAGE=container-vm-v20140929
 MACHINE_TYPE=f1-micro
+
+INSTANCE_NAME=ceiling-kat
+IMAGE=container-vm-v20140929
+IMAGE_PROJECT=google-containers
+
+#INSTANCE_NAME=ceiling-kat-coros
+#IMAGE=coreos-stable-444-5-0-v20141016
+#IMAGE_PROJECT=coreos-cloud
 
 export DJANGO_SETTINGS_MODULE=surf_kat.settings.development
 
@@ -12,19 +18,19 @@ export DJANGO_SETTINGS_MODULE=surf_kat.settings.development
 all:
 
 worker:
-	celery -A surf_kat worker -l info
+	python3 ./manage.py celery -A surf_kat worker -l info
 
 broker:
 	rabbitmq-server
 
 django:
-	./manage.py runserver
+	python3 ./manage.py runserver
 
 syncdb:
-	./manage.py syncdb
+	python3 ./manage.py syncdb
 
 migrations:
-	./manage.py makemigrations
+	python3 ./manage.py makemigrations
 
 git_pull:
 	git pull
@@ -50,7 +56,7 @@ fig_reload: git_pull fig_stop fig_build fig_up fig_syncdb
 vm_create:
 	gcloud compute instances create $(INSTANCE_NAME) \
 		--image ${IMAGE} \
-		--image-project google-containers \
+		--image-project $(IMAGE_PROJECT) \
 		--zone $(ZONE) \
 		--machine-type ${MACHINE_TYPE}
 
