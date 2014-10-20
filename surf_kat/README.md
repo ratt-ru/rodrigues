@@ -49,9 +49,10 @@ Development setup
 You need:
 
    * Python 3
-   * Python PIP (`$ apt-get install python3-pip`)
-   * RabbitMQ (`$ apt-get install rabbitmq-server`)
-   * docker (`$ apt-get install docker.io`)
+   * Python PIP (`$ sudo apt-get install python3-pip`)
+   * RabbitMQ (`$ sudo apt-get install rabbitmq-server`)
+   * docker (`$ sudo apt-get install docker.io`)
+   * postgres (`$ sudo apt-get install postgresql postgresql-server-dev-all`)
 
 Now to install the requirered libraries run inside the surf_kat folder:
 
@@ -59,11 +60,11 @@ Now to install the requirered libraries run inside the surf_kat folder:
    
 Now you are ready to start the pipeline. To start the django server you first need to populate the database:
 
-    $ DJANGO_SETTINGS_MODULE=surf_kat.settings.development ./manage.py syncdb
+    $ DJANGO_SETTINGS_MODULE=surf_kat.settings.development python3 ./manage.py syncdb
    
 Now you can run a development webserver using:
 
-    $ DJANGO_SETTINGS_MODULE=surf_kat.settings.development ./manage.py runserver
+    $ DJANGO_SETTINGS_MODULE=surf_kat.settings.development python3 ./manage.py runserver
    
 To run the scheduled simulations you need to run a broker and celery worker:
 
