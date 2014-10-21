@@ -15,6 +15,13 @@ class SimulationList(ListView):
 class SimulationDetail(DetailView):
     model = Simulation
 
+
+class SimulationConfig(DetailView):
+    model = Simulation
+    template_name = 'simqueue/config.txt'
+    content_type = 'text/plain'
+
+
 class SimulationDelete(DeleteView):
     model = Simulation
     success_url = reverse_lazy('list')

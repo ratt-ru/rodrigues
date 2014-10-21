@@ -44,6 +44,7 @@ def run_docker(config):
         return docker_status(status=status,
                              logs=docker_client.logs(container_id))
     except (DockerException, RequestException) as e:
+        logger.error("simulation crashed: " + str(e))
         return docker_status(status=1, logs=str(e))
 
 
