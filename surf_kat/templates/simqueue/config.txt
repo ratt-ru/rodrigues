@@ -19,7 +19,7 @@ ms_freq0={{ object.ms_freq0 }}
 ms_dfreq={{ object.ms_dfreq }}
 ms_nchan={{ object.ms_nchan }}
 ms_nband={{ object.ms_nband }}
-ms_write_auto_corr={{ object.ms_write_auto_corr }}
+ms_writeAutoCorr={{ object.ms_write_auto_corr }}
 ms_dec={{ object.ms_dec }}
 ms_ra={{ object.ms_ra }}
 

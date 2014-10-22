@@ -27,10 +27,10 @@ class Simulation(Model):
                        default='I')
 
     # observation setup
-    ms_hours = FloatField('Synthesis time', default=1, help_text='in seconds')
-    ms_dtime = FloatField('Integration time', default=1, help_text='in seconds')
-    ms_freq0 = FloatField('Start frequency', default=1, help_text='in Hz')
-    ms_dfreq = FloatField('Channel width', default=1, help_text='in Hz')
+    ms_hours = IntegerField('Synthesis time', default=4, help_text='in hours')
+    ms_dtime = IntegerField('Integration time', default=10, help_text='in seconds')
+    ms_freq0 = FloatField('Start frequency', default=1400e6, help_text='in Hz')
+    ms_dfreq = FloatField('Channel width', default=50e6, help_text='in Hz')
     ms_nchan = IntegerField('Channels per band', default=1,
                             help_text='Number of frequency channels per band')
     ms_nband = IntegerField('Frequency bands', default=1,
@@ -38,8 +38,8 @@ class Simulation(Model):
     ms_write_auto_corr = BooleanField('Autocorrelations',
                                       help_text='Include autocorrelation in data',
                                       default=True)
-    ms_dec = FloatField('Declinations', blank=True, null=True)
-    ms_ra = FloatField('Right ascension', blank=True, null=True)
+    ms_dec = FloatField('Declinations', default=-30)
+    ms_ra = FloatField('Right ascension', default=0)
 
     BEAM_TYPES = (
         ('M', 'MeerKAT 1'),
@@ -141,10 +141,4 @@ class Simulation(Model):
     task_id = CharField(max_length=36, blank=True, null=True)
 
     def __str__(self):
-        return self.name
-
-    def config(self):
-        result = []
-        for field in self._meta.get_all_field_names():
-            result.append("%s=%s\n" % (field, getattr(self, field)))
-        return "".join(result)
+        return "<simulation %s>" % self.name

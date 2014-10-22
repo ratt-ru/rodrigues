@@ -11,7 +11,8 @@ from requests.exceptions import RequestException
 from docker.errors import DockerException
 from django.conf import settings
 
-from simqueue.models import Simulation
+from .models import Simulation
+from .config import generate_config
 
 
 logger = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ def simulate(simulation_id):
     simulation.save()
     logger.info('starting simulation %s' % simulation_id)
 
-    config = simulation.config()
+    config = generate_config(simulation)
     results = run_docker(config)
 
     if results.status:
