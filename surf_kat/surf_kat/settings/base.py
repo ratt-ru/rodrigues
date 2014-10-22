@@ -69,5 +69,9 @@ LOGIN_REDIRECT_URL = '/'
 
 
 DOCKER_IMAGE = 'gijzelaerr/ceiling-kat'
-DOCKER_CMD = 'sh -c "cd /opt/ceiling-kat/web-kat && pyxis CFG=/results/sims.cfg azishe OUTDIR=/results"'
-
+DOCKER_CMD = 'sh -c "' \
+             'cd /opt/ceiling-kat/web-kat && ' \
+             'pyxis ' \
+             'CFG=/results/sims.cfg ' \
+             'LOG=/results/output.log ' \
+             'OUTDIR=/results azishe"'
