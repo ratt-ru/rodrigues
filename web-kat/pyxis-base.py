@@ -91,6 +91,11 @@ TDLCONF = 'tdlconf.profiles'
 CFG = 'meerkat_sims.cfg'
 CHANNELIZE = 0
 NCHAN = 1
+def str2bool(val):
+    if val.lower() in 'true yes 1':
+        return True
+    else: return False
+
 def readCFG(cfg='$CFG'):
   cfg_std = open(II(cfg))
   params = {}
@@ -118,15 +123,16 @@ def readCFG(cfg='$CFG'):
   else : v.USING_SIAMESE = True
   if params['add_noise'] == 'True' : 
     v.NOISE = None #eval(params['vis_noise_std'])
-  v.MAKE_PSF = eval(params['make_psf'])
+  v.MAKE_PSF = params['make_psf']
   v.OUTPUT_TYPE = params['output']
   #v.COLUMN = params['column'].upper()
-  v.CLEAN = eval(params['clean'])
-  own_tdl = eval(params['upload_tdl'])
+  v.CLEAN = str2bool(params['clean'])
+  own_tdl = str2bool(params['upload_tdl'])
   if own_tdl:
     v.TDLCONF = params['tdlconf']
     v.TDLSEC = params['tdlsection']
-  v.CHANNELIZE = int(params['channelise'])
+  try: v.CHANNELIZE = int(params['channelise'])
+  except ValueError : v.CHANNELIZE = 0
   return options
 
 _SEFD = {}
@@ -714,3 +720,23 @@ _SOFIA_DEFAULTS = {'steps': {'doFlag' : 'false',\
 'writeSQL' : 'false',\
 'parameters' : ['*']}}
 
+# wsclean work around
+def add_weight_spectrum(msname='$MS'):
+ msname = interpolate_locals('msname')
+ tab = pyrap.tables.table(msname,readonly=False)
+ try: tab.getcol('WEIGHT_SPECTRUM')
+ except RuntimeError:
+  warn('Did not find WEIGHT_SPECTRUM column in $msname')
+  from pyrap.tables import maketabdesc
+  from pyrap.tables import makearrcoldesc
+  coldmi = tab.getdminfo('DATA')
+  dshape = tab.getcol('DATA').shape
+  coldmi['NAME'] = 'weight_spec'
+  info('adding WEIGHT_SPECTRUM column to $msname')
+  shape = tab.getcol('DATA')[0].shape
+  tab.addcols(maketabdesc(makearrcoldesc('WEIGHT_SPECTRUM',0,shape=shape,valuetype='float')),coldmi)
+  ones = np.ndarray(dshape)
+  info('Filling WEIGHT_SPECTRUM with unity')
+  ones[...] = 1
+  tab.putcol('WEIGHT_SPECTRUM',ones)
+ tab.close()

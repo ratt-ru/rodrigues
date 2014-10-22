@@ -45,7 +45,7 @@ def simulate(conf='MeerKAT64',lsmfits='$LSMFITS',label=None,lsmcont='$LSMCONT',t
   noise_vis,noise = 0,0
   if not image_only: 
     if ADD_NOISE: 
-      noise_vis =  NOISE or compute_vis_noise(sefd=get_sefd(freq0))/10000000
+      noise_vis =  NOISE or compute_vis_noise(sefd=get_sefd(freq0))/1e9
       simcube(cube=lsmfits,noise=noise_vis,column='MODEL_DATA' if ADD_NOISE else 'CORRECTED_DATA')
     noise = noise or 1e-5
   if not sim_only:
@@ -62,7 +62,7 @@ def simulate(conf='MeerKAT64',lsmfits='$LSMFITS',label=None,lsmcont='$LSMCONT',t
     else: restore = False
     ms.CHANRANGE = 0,nchan-1,1
     imager.IMAGE_CHANNELIZE = 1
-    imager.npix = 2048
+    imager.npix = 4096
     imager.cellsize = '1arcsec'
     imager.weight = 'uniform'
     # options['weigh_fov'] = '
