@@ -540,6 +540,7 @@ NTimes=%d
   v.MS = msname;
   if DOALL: _addms(msname)
   # plot uv-coverage
+  if not os.path.exists(DESTDIR): x.sh('mkdir -p $DESTDIR ')
   ms.plot_uvcov(ms=.1,width=10,height=10,dpi=150,save="$OUTFILE-uvcov.png")
 
 document_globals(makems,"MAKEMS_*");
