@@ -23,8 +23,8 @@ def image(msname='$MS',lsmname='$LSM',use_imager='LWIMAGER',restore=False,option
   """ Images MS"""
   imager.cellsize = '1arcsec' 
   if restore : 
-     #ms.copycol() # Copy content of DATA to CORRECTED_DATA if making clean map
-     options['data'] = 'CORRECTED_DATA' # make sure to image corrected data
+     if COLUMN!='CORRECTED_DATA' :ms.copycol(fromcol=COLUMN) # Copy content of DATA to CORRECTED_DATA if making clean map
+     v.COLUMN = 'CORRECTED_DATA' # make sure to image corrected data
   if NCHAN>1 : 
     start = 1
     step = CHANNELIZE or NCHAN
@@ -37,6 +37,7 @@ def make_psf(options={}):
   compute_psf_and_noise(noise_map=False)
 
 def azishe(cfg='$CFG',make_image=True,psf='$MAKE_PSF'):
+  if CLEAN : v.COLUMN = 'CORRECTED_DATA'
   _cfg = readCFG(cfg)
   ms_opts = _cfg['ms_']
   cr_opts = _cfg['cr_']
@@ -67,8 +68,8 @@ def azishe(cfg='$CFG',make_image=True,psf='$MAKE_PSF'):
   if restore : 
     restore = clean_opts
     if clean_opts['operation'] != 'multiscale' : 
-      del clean_opts['nscales']
-      del clean_opts['usevector']
+      if 'nscales' in clean_opts.keys(): del clean_opts['nscales']
+      if 'uservector' in clean_opts.keys(): del clean_opts['uservector']
   try : imager.weight = im_opts['weight']
   except KeyError : imager.weight= 'uniform'
   imager.wprojplanes = 128
