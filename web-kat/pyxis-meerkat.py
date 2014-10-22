@@ -14,6 +14,7 @@ def simulate(msname='$MS',lsmname='$LSM',tdlconf='$TDLCONF',section='$TDLSEC',fr
     options['tiggerlsm.filename'] = LSM
   options['noise_stddev'] = NOISE or compute_vis_noise(sefd=get_sefd(freq0))
   options['ms_sel.output_column'] = COLUMN
+  options['ms_sel.msname'] = msname
   if USING_SIAMESE : section = 'turbo-sim:default'
   options['ms_sel.select_channels'] = 0
   mqt.run('turbo-sim.py',job='_tdl_job_1_simulate_MS',config=tdlconf,section=section,options=options)
