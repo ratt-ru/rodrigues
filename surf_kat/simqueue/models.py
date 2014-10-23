@@ -138,7 +138,6 @@ class Simulation(Model):
     started = DateTimeField(blank=True, null=True)
     finished = DateTimeField(blank=True, null=True)
     log = TextField(blank=True, null=True)
-    task_id = CharField(max_length=36, blank=True, null=True)
 
     def __str__(self):
         return "<simulation %s>" % self.name

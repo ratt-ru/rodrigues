@@ -36,13 +36,20 @@ def run_docker(config):
                                                            'ro': False}})
 
         if docker_client.wait(container_id):
-            logger.warning('simulation crashed')
+            logger.warning('simulation exited with an error')
             status = True
         else:
             logger.info('simulate finished')
             status = False
-        return docker_status(status=status,
-                             logs=docker_client.logs(container_id))
+        logs = docker_client.logs(container_id)
+
+        output = path.join(tempdir, 'output.log')
+        if os.access(output):
+            logs += "\n * content of output.log:\n"
+            logs + open(output, 'r').read()
+
+        return docker_status(status=status, logs=logs)
+
     except (DockerException, RequestException) as e:
         logger.error("simulation crashed: " + str(e))
         return docker_status(status=1, logs=str(e))

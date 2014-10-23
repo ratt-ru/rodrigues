@@ -22,7 +22,6 @@
     <ul>
         <li><b>ID:</b> {{ simulation.id }}</li>
         <li><b>status:</b> <span class="label label-{{ simulation.get_state_display|status_label  }}">{{ simulation.get_state_display }}</span></li>
-        <li><b>celery task ID:</b>{{ simulation.task_id }}</li>
         <li><b>start:</b> {{ simulation.started }}</li>
         <li><b>finished:</b>{{ simulation.finished }}</li>
         <li><b>name:</b> {{ simulation.name }}</li>

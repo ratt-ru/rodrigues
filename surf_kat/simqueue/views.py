@@ -88,10 +88,17 @@ class SimulationCreate(LoginRequiredMixin, CreateView):
         form = self.get_form(form_class)
         if form.is_valid():
             self.object = form.save()
-            task = tasks.simulate.delay(simulation_id=self.object.id)
-            self.object.task_id = task.task_id
+            try:
+                tasks.simulate.delay(simulation_id=self.object .id)
+            except OSError as e:
+                    error = "can't start simulation %s: %s" % (self.object .id,
+                                                               str(e))
+                    messages.error(request, error)
+                    self.object.state = self.object.CRASHED
+                    self.object.log = error
+            else:
+                messages.info(request, 'Scheduling new task...')
             self.object.save()
-            messages.info(request, 'Scheduling new task...')
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -106,9 +113,17 @@ class Reschedule(LoginRequiredMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
             self.object = self.get_object()
-            self.object.log = ""
-            tasks.simulate.delay(simulation_id=self.object.id)
-            messages.info(request, 'Rescheduling task...')
+            try:
+                tasks.simulate.delay(simulation_id=self.object .id)
+            except OSError as e:
+                    error = "can't start simulation %s: %s" % (self.object .id,
+                                                               str(e))
+                    messages.error(request, error)
+                    self.object.state = self.object.CRASHED
+                    self.object.log = error
+                    self.object.save()
+            else:
+                messages.info(request, 'Rescheduling task...')
             return HttpResponseRedirect(reverse('detail',
                                                 args=(self.object.id,)))
 
