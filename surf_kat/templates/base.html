@@ -17,6 +17,10 @@
             <li><a href="{% url 'create' %}">Create</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
+            {% if user.is_staff %}
+                <li><a href="{% url 'admin:index' %}">admin</a></li>
+            {%  endif %}
+
             {% if user.is_authenticated %}
                 <li><a href="#">logged in as {{ user.username }}</a></li>
                 <li><a href="{% url 'logout' %}">Log out</a></li>
