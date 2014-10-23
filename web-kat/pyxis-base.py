@@ -29,8 +29,8 @@ imager.wprojplanes = 0
 imager.weight = "natural"
 imager.cachesize = "32000"
 imager.LWIMAGER_PATH = "lwimager" # 
-imager.DIRTY_IMAGE_Template = "${OUTFILE}.${imager.weight}${.<imager.robust}${.<imager.filter}.dirty.fits"
-imager.RESTORED_IMAGE_Template = "${OUTFILE}.${imager.weight}${.<imager.robust}${.<imager.filter}.restored.fits"
+imager.DIRTY_IMAGE_Template = "${OUTFILE}.dirty.fits"
+imager.RESTORED_IMAGE_Template = "${OUTFILE}.restored.fits"
 
 # destination directory: if MS is foo.MS, then directory is [OUTDIR]/plots-foo[-LABEL] 
 DESTDIR_Template = '${OUTDIR>/}plots-${MS:BASE}'
@@ -114,16 +114,16 @@ def readCFG(cfg='$CFG'):
      if not found:
       if key.startswith(item):
         found=True
-        options[item][key.split(item)[-1]] = params[key]
+        options[item][key.split(item)[-1]] = params[key].lower()
         del params[key]
   if params['skytype'] == 'tiggerlsm': 
     v.LSM = params['skyname']
     v.TDLSEC = 'turbo-sim:own_lsm'
   elif params['skytype'].upper() == 'FITS' : v.FITS = params['skyname']
   else : v.USING_SIAMESE = True
-  if params['add_noise'] == 'True' : 
+  if str2bool(params['add_noise']): 
     v.NOISE = None #eval(params['vis_noise_std'])
-  v.MAKE_PSF = params['make_psf']
+  v.MAKE_PSF = str2bool(params['make_psf'])
   v.OUTPUT_TYPE = params['output']
   #v.COLUMN = params['column'].upper()
   v.CLEAN = str2bool(params['clean'])

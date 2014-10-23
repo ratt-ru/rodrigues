@@ -53,16 +53,16 @@ def azishe(cfg='$CFG',make_image=True,psf='$MAKE_PSF'):
   ra_str = '%d:%d:%.2f'%(hrs,mins,secs)
   ms_opts['ra'] = ra_str
   #--------------------------------------------------------
-  freq0 = eval(ms_opts['freq0'])
-  nchan =  eval(ms_opts['nchan'])
+  freq0 = float(ms_opts['freq0'])
+  nchan =  int(ms_opts['nchan'])
   if nchan>1 : 
-   ms_opts['nchan'],shift = eval(ms_opts['nchan']) + 1,True
+   ms_opts['nchan'],shift = int(ms_opts['nchan']) + 1,True
    nchan +=1
   else: shift = False
   v.NCHAN = nchan
   makems(shift=shift,**ms_opts) # simulate empty MS
   ms.CHANRANGE = 0,nchan-1,1
-  simulate(freq0=freq0)
+  #simulate(freq0=freq0)
   #imager.CHANNELIZE = 1
   restore = CLEAN
   if restore : 
@@ -73,4 +73,7 @@ def azishe(cfg='$CFG',make_image=True,psf='$MAKE_PSF'):
   try : imager.weight = im_opts['weight']
   except KeyError : imager.weight= 'uniform'
   imager.wprojplanes = 128
+  imager.cellsize = '%sarcsec'%(im_opts['cellsize'])
+  imager.stokes = im_opts['stokes'].upper()
+  del im_opts['cellsize'],im_opts['stokes']
   image(restore=restore,options=im_opts)
