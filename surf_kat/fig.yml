@@ -18,6 +18,7 @@ worker:
  volumes:
   - /var/run:/var/run
   - /var/lib/docker:/var/lib/docker
+  - /results
 django:
   build: .
   command: uwsgi --socket surf_kat.sock --module surf_kat.wsgi --chmod-socket=666
@@ -31,6 +32,8 @@ django:
     - DEBUG=false
   volumes:
     - /code
+  volumes_from:
+    - worker
 nginx:
   build: nginx
   volumes_from:

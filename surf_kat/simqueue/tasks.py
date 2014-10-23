@@ -23,8 +23,7 @@ docker_status = namedtuple('DockerStatus', ['status', 'logs'])
 
 def run_docker(config):
     try:
-        tempdir = tempfile.mkdtemp(dir=path.join(settings.BASE_DIR,
-                                                 'tmp_results'))
+        tempdir = tempfile.mkdtemp(dir=settings.RESULTS_DIR)
         config_file = open(path.join(tempdir, 'sims.cfg'), 'w')
         config_file.write(config)
         config_file.close()
@@ -46,7 +45,7 @@ def run_docker(config):
         output = path.join(tempdir, 'output.log')
         if os.access(output, os.R_OK):
             logs += "\n * content of output.log:\n"
-            logs + open(output, 'r').read()
+            logs += open(output, 'r').read()
 
         return docker_status(status=status, logs=logs)
 

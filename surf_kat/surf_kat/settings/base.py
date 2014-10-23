@@ -56,7 +56,7 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = ( os.path.join(BASE_DIR, "static"),)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATIC_ROOT = os.path.join(BASE_DIR, "static_serve")
 
 
@@ -85,3 +85,4 @@ DOCKER_CMD = 'sh -c "' \
              'CFG=/results/sims.cfg ' \
              'LOG=/results/output.log ' \
              'OUTDIR=/results azishe"'
+

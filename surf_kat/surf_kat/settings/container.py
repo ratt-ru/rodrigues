@@ -30,3 +30,5 @@ ALLOWED_HOSTS = ['*']
 
 DOCKER_URI = 'unix://var/run/docker.sock'
 
+
+RESULTS_DIR = '/results'
