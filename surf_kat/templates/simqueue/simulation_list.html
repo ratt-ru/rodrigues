@@ -11,6 +11,8 @@
             <th>id</th>
             <th>name</th>
             <th>status</th>
+            <th>started</th>
+            <th>finished</th>
             <th>actions</th>
         </tr>
 
@@ -19,15 +21,17 @@
                 <td><a href="{%  url 'detail' simulation.id %}">{{ simulation.id }}</a></td>
                 <td>{{ simulation.name }}</td>
                 <td><a href="{%  url 'detail' simulation.id %}"><span class="label label-{{ simulation.get_state_display|status_label  }}">{{ simulation.get_state_display }}</span></a></td>
+                <td>{{ simulation.started }}</td>
+                <td>{{ simulation.finished }}</td>
                 <td>
                     <div class="btn-group">
                         <a href="{% url 'delete' simulation.id %}">
-                            <button type="button" class="btn btn-default btn-sm">
+                            <button type="button" class="btn btn-danger btn-sm">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </button>
                         </a>
                         <a href="{% url 'reschedule' simulation.id %}">
-                            <button type="button" class="btn btn-default btn-sm">
+                            <button type="button" class="btn btn-warning btn-sm">
                                 <span class="glyphicon glyphicon-repeat"></span>
                             </button>
                         </a>
