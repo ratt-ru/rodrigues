@@ -141,3 +141,14 @@ class Simulation(Model):
 
     def __str__(self):
         return "<simulation %s>" % self.name
+
+    def set_crashed(self, error):
+        self.state = self.object.CRASHED
+        self.log = error
+        self.started = False
+        self.finished = False
+
+    def set_scheduled(self):
+        self.state = self.object.SCHEDULED
+        self.started = False
+        self.finished = False

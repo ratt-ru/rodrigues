@@ -41,10 +41,10 @@ def run_docker(config):
         else:
             logger.info('simulate finished')
             status = False
-        logs = docker_client.logs(container_id)
+        logs = docker_client.logs(container_id).decode()
 
         output = path.join(tempdir, 'output.log')
-        if os.access(output):
+        if os.access(output, os.R_OK):
             logs += "\n * content of output.log:\n"
             logs + open(output, 'r').read()
 

@@ -4,8 +4,8 @@ from simqueue.models import Simulation
 from django.views.generic.edit import CreateView
 from django.views.generic import ListView, DetailView, DeleteView
 from django.contrib import messages
-from simqueue import tasks
-from simqueue.mixins import LoginRequiredMixin
+from . import tasks
+from .mixins import LoginRequiredMixin
 from .config import generate_config
 
 
@@ -94,9 +94,9 @@ class SimulationCreate(LoginRequiredMixin, CreateView):
                     error = "can't start simulation %s: %s" % (self.object .id,
                                                                str(e))
                     messages.error(request, error)
-                    self.object.state = self.object.CRASHED
-                    self.object.log = error
+                    self.object.set_crashed(error)
             else:
+                self.object.set_scheduled()
                 messages.info(request, 'Scheduling new task...')
             self.object.save()
             return self.form_valid(form)
@@ -119,11 +119,11 @@ class Reschedule(LoginRequiredMixin, DetailView):
                     error = "can't start simulation %s: %s" % (self.object .id,
                                                                str(e))
                     messages.error(request, error)
-                    self.object.state = self.object.CRASHED
-                    self.object.log = error
-                    self.object.save()
+                    self.object.set_crashed(error)
             else:
+                self.object.set_scheduled()
                 messages.info(request, 'Rescheduling task...')
+            self.object.save()
             return HttpResponseRedirect(reverse('detail',
                                                 args=(self.object.id,)))
 
