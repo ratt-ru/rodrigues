@@ -4,7 +4,7 @@ from celery import shared_task
 from collections import namedtuple
 import tempfile
 from os import path
-
+import os
 from pytz import timezone
 import docker
 from requests.exceptions import RequestException
@@ -23,18 +23,17 @@ docker_status = namedtuple('DockerStatus', ['status', 'logs'])
 
 def run_docker(config):
     try:
-        tempdir = tempfile.mkdtemp()
-        docker_client = docker.Client(settings.DOCKER_URI)
-        container_id = docker_client.create_container(settings.DOCKER_IMAGE,
-                                                      settings.DOCKER_CMD,
-                                                      volumes=['/results']
-                                                      )
-        docker_client.start(container_id, binds={tempdir: {'bind': '/results',
-                                                           'ro': False}})
-
+        tempdir = tempfile.mkdtemp(dir=path.join(settings.BASE_DIR,
+                                                 'tmp_results'))
         config_file = open(path.join(tempdir, 'sims.cfg'), 'w')
         config_file.write(config)
         config_file.close()
+        docker_client = docker.Client(settings.DOCKER_URI)
+        container_id = docker_client.create_container(image=settings.DOCKER_IMAGE,
+                                                      command=settings.DOCKER_CMD,
+                                                      )
+        docker_client.start(container_id, binds={tempdir: {'bind': '/results',
+                                                           'ro': False}})
 
         if docker_client.wait(container_id):
             logger.warning('simulation crashed')
@@ -53,6 +52,7 @@ def run_docker(config):
 def simulate(simulation_id):
     simulation = Simulation.objects.get(pk=simulation_id)
     simulation.state = simulation.RUNNING
+    simulation.log = "running..."
     simulation.started = datetime.now(timezone(settings.TIME_ZONE))
     simulation.save()
     logger.info('starting simulation %s' % simulation_id)

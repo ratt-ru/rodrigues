@@ -1,3 +1,4 @@
 db.sqlite3
 .idea
 static_serve
+tmp_results/tmp*
