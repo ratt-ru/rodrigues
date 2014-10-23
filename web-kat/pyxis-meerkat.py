@@ -62,7 +62,7 @@ def azishe(cfg='$CFG',make_image=True,psf='$MAKE_PSF'):
   v.NCHAN = nchan
   makems(shift=shift,**ms_opts) # simulate empty MS
   ms.CHANRANGE = 0,nchan-1,1
-  #simulate(freq0=freq0)
+  simulate(freq0=freq0)
   #imager.CHANNELIZE = 1
   restore = CLEAN
   if restore : 
