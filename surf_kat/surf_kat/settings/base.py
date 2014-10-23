@@ -1,4 +1,7 @@
 import os
+from django.contrib.messages import constants as messages
+
+
 BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..')
 
 DEBUG = False
@@ -66,6 +69,13 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 
 
 LOGIN_REDIRECT_URL = '/'
+
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+    messages.DEBUG: 'info',
+}
+
 
 
 DOCKER_IMAGE = 'gijzelaerr/ceiling-kat'
