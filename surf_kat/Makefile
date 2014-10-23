@@ -20,6 +20,9 @@ all:
 worker:
 	python3 `which celery` -A surf_kat worker -l info
 
+flower:
+	python3 `which celery` -A surf_kat flower
+
 broker:
 	rabbitmq-server
 

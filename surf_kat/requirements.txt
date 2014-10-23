@@ -5,4 +5,5 @@ psycopg2
 django-debug-toolbar
 pytz
 uwsgi
+flower
 
