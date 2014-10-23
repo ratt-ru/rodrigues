@@ -90,7 +90,7 @@ class Simulation(Model):
     im_wprojplanes = IntegerField('w-Projection planes', default=0)
     im_mode = CharField('Imaging mode', choices=IMAGING_TYPES, max_length=1,
                         default='C')
-    im_spwid = CharField('Spectral window', default=1, max_length=32)
+    im_spwid = CharField('Spectral window', default=0, max_length=32)
     channelise = CharField('Image channelise', choices=CHANNELISE_TYPES,
                            max_length=10, default='A')
     im_stokes = CharField('Stokes', default='I', max_length=4)
