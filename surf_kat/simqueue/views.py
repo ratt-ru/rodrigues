@@ -5,9 +5,15 @@ from simqueue.models import Simulation
 from django.views.generic.edit import CreateView
 from django.views.generic import ListView, DetailView, DeleteView
 from django.contrib import messages
+from django.http import HttpResponse
 from . import tasks
 from .mixins import LoginRequiredMixin
 from .config import generate_config
+import aplpy
+from matplotlib import pyplot
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+
 
 
 logger = logging.getLogger(__name__)
@@ -81,6 +87,25 @@ class SimulationDelete(DeleteView):
     success_url = reverse_lazy('list')
 
 
+def schedule_simulation(simulation, request):
+    """
+    schedule a simulation task, catch error if problem, log in all cases.
+    """
+    try:
+        async = tasks.simulate.delay(simulation_id=simulation.id)
+    except OSError as e:
+            error = "can't start simulation %s: %s" % (simulation.id,
+                                                       str(e))
+            messages.error(request, error)
+            logger.error(error)
+            simulation.set_crashed(error)
+    else:
+        simulation.task_id = async.task_id
+        simulation.save(update_fields=["task_id"])
+        simulation.set_scheduled()
+        messages.info(request, 'Scheduling task %s...' % simulation.id)
+
+
 class SimulationCreate(LoginRequiredMixin, CreateView):
     model = Simulation
     fields = fields
@@ -92,18 +117,8 @@ class SimulationCreate(LoginRequiredMixin, CreateView):
         form = self.get_form(form_class)
         if form.is_valid():
             self.object = form.save()
-            try:
-                self.object.task_id = tasks.simulate.delay(simulation_id=self.object.id).task_id
-            except OSError as e:
-                    error = "can't start simulation %s: %s" % (self.object .id,
-                                                               str(e))
-                    messages.error(request, error)
-                    logger.error(error)
-                    self.object.set_crashed(error)
-            else:
-                self.object.set_scheduled()
-                messages.info(request, 'Scheduling new task...')
             self.object.save()
+            schedule_simulation(self.object, request)
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -118,21 +133,22 @@ class Reschedule(LoginRequiredMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
             self.object = self.get_object()
-            try:
-                async = tasks.simulate.delay(simulation_id=self.object.id)
-                self.object.task_id = async.task_id
-            except OSError as e:
-                    error = "can't start simulation %s: %s" % (self.object .id,
-                                                               str(e))
-                    messages.error(request, error)
-                    logger.error(error)
-                    self.object.set_crashed(error)
-            else:
-                self.object.set_scheduled()
-                messages.info(request, 'Rescheduling task...')
-            self.object.save()
+            schedule_simulation(self.object, request)
             return HttpResponseRedirect(reverse('detail',
                                                 args=(self.object.id,)))
+
+
+class SimulationImage(DetailView):
+    model = Simulation
+    result = 'results_dirty'
+
+    def render_to_response(self, context, **kwargs):
+        response = HttpResponse(content_type='image/png')
+        fig = pyplot.figure()
+        filename = str(getattr(self.object, self.result).file)
+        aplpy.FITSFigure(filename, figure=fig)
+        fig.canvas.print_figure(response, format='png')
+        return response
 
 
 

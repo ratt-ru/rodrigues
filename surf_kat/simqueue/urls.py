@@ -1,13 +1,12 @@
-from django.conf.urls import patterns, include, url
-from django.contrib import admin
+from django.conf.urls import patterns, url
+
 
 from simqueue.views import (SimulationCreate, SimulationList, SimulationDetail,
-                            Reschedule, SimulationDelete, SimulationConfig)
+                            Reschedule, SimulationDelete, SimulationConfig,
+                            SimulationImage)
 
 
-admin_url = url(r'^admin/', include(admin.site.urls))
 
-list_url = url(r'^$', SimulationList.as_view(), name='list')
 
 create_url = url(r'^create/', SimulationCreate.as_view(), name='create')
 
@@ -23,15 +22,21 @@ config_url = url(r'^config/(?P<pk>\d+)/$', SimulationConfig.as_view(),
 reschedule_url = url(r'^reschedule/(?P<pk>\d+)/$', Reschedule.as_view(),
                      name='reschedule')
 
+list_url = url(r'^$', SimulationList.as_view(), name='list')
+
+
+image_url = url(r'^image/(?P<pk>\d+)/$', SimulationImage.as_view(),
+                name='image')
+
 
 all_ = (
-    admin_url,
     list_url,
     create_url,
     detail_url,
     reschedule_url,
     delete_url,
     config_url,
+    image_url,
 )
 
 urlpatterns = patterns('', *all_)

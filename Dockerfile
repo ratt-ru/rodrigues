@@ -1,7 +1,7 @@
 FROM gijzelaerr/papino-meqtrees
-RUN apt-get install -y git time
+RUN apt-get install -y time
 ADD docker/casarc /root/.casarc
-ADD . /opt/ceiling-kat
-WORKDIR /opt/ceiling-kat
+ADD . /code
+WORKDIR /code
 VOLUME /results
 

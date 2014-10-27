@@ -1,5 +1,6 @@
 from django.db.models import Model, CharField, FileField, BooleanField,\
     FloatField, IntegerField, DateTimeField, TextField
+from celery.result import AsyncResult
 
 
 class Simulation(Model):
@@ -17,8 +18,8 @@ class Simulation(Model):
     # global settings
     name = CharField(default='New simulation', max_length=200)
     sky_type = CharField(choices=SKY_TYPES, max_length=1, default='T')
-    sky_model = FileField(blank=True)
-    tdl_conf = FileField(blank=True, help_text='TDL Configuration File')
+    sky_model = FileField(blank=True, upload_to='sky')
+    tdl_conf = FileField('TDL Configuration File', blank=True, upload_to='tdl')
     tdl_section = CharField(blank=True, max_length=200)
     make_psf = BooleanField(default=True, blank=True)
     add_noise = BooleanField(default=True, blank=True)
@@ -138,19 +139,36 @@ class Simulation(Model):
     started = DateTimeField(blank=True, null=True)
     finished = DateTimeField(blank=True, null=True)
     log = TextField(blank=True, null=True)
-    task_id = TextField(max_length=36, blank=True, null=True)
+    task_id = CharField(max_length=36, null=True, blank=True)
+
+    # results
     result_dir = CharField(blank=True, null=True, max_length=11)
+    results_uvcov = FileField(blank=True, upload_to='uvcov', null=True)
+    results_dirty = FileField(blank=True, upload_to='dirty', null=True)
+    results_model = FileField(blank=True, upload_to='model', null=True)
+    results_residual = FileField(blank=True, upload_to='residual', null=True)
+    results_restored = FileField(blank=True, upload_to='restored', null=True)
+
 
     def __str__(self):
-        return "<simulation %s>" % self.name
+        return "<simulation name='%s' id=%s>" % (self.name, self.id)
 
     def set_crashed(self, error):
         self.state = self.CRASHED
         self.log = error
         self.started = None
         self.finished = None
+        self.save(update_fields=["state", "log", "started", "finished"])
 
     def set_scheduled(self):
         self.state = self.SCHEDULED
         self.started = None
         self.finished = None
+        self.log = ""
+        self.save(update_fields=["state", "started", "finished"])
+
+    def get_task_status(self):
+        if self.task_id:
+            return AsyncResult(self.task_id).status
+        else:
+            return 'NO TASK ID'

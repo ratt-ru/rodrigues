@@ -20,7 +20,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'simqueue',
     'debug_toolbar.apps.DebugToolbarConfig',
-    'djcelery',
+    'kombu.transport.django',
 )
 
 
@@ -66,10 +66,12 @@ TEMPLATE_DIRS = (
 )
 
 
-CELERY_ACCEPT_CONTENT = ['pickle', 'json']
-
-
-CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+BROKER_URL = 'amqp://'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_RESULT_BACKEND = 'amqp'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 
 LOGIN_REDIRECT_URL = '/'
@@ -81,13 +83,16 @@ MESSAGE_TAGS = {
 }
 
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploaded')
+MEDIA_URL = '/media/'
 
 DOCKER_IMAGE = 'gijzelaerr/ceiling-kat'
 DOCKER_CMD = 'sh -c "' \
-             'cd /opt/ceiling-kat/web-kat && ' \
+             'mkdir /tmp_results && ' \
+             'cd /code/web-kat && ' \
              'pyxis ' \
              'CFG=/results/sims.cfg ' \
-             'LOG=/results/output.log ' \
-             'OUTFILE=/results/results ' \
-             'OUTDIR=/results azishe"'
-
+             'LOG=/tmp_results/output.log ' \
+             'OUTFILE=/tmp_results/results ' \
+             'OUTDIR=/tmp_results azishe; ' \
+             'cp -av /tmp_results/* /results"'

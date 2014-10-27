@@ -21,9 +21,11 @@
     <ul>
         <li><b>ID:</b> {{ simulation.id }}</li>
         <li><b>status:</b> <span class="label label-{{ simulation.get_state_display|status_label  }}">{{ simulation.get_state_display }}</span></li>
+        <li><b>celery status:</b> <span class="label label-default">{{ simulation.get_task_status }}</span></li>
         <li><b>start:</b> {{ simulation.started }}</li>
         <li><b>finished:</b>{{ simulation.finished }}</li>
         <li><b>name:</b> {{ simulation.name }}</li>
+        <li><b>uvcov: </b><img src="{{ MEDIA_URL }}{{ simulation.results_uvcov }}" width="500"></li>
         <li><b>log:</b> <div class="well" style="font-family:monospace;">{{ simulation.log|linebreaksbr }}</div></li>
         <li><b>config file:</b> <div class="well" style="font-family:monospace;">{{ config|linebreaksbr }}</div></li>
     </ul>

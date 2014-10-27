@@ -7,3 +7,5 @@ pytz
 uwsgi
 flower
 django-celery
+aplpy
+matplotlib
