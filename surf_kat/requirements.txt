@@ -6,4 +6,4 @@ django-debug-toolbar
 pytz
 uwsgi
 flower
-
+django-celery

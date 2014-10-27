@@ -15,7 +15,7 @@ DATABASES = {
     }
 }
 
-BROKER_URL = 'amqp://'
+BROKER_URL = 'amqp://localhost/'
 
 
 ALLOWED_HOSTS = ['127.0.0.1']

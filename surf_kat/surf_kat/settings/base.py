@@ -20,6 +20,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'simqueue',
     'debug_toolbar.apps.DebugToolbarConfig',
+    'djcelery',
 )
 
 
@@ -68,6 +69,9 @@ TEMPLATE_DIRS = (
 CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 
 
+CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+
+
 LOGIN_REDIRECT_URL = '/'
 
 
@@ -84,5 +88,6 @@ DOCKER_CMD = 'sh -c "' \
              'pyxis ' \
              'CFG=/results/sims.cfg ' \
              'LOG=/results/output.log ' \
+             'OUTFILE=/results/results ' \
              'OUTDIR=/results azishe"'
 

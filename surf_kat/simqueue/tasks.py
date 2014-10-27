@@ -18,12 +18,13 @@ from .config import generate_config
 logger = logging.getLogger(__name__)
 
 
-docker_status = namedtuple('DockerStatus', ['status', 'logs'])
+docker_status = namedtuple('DockerStatus', ['status', 'logs', 'result_dir'])
 
 
 def run_docker(config):
     try:
         tempdir = tempfile.mkdtemp(dir=settings.RESULTS_DIR)
+        tempdir_name = path.basename(tempdir)
         config_file = open(path.join(tempdir, 'sims.cfg'), 'w')
         config_file.write(config)
         config_file.close()
@@ -47,11 +48,11 @@ def run_docker(config):
             logs += "\n * content of output.log:\n"
             logs += open(output, 'r').read()
 
-        return docker_status(status=status, logs=logs)
+        return docker_status(status=status, logs=logs, result_dir=tempdir_name)
 
     except (DockerException, RequestException) as e:
         logger.error("simulation crashed: " + str(e))
-        return docker_status(status=1, logs=str(e))
+        return docker_status(status=1, logs=str(e), result_dir=tempdir_name)
 
 
 @shared_task
@@ -73,4 +74,5 @@ def simulate(simulation_id):
 
     simulation.log = results.logs
     simulation.finished = datetime.now(timezone(settings.TIME_ZONE))
+    simulation.result_dir = simulation.result_dir
     simulation.save()

@@ -11,7 +11,6 @@
             <form>
                 {% csrf_token %}
                 <button type="submit" formmethod="post" formaction="{% url 'reschedule' simulation.id %}" class="btn btn-warning">Reschedule</button>
-
                 <a href="{% url 'detail' simulation.id %}"><button type="button" class="btn btn-info">Refresh</button></a>
                 <a href="{% url 'delete' simulation.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
                 <a href="{% url 'config' simulation.id %}"><button type="button" class="btn btn-default">config</button></a>

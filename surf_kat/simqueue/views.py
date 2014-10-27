@@ -1,3 +1,4 @@
+import logging
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import HttpResponseRedirect
 from simqueue.models import Simulation
@@ -7,6 +8,9 @@ from django.contrib import messages
 from . import tasks
 from .mixins import LoginRequiredMixin
 from .config import generate_config
+
+
+logger = logging.getLogger(__name__)
 
 
 fields = (
@@ -89,11 +93,12 @@ class SimulationCreate(LoginRequiredMixin, CreateView):
         if form.is_valid():
             self.object = form.save()
             try:
-                tasks.simulate.delay(simulation_id=self.object .id)
+                self.object.task_id = tasks.simulate.delay(simulation_id=self.object.id).task_id
             except OSError as e:
                     error = "can't start simulation %s: %s" % (self.object .id,
                                                                str(e))
                     messages.error(request, error)
+                    logger.error(error)
                     self.object.set_crashed(error)
             else:
                 self.object.set_scheduled()
@@ -114,11 +119,13 @@ class Reschedule(LoginRequiredMixin, DetailView):
     def post(self, request, *args, **kwargs):
             self.object = self.get_object()
             try:
-                tasks.simulate.delay(simulation_id=self.object .id)
+                async = tasks.simulate.delay(simulation_id=self.object.id)
+                self.object.task_id = async.task_id
             except OSError as e:
                     error = "can't start simulation %s: %s" % (self.object .id,
                                                                str(e))
                     messages.error(request, error)
+                    logger.error(error)
                     self.object.set_crashed(error)
             else:
                 self.object.set_scheduled()
