@@ -1,5 +1,5 @@
 db:
-  image: postgres
+  image: postgres:9.3
 broker:
   image: dockerfile/rabbitmq
   ports:
