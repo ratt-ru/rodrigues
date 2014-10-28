@@ -28,43 +28,54 @@
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-md-3">
-            {% if simulation.results_dirty %}
-                <img src="{% url 'fits' simulation.id 'dirty' %}" width="500">
-            {% else %}
-                Not available
-            {% endif %}
+            <a href="#" class="thumbnail">
+                {% if simulation.results_dirty %}
+                    <img src="{% url 'fits' simulation.id 'dirty' %}" width="500" alt="dirty">
+                {% else %}
+                    Not available
+                {% endif %}
+            </a>
         </div>
         <div class="col-md-3">
-            {% if simulation.results_model %}
-                <img src="{% url 'fits' simulation.id 'model' %}" width="500">
-            {% else %}
-                Not available
-            {% endif %}
+            <a href="#" class="thumbnail">
+                {% if simulation.results_model %}
+                    <img src="{% url 'fits' simulation.id 'model' %}" width="500">
+                {% else %}
+                    Not available
+                {% endif %}
+            </a>
         </div>
         <div class="col-md-3">
-            {% if simulation.results_residual %}
-                <img src="{% url 'fits' simulation.id 'residual' %}" width="500">
-            {% else %}
-                Not available
-            {% endif %}
+            <a href="#" class="thumbnail">
+                {% if simulation.results_residual %}
+                    <img src="{% url 'fits' simulation.id 'residual' %}" width="500">
+                {% else %}
+                    Not available
+                {% endif %}
+            </a>
         </div>
         <div class="col-md-3">
-            {% if simulation.results_restored %}
-                <img src="{% url 'fits' simulation.id 'restored' %}" width="500">
-            {% else %}
-                Not available
-            {%  endif %}
+            <a href="#" class="thumbnail">
+                {% if simulation.results_restored %}
+                    <img src="{% url 'fits' simulation.id 'restored' %}" width="500">
+                {% else %}
+                    Not available
+                {%  endif %}
+            </a>
         </div>
     </div>
     <div class="row text-center">
         <div class="col-md-12">
-            {% if simulation.results_uvcov %}
-                <img src="{{ MEDIA_URL }}{{ simulation.results_uvcov }}" width="500">
-            {% else %}
-                Not available
-            {% endif %}
+            <a href="#" class="thumbnail">
+                {% if simulation.results_uvcov %}
+                    <img src="{{ MEDIA_URL }}{{ simulation.results_uvcov }}" width="500">
+                {% else %}
+                    Not available
+                {% endif %}
+            </a>
         </div>
     </div>
 
