@@ -1,10 +1,10 @@
 #!make
 
-ZONE=europe-west1-a
+ZONE=europe-west1-b
 MACHINE_TYPE=f1-micro
 
 INSTANCE_NAME=ceiling-kat
-IMAGE=container-vm-v20140929
+IMAGE=container-vm-v20141016
 IMAGE_PROJECT=google-containers
 
 #INSTANCE_NAME=ceiling-kat-coros
@@ -70,4 +70,4 @@ vm_ssh:
 	gcloud compute ssh --zone $(ZONE) $(INSTANCE_NAME)
 
 vm_ip:
-	@gcloud compute instances describe ceiling-kat --zone europe-west1-a | grep natIP | awk '{ print $$2 }'
+	@gcloud compute instances describe $(INSTANCE_NAME) --zone $(ZONE) | grep natIP | awk '{ print $$2 }'
