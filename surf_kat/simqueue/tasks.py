@@ -109,10 +109,3 @@ def simulate(simulation_id):
     simulation.save(update_fields=["finished", "log", "state", "result_dir",
                                    "results_uvcov"])
     return simulation.state
-
-
-@shared_task
-def debug_task(simulation_id="nothhin"):
-    import time
-    time.sleep(10)
-    return simulation_id

@@ -1,6 +1,7 @@
 import logging
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import HttpResponseRedirect
+from django.http import Http404
 from simqueue.models import Simulation
 from django.views.generic.edit import CreateView
 from django.views.generic import ListView, DetailView, DeleteView
@@ -9,12 +10,10 @@ from django.http import HttpResponse
 from . import tasks
 from .mixins import LoginRequiredMixin
 from .config import generate_config
+
+import matplotlib
+matplotlib.use('agg')
 import aplpy
-from matplotlib import pyplot
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
-
-
 
 logger = logging.getLogger(__name__)
 
@@ -138,17 +137,23 @@ class Reschedule(LoginRequiredMixin, DetailView):
                                                 args=(self.object.id,)))
 
 
-class SimulationImage(DetailView):
+class SimulationFits(DetailView):
+    """
+    visualises Filefield model files using aplpy
+    """
     model = Simulation
-    result = 'results_dirty'
+    fits_fields = ['dirty', 'model', 'residual', 'restored']
 
     def render_to_response(self, context, **kwargs):
+        field = self.kwargs['field']
+        if field not in self.fits_fields:
+            raise Http404
         response = HttpResponse(content_type='image/png')
-        fig = pyplot.figure()
-        filename = str(getattr(self.object, self.result).file)
-        aplpy.FITSFigure(filename, figure=fig)
+        fig = matplotlib.pyplot.figure()
+        filename = str(getattr(self.object, 'results_' + field).file)
+        plot = aplpy.FITSFigure(filename, figure=fig,
+                                auto_refresh=False)
+        plot.show_colorscale()
         fig.canvas.print_figure(response, format='png')
         return response
-
-
 

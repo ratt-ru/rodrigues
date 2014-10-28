@@ -26,6 +26,10 @@
         <li><b>finished:</b>{{ simulation.finished }}</li>
         <li><b>name:</b> {{ simulation.name }}</li>
         <li><b>uvcov: </b><img src="{{ MEDIA_URL }}{{ simulation.results_uvcov }}" width="500"></li>
+        <li><b>Dirty: </b><img src="{% url 'fits' simulation.id 'dirty' %}" width="500"></li>
+        <li><b>model: </b><img src="{% url 'fits' simulation.id 'model' %}" width="500"></li>
+        <li><b>residual: </b><img src="{% url 'fits' simulation.id 'residual' %}" width="500"></li>
+        <li><b>restored: </b><img src="{% url 'fits' simulation.id 'restored' %}" width="500"></li>
         <li><b>log:</b> <div class="well" style="font-family:monospace;">{{ simulation.log|linebreaksbr }}</div></li>
         <li><b>config file:</b> <div class="well" style="font-family:monospace;">{{ config|linebreaksbr }}</div></li>
     </ul>

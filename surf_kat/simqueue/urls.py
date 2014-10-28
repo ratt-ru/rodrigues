@@ -3,7 +3,7 @@ from django.conf.urls import patterns, url
 
 from simqueue.views import (SimulationCreate, SimulationList, SimulationDetail,
                             Reschedule, SimulationDelete, SimulationConfig,
-                            SimulationImage)
+                            SimulationFits)
 
 
 
@@ -24,9 +24,8 @@ reschedule_url = url(r'^reschedule/(?P<pk>\d+)/$', Reschedule.as_view(),
 
 list_url = url(r'^$', SimulationList.as_view(), name='list')
 
-
-image_url = url(r'^image/(?P<pk>\d+)/$', SimulationImage.as_view(),
-                name='image')
+fits_url = url(r'^fits/(?P<pk>\d+)/(?P<field>\w+)/$', SimulationFits.as_view(),
+               name='fits')
 
 
 all_ = (
@@ -36,7 +35,7 @@ all_ = (
     reschedule_url,
     delete_url,
     config_url,
-    image_url,
+    fits_url,
 )
 
 urlpatterns = patterns('', *all_)
