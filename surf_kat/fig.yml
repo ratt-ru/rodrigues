@@ -6,7 +6,7 @@ broker:
     - "5672:5672"
     - "15672:15672"
 worker:
- build: .
+ image: gijzelaerrr/surf_kat
  command: celery worker -A surf_kat -l INFO
  links:
    - broker
@@ -20,7 +20,7 @@ worker:
   - /var/lib/docker:/var/lib/docker
   - /results
 django:
-  build: .
+  image: gijzelaerrr/surf_kat
   command: uwsgi --socket surf_kat.sock --module surf_kat.wsgi --chmod-socket=666
   links:
     - db
