@@ -71,3 +71,10 @@ vm_ssh:
 
 vm_ip:
 	@gcloud compute instances describe $(INSTANCE_NAME) --zone $(ZONE) | grep natIP | awk '{ print $$2 }'
+
+deploy:
+	apt-get update
+	apt-get install -y python-pip
+	pip install fig
+	fig up -d
+	fig run django ./manage.py syncdb
