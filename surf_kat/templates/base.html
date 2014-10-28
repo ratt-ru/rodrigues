@@ -33,7 +33,7 @@
 </nav>
 
 
-<div class="container">
+<div class="container-fluid">
     {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" role="alert">
             <strong>{{ message.tags }}:</strong> {{ message }}
@@ -44,12 +44,14 @@
     {%  block content %}Developer, you block overwrite content block{% endblock %}
     <hr>
     <div class="row text-center">
-        <img src="{% static "ceiling_small.png" %}" alt="surf kat"/>
+        <div class="col-md-12">
+            <img src="{% static "ceiling_small.png" %}" alt="surf kat"/>
+        </div>
     </div>
-    </container>
+</div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
 </body>
 </html>

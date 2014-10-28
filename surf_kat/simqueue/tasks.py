@@ -4,6 +4,7 @@ from celery import shared_task
 from collections import namedtuple
 import tempfile
 import os
+from django.contrib import messages
 from pytz import timezone
 import docker
 from requests.exceptions import RequestException
@@ -13,7 +14,6 @@ from django.core.files import File
 
 from .models import Simulation
 from .config import generate_config
-
 
 
 logger = logging.getLogger(__name__)
@@ -109,3 +109,21 @@ def simulate(simulation_id):
     simulation.save(update_fields=["finished", "log", "state", "result_dir",
                                    "results_uvcov"])
     return simulation.state
+
+
+def schedule_simulation(simulation, request):
+    """
+    schedule a simulation task, catch error if problem, log in all cases.
+    """
+    try:
+        async = simulate.delay(simulation_id=simulation.id)
+    except OSError as e:
+            error = "can't start simulation %s: %s" % (simulation.id,
+                                                       str(e))
+            messages.error(request, error)
+            logger.error(error)
+            simulation.set_crashed(error)
+    else:
+        simulation.task_id = async.task_id
+        simulation.save(update_fields=["task_id"])
+        simulation.set_scheduled()

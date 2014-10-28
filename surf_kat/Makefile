@@ -48,7 +48,7 @@ fig_build:
 	fig build
 
 fig_syncdb:
-	fig run django ./manage.py syncdb
+	fig run django python3 ./manage.py syncdb
 
 fig_REINITIALISE:
 	fig stop && fig rm --force && fig build && fig up -d

@@ -149,7 +149,6 @@ class Simulation(Model):
     results_residual = FileField(blank=True, upload_to='residual', null=True)
     results_restored = FileField(blank=True, upload_to='restored', null=True)
 
-
     def __str__(self):
         return "<simulation name='%s' id=%s>" % (self.name, self.id)
 
@@ -169,6 +168,9 @@ class Simulation(Model):
 
     def get_task_status(self):
         if self.task_id:
-            return AsyncResult(self.task_id).status
+            try:
+                return AsyncResult(self.task_id).status
+            except OSError as e:
+                return "can't connect to broker: " + str(e)
         else:
             return 'NO TASK ID'
