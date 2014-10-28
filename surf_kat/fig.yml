@@ -35,7 +35,7 @@ django:
   volumes_from:
     - worker
 nginx:
-  build: nginx
+  build: docker/nginx
   volumes_from:
     - django
   ports:
