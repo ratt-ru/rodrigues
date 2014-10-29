@@ -1,15 +1,79 @@
 #!make
-IMAGE_NAME=gijzelaerr/ceiling-kat
 
-.PHONY: all build run
+ZONE=europe-west1-b
+MACHINE_TYPE=f1-micro
+INSTANCE_NAME=ceiling-kat
+IMAGE=container-vm-v20141016
+IMAGE_PROJECT=google-containers
 
-all: build run
+DJANGO_FOLDER=django_kat
 
-build:
-	docker build -t $(IMAGE_NAME) .
+export DJANGO_SETTINGS_MODULE=django_kat.settings.development
 
-force-build:
-	docker build -t $(IMAGE_NAME) --no-cache=true .
 
-run:
-	docker run -v `pwd`/docker/results:/results $(IMAGE_NAME) sh -c "cd /opt/ceiling-kat/web-kat && pyxis CFG=webkat_default.cfg azishe OUTDIR=/results"
+.PHONY: all worker amqp django syncdb fig fig_syncdb fig_restart vm_create vm_delete vm_ssh vm_ip
+
+all:
+
+worker:
+	cd $(DJANGO_FOLDER) && python3 `which celery` -A django_kat worker -l info
+
+flower:
+	cd $(DJANGO_FOLDER) && python3 `which celery` -A django_kat flower
+
+broker:
+	rabbitmq-server
+
+django:
+	cd $(DJANGO_FOLDER) && python3 ./manage.py runserver
+
+syncdb:
+	cd $(DJANGO_FOLDER) && python3 ./manage.py syncdb
+
+migrations:
+	cd $(DJANGO_FOLDER) && python3 ./manage.py makemigrations
+
+git_pull:
+	git pull
+
+fig_up:
+	fig up -d
+
+fig_stop:
+	fig stop
+
+fig_build:
+	fig build
+
+fig_syncdb:
+	fig run django python3 ./manage.py syncdb
+
+fig_REINITIALISE:
+	fig stop && fig rm --force && fig build && fig up -d
+
+fig_reload: git_pull fig_stop fig_build fig_up fig_syncdb
+	true
+
+vm_create:
+	gcloud compute instances create $(INSTANCE_NAME) \
+		--image ${IMAGE} \
+		--image-project $(IMAGE_PROJECT) \
+		--zone $(ZONE) \
+		--machine-type ${MACHINE_TYPE}
+
+vm_delete:
+	gcloud compute instances delete --zone $(ZONE) $(INSTANCE_NAME)
+
+vm_ssh:
+	gcloud compute ssh --zone $(ZONE) $(INSTANCE_NAME)
+
+vm_ip:
+	@gcloud compute instances describe $(INSTANCE_NAME) --zone $(ZONE) | grep natIP | awk '{ print $$2 }'
+
+deploy:
+	apt-get update
+	apt-get install -y python-pip
+	pip install fig
+	fig up -d
+	fig run django python3 manage.py syncdb
+
