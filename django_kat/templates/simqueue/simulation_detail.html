@@ -28,36 +28,32 @@
 
 
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-6">
             <div class="panel panel-primary">
-                <div class="panel-heading">Results</div>
+                <div class="panel-heading">Dirty image</div>
                 <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="thumbnail">
-                                <div class="caption">
-                                    <h3>Dirty image</h3>
-                                </div>
-                                {% if simulation.results_dirty %}
-                                    <img src="{% url 'fits' simulation.id 'dirty' %}" width="600">
-                                {% else %}
-                                    not available
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <a href="#" class="thumbnail">
-                                <div class="caption">
-                                    <h3>Restored image</h3>
-                                </div>
-                                {% if simulation.results_restored %}
-                                    <img src="{% url 'fits' simulation.id 'restored' %}" width="600">
-                                {% else %}
-                                    Restored image not available
-                                {%  endif %}
-                            </a>
-                        </div>
-                    </div>
+                    {% if simulation.results_dirty %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' simulation.id 'dirty' %}" width="600">
+                        </a>
+                    {% else %}
+                        <h3>not available</h3>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Restored image</div>
+                <div class="panel-body">
+                    {% if simulation.results_restored %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' simulation.id 'restored' %}" width="600">
+                        </a>
+                    {% else %}
+                        <h3>not available</h3>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -72,7 +68,8 @@
                         <li><b>status:</b> <span class="label label-{{ simulation.get_state_display|status_label  }}">{{ simulation.get_state_display }}</span></li>
                         <li><b>celery status:</b> <span class="label label-default">{{ simulation.get_task_status }}</span></li>
                         <li><b>start:</b> {{ simulation.started }}</li>
-                        <li><b>finished:</b>{{ simulation.finished }}</li>
+                        <li><b>finished:</b> {{ simulation.finished }}</li>
+                        <li><b>duration:</b> {{ simulation.duration }}</li>
                         <li><b>name:</b> {{ simulation.name }}</li>
                     </ul>
                 </div>
@@ -80,51 +77,50 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
+
+        <div class="col-md-4">
             <div class="panel panel-primary">
-                <div class="panel-heading">Detailed results</div>
+                <div class="panel-heading">Model image</div>
                 <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <a href="#" class="thumbnail">
-                                <div class="caption">
-                                    <h3>Model image</h3>
-                                </div>
-                                {% if simulation.results_model %}
-                                    <img src="{% url 'fits' simulation.id 'model' %}" width="500">
-                                {% else %}
-                                    Not available
-                                {% endif %}
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <a href="#" class="thumbnail">
-                                <div class="caption">
-                                    <h3>Residual image</h3>
-                                </div>
-                                {% if simulation.results_residual %}
-                                    <img src="{% url 'fits' simulation.id 'residual' %}" width="500">
-                                {% else %}
-                                    Not available
-                                {% endif %}
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <a href="#" class="thumbnail">
-                                <div class="caption">
-                                    <h3>uvcov</h3>
-                                </div>
-                                {% if simulation.results_uvcov %}
-                                    <img src="{{ MEDIA_URL }}{{ simulation.results_uvcov }}" width="500">
-                                {% else %}
-                                    Not available
-                                {% endif %}
-                            </a>
-                        </div>
-                    </div>
+                    {% if simulation.results_model %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' simulation.id 'model' %}" width="600">
+                        </a>
+                    {% else %}
+                        <h3>not available</h3>
+                    {% endif %}
                 </div>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Residual image</div>
+                <div class="panel-body">
+                    {% if simulation.results_residual %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' simulation.id 'residual' %}" width="600">
+                        </a>
+                    {% else %}
+                        <h3>not available</h3>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Uvcov image</div>
+                <div class="panel-body">
+                    {% if simulation.results_dirty %}
+                        <a href="#" class="thumbnail">
+                            <img src="{{ MEDIA_URL }}{{ simulation.results_uvcov }}" width="500">
+                        </a>
+                    {% else %}
+                        <h3>not available</h3>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div class="row">
