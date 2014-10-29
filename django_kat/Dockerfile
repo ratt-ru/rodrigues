@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED 1
 ENV DEBIAN_FRONTEND noninteractive
 ADD docker/apt.sources.list /etc/apt/sources.list
 RUN apt-get update
-RUN apt-get install -y python3-numpy python3-pip python3-psycopg2 python3-matplotlib
+RUN apt-get install -y python3-numpy python3-pip python3-psycopg2 python3-matplotlib libc6-dev
 RUN mkdir /code
 WORKDIR /code
 ADD requirements.txt /code/

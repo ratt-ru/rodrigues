@@ -1,5 +1,5 @@
 """
-WSGI config for surf_kat project.
+WSGI config for django_kat project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -8,7 +8,7 @@ https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/
 """
 
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "surf_kat.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_kat.settings")
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()

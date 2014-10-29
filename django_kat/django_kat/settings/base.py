@@ -35,10 +35,10 @@ MIDDLEWARE_CLASSES = (
 )
 
 
-ROOT_URLCONF = 'surf_kat.urls'
+ROOT_URLCONF = 'django_kat.urls'
 
 
-WSGI_APPLICATION = 'surf_kat.wsgi.application'
+WSGI_APPLICATION = 'django_kat.wsgi.application'
 
 
 LANGUAGE_CODE = 'en-us'
@@ -86,10 +86,9 @@ MESSAGE_TAGS = {
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploaded')
 MEDIA_URL = '/media/'
 
-DOCKER_IMAGE = 'gijzelaerr/ceiling-kat'
+DOCKER_IMAGE = 'gijzelaerr/simulator'
 DOCKER_CMD = 'sh -c "' \
              'mkdir /tmp_results && ' \
-             'cd /code/web-kat && ' \
              'pyxis ' \
              'CFG=/results/sims.cfg ' \
              'LOG=/tmp_results/output.log ' \

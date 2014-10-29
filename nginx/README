@@ -1,0 +1,4 @@
+this folder contains a docker file file 
+that configures a nginx webserver.
+
+The nginx webserver is the entrypoint in our docker orchestra.

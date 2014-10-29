@@ -5,28 +5,30 @@ broker:
   ports:
     - "5672:5672"
     - "15672:15672"
+
 worker:
- image: gijzelaerrr/surf_kat
- command: celery worker -A surf_kat -l INFO
+ build: django_kat
+ command: celery worker -A django_kat -l INFO
  links:
    - broker
    - db
  environment:
-   - DJANGO_SETTINGS_MODULE=surf_kat.settings.container
+   - DJANGO_SETTINGS_MODULE=django_kat.settings.container
    - C_FORCE_ROOT=true
    - SECRET_KEY="doens't matter"
  volumes:
   - /var/run:/var/run
   - /var/lib/docker:/var/lib/docker
   - /results
+
 django:
-  image: gijzelaerrr/surf_kat
-  command: uwsgi --socket surf_kat.sock --module surf_kat.wsgi --chmod-socket=666
+  build: django_kat
+  command: uwsgi --socket django_kat.sock --module django_kat.wsgi --chmod-socket=666
   links:
     - db
     - broker
   environment:
-    - DJANGO_SETTINGS_MODULE=surf_kat.settings.container
+    - DJANGO_SETTINGS_MODULE=django_kat.settings.container
     - SECRET_KEY="please change me"
     - HOSTNAME="192.168.59.103"
     - DEBUG=false
@@ -34,8 +36,9 @@ django:
     - /code
   volumes_from:
     - worker
+
 nginx:
-  build: docker/nginx
+  build: nginx
   volumes_from:
     - django
   ports:

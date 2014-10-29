@@ -11,17 +11,17 @@ IMAGE_PROJECT=google-containers
 #IMAGE=coreos-stable-444-5-0-v20141016
 #IMAGE_PROJECT=coreos-cloud
 
-export DJANGO_SETTINGS_MODULE=surf_kat.settings.development
+export DJANGO_SETTINGS_MODULE=django_kat.settings.development
 
 .PHONY: all worker amqp django syncdb fig fig_syncdb fig_restart vm_create vm_delete vm_ssh vm_ip
 
 all:
 
 worker:
-	python3 `which celery` -A surf_kat worker -l info
+	python3 `which celery` -A django_kat worker -l info
 
 flower:
-	python3 `which celery` -A surf_kat flower
+	python3 `which celery` -A django_kat flower
 
 broker:
 	rabbitmq-server
