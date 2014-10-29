@@ -5,90 +5,146 @@
 {%  block content %}
 
     <h1>Details for simulation {{ simulation.id }}</h1>
-    <div class="row">
-        <div class="col-md-3">
-            <ul>
-                <li><b>ID:</b> {{ simulation.id }}</li>
-                <li><b>status:</b> <span class="label label-{{ simulation.get_state_display|status_label  }}">{{ simulation.get_state_display }}</span></li>
-                <li><b>celery status:</b> <span class="label label-default">{{ simulation.get_task_status }}</span></li>
-                <li><b>start:</b> {{ simulation.started }}</li>
-                <li><b>finished:</b>{{ simulation.finished }}</li>
-                <li><b>name:</b> {{ simulation.name }}</li>
-            </ul>
+
+    <form>
+        {% csrf_token %}
+        <div class="btn-group btn-group-lg">
+
+            <button type="submit" formmethod="post" formaction="{% url 'reschedule' simulation.id %}" class="btn btn-warning">Reschedule</button>
+
+            <a href="{% url 'detail' simulation.id %}" class="btn btn-info btn-lg" role="button">Refresh</a>
+            <a href="{% url 'delete' simulation.id %}" class="btn btn-danger btn-lg" role="button">Delete</a>
+            <a href="{% url 'config' simulation.id %}" class="btn btn-default btn-lg" role="button">Config</a>
+
         </div>
-        <div class="col-md-3">
-            <div class="btn-group">
-                <form>
-                    {% csrf_token %}
-                    <button type="submit" formmethod="post" formaction="{% url 'reschedule' simulation.id %}" class="btn btn-warning">Reschedule</button>
-                    <a href="{% url 'detail' simulation.id %}"><button type="button" class="btn btn-info">Refresh</button></a>
-                    <a href="{% url 'delete' simulation.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
-                    <a href="{% url 'config' simulation.id %}"><button type="button" class="btn btn-default">config</button></a>
-                </form>
+    </form>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="btn-group btn-group-lg">
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Results</div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="thumbnail">
+                                <div class="caption">
+                                    <h3>Dirty image</h3>
+                                </div>
+                                {% if simulation.results_dirty %}
+                                    <img src="{% url 'fits' simulation.id 'dirty' %}" width="600">
+                                {% else %}
+                                    not available
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="#" class="thumbnail">
+                                <div class="caption">
+                                    <h3>Restored image</h3>
+                                </div>
+                                {% if simulation.results_restored %}
+                                    <img src="{% url 'fits' simulation.id 'restored' %}" width="600">
+                                {% else %}
+                                    Restored image not available
+                                {%  endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Job properties</div>
+                <div class="panel-body">
+                    <ul>
+                        <li><b>ID:</b> {{ simulation.id }}</li>
+                        <li><b>status:</b> <span class="label label-{{ simulation.get_state_display|status_label  }}">{{ simulation.get_state_display }}</span></li>
+                        <li><b>celery status:</b> <span class="label label-default">{{ simulation.get_task_status }}</span></li>
+                        <li><b>start:</b> {{ simulation.started }}</li>
+                        <li><b>finished:</b>{{ simulation.finished }}</li>
+                        <li><b>name:</b> {{ simulation.name }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Detailed results</div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="#" class="thumbnail">
+                                <div class="caption">
+                                    <h3>Model image</h3>
+                                </div>
+                                {% if simulation.results_model %}
+                                    <img src="{% url 'fits' simulation.id 'model' %}" width="500">
+                                {% else %}
+                                    Not available
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="#" class="thumbnail">
+                                <div class="caption">
+                                    <h3>Residual image</h3>
+                                </div>
+                                {% if simulation.results_residual %}
+                                    <img src="{% url 'fits' simulation.id 'residual' %}" width="500">
+                                {% else %}
+                                    Not available
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="#" class="thumbnail">
+                                <div class="caption">
+                                    <h3>uvcov</h3>
+                                </div>
+                                {% if simulation.results_uvcov %}
+                                    <img src="{{ MEDIA_URL }}{{ simulation.results_uvcov }}" width="500">
+                                {% else %}
+                                    Not available
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-3">
-            <a href="#" class="thumbnail">
-                {% if simulation.results_dirty %}
-                    <img src="{% url 'fits' simulation.id 'dirty' %}" width="500" alt="dirty">
-                {% else %}
-                    Not available
-                {% endif %}
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="#" class="thumbnail">
-                {% if simulation.results_model %}
-                    <img src="{% url 'fits' simulation.id 'model' %}" width="500">
-                {% else %}
-                    Not available
-                {% endif %}
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="#" class="thumbnail">
-                {% if simulation.results_residual %}
-                    <img src="{% url 'fits' simulation.id 'residual' %}" width="500">
-                {% else %}
-                    Not available
-                {% endif %}
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="#" class="thumbnail">
-                {% if simulation.results_restored %}
-                    <img src="{% url 'fits' simulation.id 'restored' %}" width="500">
-                {% else %}
-                    Not available
-                {%  endif %}
-            </a>
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Log file</div>
+                <div class="panel-body">
+                    <div class="well" style="font-family:monospace;">{{ simulation.log|linebreaksbr }}</div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="row text-center">
+    <div class="row">
         <div class="col-md-12">
-            <a href="#" class="thumbnail">
-                {% if simulation.results_uvcov %}
-                    <img src="{{ MEDIA_URL }}{{ simulation.results_uvcov }}" width="500">
-                {% else %}
-                    Not available
-                {% endif %}
-            </a>
-        </div>
-    </div>
-
-    <div>
-        <div class="col-md-12">
-            <h2>log</h2>
-            <div class="well" style="font-family:monospace;">{{ simulation.log|linebreaksbr }}</div></li>
-        </div>
-    </div>
-    <div>
-        <div class="col-md-12">
-            <h2>config file</h2>
-            <div class="well" style="font-family:monospace;">{{ config|linebreaksbr }}</div></li>
+            <div class="panel panel-primary">
+                <div class="panel-heading">Config file</div>
+                <div class="panel-body">
+                    <div class="well" style="font-family:monospace;">{{ config|linebreaksbr }}</div>
+                </div>
+            </div>
         </div>
     </div>
 
