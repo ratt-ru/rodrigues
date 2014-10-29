@@ -174,3 +174,7 @@ class Simulation(Model):
                 return "can't connect to broker: " + str(e)
         else:
             return 'NO TASK ID'
+
+    def duration(self):
+        if self.finished and self.started:
+            return str(self.finished - self.started)
