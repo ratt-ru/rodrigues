@@ -77,3 +77,6 @@ deploy:
 	fig up -d
 	fig run django python3 manage.py syncdb
 
+psql:
+	docker run -it --link ceilingkat_db_1:db1 postgres psql -h db1 -U postgres
+
