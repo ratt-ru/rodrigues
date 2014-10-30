@@ -1,9 +1,11 @@
 #!make
 
 ZONE=europe-west1-b
-MACHINE_TYPE=f1-micro
+#MACHINE_TYPE=f1-micro
+MACHINE_TYPE=n1-standard-4
 INSTANCE_NAME=ceiling-kat
 IMAGE=container-vm-v20141016
+#IMAGE=coreos-beta-444-5-0-v20141016
 IMAGE_PROJECT=google-containers
 
 DJANGO_FOLDER=django_kat
@@ -57,8 +59,8 @@ fig_reload: git_pull fig_stop fig_build fig_up fig_syncdb
 vm_create:
 	gcloud compute instances create $(INSTANCE_NAME) \
 		--image ${IMAGE} \
-		--image-project $(IMAGE_PROJECT) \
 		--zone $(ZONE) \
+		--image-project $(IMAGE_PROJECT) \
 		--machine-type ${MACHINE_TYPE}
 
 vm_delete:
