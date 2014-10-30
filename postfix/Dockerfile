@@ -12,6 +12,7 @@ RUN postconf -e 'myhostname = ceiling-kat.meqtrees.net'
 RUN postconf -e 'mydestination = localhost.localdomain, localhost'
 RUN postconf -e 'mynetworks = 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16'
 RUN postconf -e 'smtp_dns_support_level = enabled'
+RUN postconf -e 'inet_protocols = ipv4'
 
 RUN echo "root: gijsmolenaar@gmail.com" >> /etc/aliases
 RUN newaliases
