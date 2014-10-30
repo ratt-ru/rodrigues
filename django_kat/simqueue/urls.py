@@ -1,9 +1,9 @@
 from django.conf.urls import patterns, url
 
 
-from simqueue.views import (SimulationCreate, SimulationList, SimulationDetail,
-                            Reschedule, SimulationDelete, SimulationConfig,
-                            SimulationFits)
+from .views import (SimulationCreate, SimulationList, SimulationDetail,
+                    Reschedule, SimulationDelete, SimulationConfig,
+                    SimulationFits)
 
 
 

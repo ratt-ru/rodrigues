@@ -87,8 +87,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'uploaded')
 MEDIA_URL = '/media/'
 
 DOCKER_IMAGE = 'gijzelaerr/simulator'
-DOCKER_CMD = 'pyxis ' \
-             'CFG=/input/sims.cfg ' \
-             'LOG=/results/output.log ' \
-             'OUTFILE=/results/results ' \
-             'OUTDIR=/results azishe ' \

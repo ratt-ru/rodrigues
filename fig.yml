@@ -6,16 +6,24 @@ broker:
     - "5672:5672"
     - "15672:15672"
 
+mail:
+  build: postfix
+  ports:
+    - 25:25
+  # somehow the docker DNS server can't resolve MX records so we use google
+  dns: 8.8.8.8
+
 worker:
  build: django_kat
  command: celery worker -A django_kat -l INFO
  links:
    - broker
    - db
+   - mail
  environment:
    - DJANGO_SETTINGS_MODULE=django_kat.settings.container
    - C_FORCE_ROOT=true
-   - SECRET_KEY="doens't matter"
+   - SECRET_KEY="doesn't matter"
  volumes:
   - /var/run:/var/run
   - /var/lib/docker:/var/lib/docker
@@ -27,11 +35,13 @@ django:
   links:
     - db
     - broker
+    - mail
   environment:
     - DJANGO_SETTINGS_MODULE=django_kat.settings.container
     - SECRET_KEY="please change me"
-    - HOSTNAME="192.168.59.103"
-    - DEBUG=false
+    #- ALLOWED_HOST="ceiling-kat.meqtrees.net"
+    #- ADMIN_EMAIL="gijsmolenaar@gmail.com"
+    #- DEBUG=false
   volumes:
     - /code
   volumes_from:
@@ -43,4 +53,29 @@ nginx:
     - django
   ports:
     - 80:80
+
+## you can enable this if you want to examine the worker queue
+#
+#flower:
+# build: django_kat
+# command: celery flower -A django_kat --logging=info
+# links:
+#   - broker
+# environment:
+#   - DJANGO_SETTINGS_MODULE=django_kat.settings.container
+#   - SECRET_KEY="doesn't matter"
+# ports:
+#   - 5555:5555
+
+
+## sentry is used for log collecting
+#
+#sentry:
+#  build: sentry
+#  links:
+#   - db
+#  environment:
+#   - SENTRY_KEY="change me"
+#  ports:
+#    - 9000:9000
 

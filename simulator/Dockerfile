@@ -4,5 +4,5 @@ ADD casarc /root/.casarc
 ADD . /code
 WORKDIR /code
 RUN mkdir /results
-RUN mkdir /input
+ADD runner.py /
 

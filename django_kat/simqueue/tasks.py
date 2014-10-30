@@ -6,6 +6,7 @@ import tempfile
 import tarfile
 import os
 import io
+import json
 from django.contrib import messages
 from pytz import timezone
 import docker
@@ -33,17 +34,17 @@ files = (
 )
 
 
-def docker_copy(docker_client, container_id, path, target="."):
+def docker_copy(client, container_id, path, target="."):
     """
     Copy is not implemented in docker-py, so we do it ourself.
 
     args:
-        docker_client: a docker client object
+        client: a docker client object
         container_id: ID of the container to copy from
         path: path to the file in the container
         target: folder where to put the file
     """
-    response = docker_client.copy(container_id, path)
+    response = client.copy(container_id, path)
     buffer = io.BytesIO()
     buffer.write(response.data)
     buffer.seek(0)
@@ -54,29 +55,28 @@ def docker_copy(docker_client, container_id, path, target="."):
 def run_docker(config, simulation):
     try:
         result_dir = tempfile.mkdtemp(dir=settings.RESULTS_DIR)
-        input_dir = tempfile.mkdtemp(dir=settings.RESULTS_DIR)
         tempdir_name = os.path.basename(result_dir)
-        config_file = open(os.path.join(input_dir, 'sims.cfg'), 'w')
-        config_file.write(config)
-        config_file.close()
-        docker_client = docker.Client(settings.DOCKER_URI)
-        container_id = docker_client.create_container(image=settings.DOCKER_IMAGE,
-                                                      command=settings.DOCKER_CMD,
-                                                      )
-        docker_client.start(container_id, binds={input_dir: {'bind': '/input',
-                                                             'ro': False}})
+        json.dumps(config)
+        client = docker.Client(settings.DOCKER_URI)
 
-        if docker_client.wait(container_id):
+        cmd = "/runner.py '%s'" % json.dumps({'sims.cfg': config})
+        logging.error(cmd)
+        container_id = client.create_container(image=settings.DOCKER_IMAGE,
+                                               command=cmd,
+                                               )
+        client.start(container_id)
+
+        if client.wait(container_id):
             logger.warning('simulation exited with an error')
             status = True
         else:
             logger.info('simulate finished')
             status = False
-        logs = docker_client.logs(container_id).decode()
+        logs = client.logs(container_id).decode()
 
         # logfile is same as stdout but with more detail
         try:
-            docker_copy(docker_client, container_id,
+            docker_copy(client, container_id,
                         path='/results/' + 'output.log', target=result_dir)
         except (DockerException, RequestException) as e:
             logger.error(str(e))
@@ -86,7 +86,7 @@ def run_docker(config, simulation):
 
         for filename, fieldname in files:
             try:
-                docker_copy(docker_client, container_id,
+                docker_copy(client, container_id,
                             path='/results/' + filename, target=result_dir)
             except (DockerException, RequestException) as e:
                 logger.error(str(e))
@@ -138,11 +138,11 @@ def schedule_simulation(simulation, request):
     try:
         async = simulate.delay(simulation_id=simulation.id)
     except OSError as e:
-            error = "can't start simulation %s: %s" % (simulation.id,
-                                                       str(e))
-            messages.error(request, error)
-            logger.error(error)
-            simulation.set_crashed(error)
+        error = "can't start simulation %s: %s" % (simulation.id,
+                                                   str(e))
+        messages.error(request, error)
+        logger.error(error)
+        simulation.set_crashed(error)
     else:
         simulation.task_id = async.task_id
         simulation.save(update_fields=["task_id"])

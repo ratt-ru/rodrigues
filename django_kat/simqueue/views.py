@@ -4,15 +4,15 @@ from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import HttpResponseRedirect
 from django.http import Http404
 from django.views.generic.edit import CreateView
-from django.views.generic import ListView, DetailView, DeleteView
+from django.views.generic import ListView, DetailView, DeleteView, TemplateView
 from django.http import HttpResponse
 import matplotlib
 
-from simqueue.models import Simulation
+from .models import Simulation
 from .forms import SimulateForm
 from .mixins import LoginRequiredMixin
 from .config import generate_config
-from simqueue.tasks import schedule_simulation
+from .tasks import schedule_simulation
 
 matplotlib.use('agg')
 import aplpy
