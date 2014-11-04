@@ -7,6 +7,7 @@ import tarfile
 import os
 import io
 import json
+import socket
 from django.contrib import messages
 from pytz import timezone
 import docker
@@ -53,6 +54,9 @@ def docker_copy(client, container_id, path, target="."):
 
 
 def run_docker(config, simulation):
+    """
+    Run the actual container and do housekeeping.
+    """
     try:
         result_dir = tempfile.mkdtemp(dir=settings.RESULTS_DIR)
         tempdir_name = os.path.basename(result_dir)
@@ -137,7 +141,7 @@ def schedule_simulation(simulation, request):
     """
     try:
         async = simulate.delay(simulation_id=simulation.id)
-    except OSError as e:
+    except (OSError, socket.error) as e:
         error = "can't start simulation %s: %s" % (simulation.id,
                                                    str(e))
         messages.error(request, error)
