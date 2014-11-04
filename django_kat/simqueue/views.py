@@ -66,7 +66,7 @@ class Reschedule(LoginRequiredMixin, DetailView):
     model = Simulation
 
     def get(self, request, *args, **kwargs):
-        super().get(self, request, *args, **kwargs)
+        super(Reschedule, self).get(self, request, *args, **kwargs)
         return HttpResponseRedirect(reverse('detail', args=(self.object.id,)))
 
     def post(self, request, *args, **kwargs):
