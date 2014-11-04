@@ -1,10 +1,8 @@
 db:
   image: postgres:9.3
+
 broker:
   image: dockerfile/rabbitmq
-  ports:
-    - "5672:5672"
-    - "15672:15672"
 
 mail:
   build: postfix
@@ -12,6 +10,24 @@ mail:
     - 25:25
   # somehow the docker DNS server can't resolve MX records so we use google
   dns: 8.8.8.8
+
+redis:
+  image: redis:latest
+
+## sentry is used for log collecting
+sentry:
+  image: slafs/sentry
+  environment:
+   - SECRET_KEY="please change me"
+   - SENTRY_URL_PREFIX=http://192.168.59.103:9000/
+   - SENTRY_ADMIN_USERNAME=gijs
+   - SENTRY_ADMIN_PASSWORD=gijsgijs
+   - SENTRY_ADMIN_EMAIL=root@localhost
+   - SENTRY_REDIS_HOST=redis
+  ports:
+    - 9000:9000
+  links:
+    - redis
 
 worker:
  build: django_kat
@@ -27,7 +43,7 @@ worker:
  volumes:
   - /var/run:/var/run
   - /var/lib/docker:/var/lib/docker
-  - /results
+  - /code/results
 
 django:
   build: django_kat
@@ -36,12 +52,14 @@ django:
     - db
     - broker
     - mail
+    - sentry
   environment:
     - DJANGO_SETTINGS_MODULE=django_kat.settings.container
-    - SECRET_KEY="please change me"
-    #- ALLOWED_HOST="ceiling-kat.meqtrees.net"
-    #- ADMIN_EMAIL="gijsmolenaar@gmail.com"
-    #- DEBUG=false
+    - SECRET_KEY=please change me
+    - ALLOWED_HOST=192.168.59.103
+    - ADMIN_EMAIL=root@localhost
+    #- DEBUG=true
+    - SENTRY_DSN=http://1c6a0e5af24d462787ae4db89d097790:039fdb4b28964af29a8c9d648ed45973@192.168.59.103:9000//2
   volumes:
     - /code
   volumes_from:
@@ -53,6 +71,13 @@ nginx:
     - django
   ports:
     - 80:80
+
+viewer:
+  image: gijzelaerr/cyberska_viewer
+  volumes_from:
+    - worker
+  ports:
+    - 8080:8080
 
 ## you can enable this if you want to examine the worker queue
 #
@@ -67,15 +92,4 @@ nginx:
 # ports:
 #   - 5555:5555
 
-
-## sentry is used for log collecting
-#
-#sentry:
-#  build: sentry
-#  links:
-#   - db
-#  environment:
-#   - SENTRY_KEY="change me"
-#  ports:
-#    - 9000:9000
 

@@ -39,9 +39,16 @@ DATABASES = {
 BROKER_URL = 'amqp://broker/'
 
 ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST', 'ceiling-kat.meqtrees.net')]
-ALLOWED_HOSTS = ['ceiling-kat.']
 
 DOCKER_URI = 'unix://var/run/docker.sock'
 
 
-RESULTS_DIR = '/results'
+# Set your DSN value
+RAVEN_CONFIG = {
+    'dsn': os.environ.get('SENTRY_DSN', 'please set SENTRY_DSN in fig.yml'),
+}
+
+# Add raven to the list of installed apps
+INSTALLED_APPS = INSTALLED_APPS + (
+    'raven.contrib.django.raven_compat',
+)

@@ -15,6 +15,7 @@ DATABASES = {
     }
 }
 
+
 BROKER_URL = 'amqp://localhost/'
 
 
@@ -22,8 +23,4 @@ ALLOWED_HOSTS = ['127.0.0.1']
 
 
 DOCKER_URI = 'tcp://192.168.59.103:2375'
-
-
-RESULTS_DIR = os.path.join(BASE_DIR, 'results')
-
 

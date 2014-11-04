@@ -7,7 +7,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'HOST': 'db_1',
+        'HOST': 'db',
         'PORT': 5432,
     }
 }
@@ -34,7 +34,7 @@ SENTRY_WEB_OPTIONS = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-EMAIL_HOST = 'localhost'
+EMAIL_HOST = 'mail'
 EMAIL_HOST_PASSWORD = ''
 EMAIL_HOST_USER = ''
 EMAIL_PORT = 25
