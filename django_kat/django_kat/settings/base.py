@@ -87,3 +87,25 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'uploaded')
 MEDIA_URL = '/media/'
 
 DOCKER_IMAGE = 'gijzelaerr/simulator'
+
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        }
+    },
+}
+
+RESULTS_DIR = os.path.join(BASE_DIR, 'results')
+
+
