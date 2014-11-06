@@ -8,6 +8,7 @@ import os
 import io
 import json
 import socket
+import shutil
 from django.contrib import messages
 from pytz import timezone
 import docker
@@ -23,15 +24,17 @@ from .config import generate_config
 logger = logging.getLogger(__name__)
 
 
-docker_status = namedtuple('DockerStatus', ['status', 'logs', 'result_dir'])
+docker_status = namedtuple('DockerStatus', ['status', 'logs'])
 
 
+# (filename in container, field in database)
 files = (
     ('results-uvcov.png', 'results_uvcov'),
     ('results.dirty.fits', 'results_dirty'),
     ('results.model.fits', 'results_model'),
     ('results.residual.fits', 'results_residual'),
     ('results.restored.fits', 'results_restored'),
+    ('output.log', ''),
 )
 
 
@@ -59,9 +62,7 @@ def run_docker(config, simulation):
     Run the actual container and do housekeeping.
     """
     try:
-        result_dir = tempfile.mkdtemp(dir=settings.RESULTS_DIR)
-        tempdir_name = os.path.basename(result_dir)
-        json.dumps(config)
+        temp_dir = tempfile.mkdtemp(dir=settings.RESULTS_DIR)
         client = docker.Client(settings.DOCKER_URI)
 
         cmd = "/runner.py '%s'" % json.dumps({'sims.cfg': config})
@@ -77,38 +78,33 @@ def run_docker(config, simulation):
         else:
             logger.info('simulate finished')
             status = False
-        logs = client.logs(container_id).decode()
 
-        # logfile is same as stdout but with more detail
-        try:
-            docker_copy(client, container_id,
-                        path='/results/' + 'output.log', target=result_dir)
-        except (DockerException, RequestException) as e:
-            logger.error(str(e))
-            logging.error('cant find output.log inside container')
-        else:
-            logs = open(os.path.join(result_dir, 'output.log'), 'r').read()
+        logs = client.logs(container_id).decode()
 
         for filename, fieldname in files:
             try:
                 docker_copy(client, container_id,
-                            path='/results/' + filename, target=result_dir)
+                            path='/results/' + filename, target=temp_dir)
             except (DockerException, RequestException) as e:
                 logger.error(str(e))
                 logging.error('cant find %s inside container' % filename)
             else:
-                fullpath = os.path.join(result_dir, filename)
-                field = getattr(simulation, fieldname)
-                field.save(filename, File(open(fullpath, 'rb')))
-                logger.info('copied %s to %s' % (filename, field.file))
-                simulation.save(update_fields=[fieldname])
+                if filename == 'output.log':
+                    logs = open(os.path.join(temp_dir, 'output.log'), 'r').read()
+                else:
+                    fullpath = os.path.join(temp_dir, filename)
+                    field = getattr(simulation, fieldname)
+                    field.save(filename, File(open(fullpath, 'rb')))
+                    logger.info('copied %s to %s' % (filename, field.file))
+                    simulation.save(update_fields=[fieldname])
 
-        return docker_status(status=status, logs=logs, result_dir=tempdir_name)
+        shutil.rmtree(temp_dir)
+        return docker_status(status=status, logs=logs)
 
     except (DockerException, RequestException) as e:
         error = "Running container failed: " + str(e)
         logger.error(error)
-        return docker_status(status=1, logs=error, result_dir=tempdir_name)
+        return docker_status(status=1, logs=error)
 
 
 
@@ -131,9 +127,7 @@ def simulate(simulation_id):
 
     simulation.log = results.logs
     simulation.finished = datetime.now(timezone(settings.TIME_ZONE))
-    simulation.result_dir = results.result_dir
-    simulation.save(update_fields=["finished", "log", "state", "result_dir",
-                                   "results_uvcov"])
+    simulation.save(update_fields=["finished", "log", "state", "results_uvcov"])
     return simulation.state
 
 
