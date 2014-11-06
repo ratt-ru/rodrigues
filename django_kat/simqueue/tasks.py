@@ -45,6 +45,7 @@ def docker_copy(client, container_id, path, target="."):
         path: path to the file in the container
         target: folder where to put the file
     """
+    logger.info("copying %s from container to %s" % (path, target))
     response = client.copy(container_id, path)
     buffer = io.BytesIO()
     buffer.write(response.data)
@@ -99,6 +100,7 @@ def run_docker(config, simulation):
                 fullpath = os.path.join(result_dir, filename)
                 field = getattr(simulation, fieldname)
                 field.save(filename, File(open(fullpath, 'rb')))
+                logger.info('copied %s to %s' % (filename, field.file))
                 simulation.save(update_fields=[fieldname])
 
         return docker_status(status=status, logs=logs, result_dir=tempdir_name)

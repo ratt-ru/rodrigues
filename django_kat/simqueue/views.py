@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import HttpResponseRedirect
 from django.http import Http404
 from django.views.generic.edit import CreateView
-from django.views.generic import ListView, DetailView, DeleteView, TemplateView
+from django.views.generic import ListView, DetailView, DeleteView
 from django.http import HttpResponse
 import matplotlib
 
@@ -89,10 +89,15 @@ class SimulationFits(DetailView):
             raise Http404
         response = HttpResponse(content_type='image/png')
         fig = matplotlib.pyplot.figure()
-        filename = str(getattr(self.object, 'results_' + field).file)
-        plot = aplpy.FITSFigure(filename, figure=fig,
-                                auto_refresh=False)
-        plot.show_colorscale()
+
+        try:
+            filename = str(getattr(self.object, 'results_' + field).file)
+            plot = aplpy.FITSFigure(filename, figure=fig,
+                                    auto_refresh=False)
+        except IOError as e:
+            matplotlib.pyplot.text(0.1, 0.8, str(e))
+        else:
+            plot.show_colorscale()
         fig.canvas.print_figure(response, format='png')
         return response
 

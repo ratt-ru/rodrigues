@@ -44,6 +44,7 @@ worker:
   - /var/run:/var/run
   - /var/lib/docker:/var/lib/docker
   - /code/results
+  - /code/uploaded
 
 django:
   build: django_kat
@@ -80,16 +81,15 @@ viewer:
     - 8080:8080
 
 ## you can enable this if you want to examine the worker queue
-#
-#flower:
-# build: django_kat
-# command: celery flower -A django_kat --logging=info
-# links:
-#   - broker
-# environment:
-#   - DJANGO_SETTINGS_MODULE=django_kat.settings.container
-#   - SECRET_KEY="doesn't matter"
-# ports:
-#   - 5555:5555
+flower:
+ build: django_kat
+ command: celery flower -A django_kat --logging=warning
+ links:
+   - broker
+ environment:
+   - DJANGO_SETTINGS_MODULE=django_kat.settings.container
+   - SECRET_KEY="doesn't matter"
+ ports:
+   - 5555:5555
 
 
