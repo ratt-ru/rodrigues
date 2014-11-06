@@ -78,7 +78,11 @@ viewer:
   volumes_from:
     - worker
   ports:
+    - 8081:80
     - 8080:8080
+  environment:
+    - REDIRECT_HOST=192.168.59.103
+    - REDIREC_PORT=8080
 
 ## you can enable this if you want to examine the worker queue
 flower:

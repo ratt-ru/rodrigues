@@ -35,6 +35,12 @@
                     {% if simulation.results_dirty %}
                         <a href="#" class="thumbnail">
                             <img src="{% url 'fits' simulation.id 'dirty' %}" width="600">
+                            <form action="http://192.168.59.103:8081/v1/viz" method="post">
+                                <input type="hidden" name="title" value="Dirty image" />
+                                <input type="hidden" name="filename" value="{{ simulation.results_dirty.file }}">
+                                <input type="submit" class="btn btn-warning" />
+                            </form>
+
                         </a>
                     {% else %}
                         <h3>not available</h3>
