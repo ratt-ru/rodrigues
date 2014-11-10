@@ -7,21 +7,16 @@
 
 ## Installation
 
-Install Docker:
 
-    https://docs.docker.com/installation/
+### On a fresh Ubuntu 14.04 machine
 
-install fig:
+run:
 
-    http://www.fig.sh/install.html
-
-checkout the git repo:
-
+    $ sudo apt-get install -y docker.io python-pip git
+    $ sudo pip install fig
     $ git clone https://github.com/ska-sa/ceiling-kat
-
-and then run:
-
-    $ pushd simulator && make && popd
+    $ cp fig_example.yml fig.yml
+    $ edit fig.yml   # set all the environment variables
     $ fig up -d
     $ fig run django python ./manage.py syncdb   # this will populate the database with empty tables
 
@@ -29,18 +24,13 @@ And answer the questions. Yes, you want to create a superuser.
 
 This will start a webserver on port 80.
 
-**note**: In deployment you WANT to change `SECRET_KEY` and `HOSTNAME` in side fig.yml
-
-
 ## Updating a deployed django_kat
 
 in the root folder run:
 
     $ git pull
-    $ fig stop
-    $ fig up -d
+    $ fig build
     $ fig run django python ./manage.py syncdb    # this will update the running database
-
 
 ## Development setup
 
