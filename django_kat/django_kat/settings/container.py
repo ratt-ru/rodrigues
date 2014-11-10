@@ -43,6 +43,8 @@ ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST', 'ceiling-kat.meqtrees.net')]
 DOCKER_URI = 'unix://var/run/docker.sock'
 
 
+# disable sentry for now
+"""
 # Set your DSN value
 RAVEN_CONFIG = {
     'dsn': os.environ.get('SENTRY_DSN', 'please set SENTRY_DSN in fig.yml'),
@@ -52,6 +54,7 @@ RAVEN_CONFIG = {
 INSTALLED_APPS = INSTALLED_APPS + (
     'raven.contrib.django.raven_compat',
 )
+"""
 
 
 CYBERSKA_URL = os.environ.get('CYBERSKA_URL', 'please set CYBERSKA_URL in fig.yml')

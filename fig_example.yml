@@ -55,7 +55,7 @@ django:
     - db
     - broker
     - mail
-    - sentry
+    #- sentry
   environment:
     - DJANGO_SETTINGS_MODULE=django_kat.settings.container
     - SECRET_KEY=please change me
