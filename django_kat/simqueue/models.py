@@ -28,7 +28,7 @@ class Simulation(Model):
                        default='I')
 
     # observation setup
-    ms_hours = IntegerField('Synthesis time', default=4, help_text='in hours')
+    ms_hours = FloatField('Synthesis time', default=0.25, help_text='in hours')
     ms_dtime = IntegerField('Integration time', default=10, help_text='in seconds')
     ms_freq0 = FloatField('Start frequency', default=1400e6, help_text='in Hz')
     ms_dfreq = FloatField('Channel width', default=50e6, help_text='in Hz')
