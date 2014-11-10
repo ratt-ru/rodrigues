@@ -11,23 +11,24 @@ mail:
   # somehow the docker DNS server can't resolve MX records so we use google
   dns: 8.8.8.8
 
-redis:
-  image: redis:latest
+## redis is used by sentry
+#redis:
+#  image: redis:latest
 
 ## sentry is used for log collecting
-sentry:
-  image: slafs/sentry
-  environment:
-   - SECRET_KEY="please change me"
-   - SENTRY_URL_PREFIX=http://192.168.59.103:9000/
-   - SENTRY_ADMIN_USERNAME=gijs
-   - SENTRY_ADMIN_PASSWORD=gijsgijs
-   - SENTRY_ADMIN_EMAIL=root@localhost
-   - SENTRY_REDIS_HOST=redis
-  ports:
-    - 9000:9000
-  links:
-    - redis
+#sentry:
+#  image: slafs/sentry
+#  environment:
+#   - SECRET_KEY="please change me"
+#   - SENTRY_URL_PREFIX=http://192.168.59.103:9000/
+#   - SENTRY_ADMIN_USERNAME=gijs
+#   - SENTRY_ADMIN_PASSWORD=gijsgijs
+#   - SENTRY_ADMIN_EMAIL=root@localhost
+#   - SENTRY_REDIS_HOST=redis
+#  ports:
+#    - 9000:9000
+#  links:
+#    - redis
 
 worker:
  build: django_kat
@@ -41,7 +42,8 @@ worker:
    - C_FORCE_ROOT=true
    - SECRET_KEY="doesn't matter"
  volumes:
-  - /var/run:/var/run
+  - /var/run/docker.pid:/var/run/docker.pid
+  - /var/run/docker.sock:/var/run/docker.sock
   - /var/lib/docker:/var/lib/docker
   - /code/results
   - /code/uploaded
@@ -58,9 +60,10 @@ django:
     - DJANGO_SETTINGS_MODULE=django_kat.settings.container
     - SECRET_KEY=please change me
     - ALLOWED_HOST=192.168.59.103
+    - CYBERSKA_URL=http://192.168.59.103:8081/v1/viz
     - ADMIN_EMAIL=root@localhost
     #- DEBUG=true
-    - SENTRY_DSN=http://1c6a0e5af24d462787ae4db89d097790:039fdb4b28964af29a8c9d648ed45973@192.168.59.103:9000//2
+    #- SENTRY_DSN=http://1c6a0e5af24d462787ae4db89d097790:039fdb4b28964af29a8c9d648ed45973@192.168.59.103:9000//2
   volumes:
     - /code
   volumes_from:
@@ -85,15 +88,15 @@ viewer:
     - REDIREC_PORT=8080
 
 ## you can enable this if you want to examine the worker queue
-flower:
- build: django_kat
- command: celery flower -A django_kat --logging=warning
- links:
-   - broker
- environment:
-   - DJANGO_SETTINGS_MODULE=django_kat.settings.container
-   - SECRET_KEY="doesn't matter"
- ports:
-   - 5555:5555
+#flower:
+# build: django_kat
+# command: celery flower -A django_kat --logging=warning
+# links:
+#   - broker
+# environment:
+#   - DJANGO_SETTINGS_MODULE=django_kat.settings.container
+#   - SECRET_KEY="doesn't matter"
+# ports:
+#   - 5555:5555
 
 

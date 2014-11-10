@@ -9,9 +9,7 @@
     <form>
         {% csrf_token %}
         <div class="btn-group btn-group-lg">
-
             <button type="submit" formmethod="post" formaction="{% url 'reschedule' simulation.id %}" class="btn btn-warning">Reschedule</button>
-
             <a href="{% url 'detail' simulation.id %}" class="btn btn-info btn-lg" role="button">Refresh</a>
             <a href="{% url 'delete' simulation.id %}" class="btn btn-danger btn-lg" role="button">Delete</a>
             <a href="{% url 'config' simulation.id %}" class="btn btn-default btn-lg" role="button">Config</a>
@@ -35,12 +33,11 @@
                     {% if simulation.results_dirty %}
                         <a href="#" class="thumbnail">
                             <img src="{% url 'fits' simulation.id 'dirty' %}" width="600">
-                            <form action="http://192.168.59.103:8081/v1/viz" method="post">
+                            <form action="{{ CYBERSKA_URL }}" method="post">
                                 <input type="hidden" name="title" value="Dirty image" />
                                 <input type="hidden" name="filename" value="{{ simulation.results_dirty.file }}">
-                                <input type="submit" class="btn btn-warning" />
+                                <input type="submit" class="btn btn-warning"  value="Open in CyberSKA viewer"/>
                             </form>
-
                         </a>
                     {% else %}
                         <h3>not available</h3>
@@ -56,6 +53,11 @@
                     {% if simulation.results_restored %}
                         <a href="#" class="thumbnail">
                             <img src="{% url 'fits' simulation.id 'restored' %}" width="600">
+                            <form action="{{ CYBERSKA_URL }}" method="post">
+                                <input type="hidden" name="title" value="Restored image" />
+                                <input type="hidden" name="filename" value="{{ simulation.results_restored.file }}">
+                                <input type="submit" class="btn btn-warning"  value="Open in CyberSKA viewer"/>
+                            </form>
                         </a>
                     {% else %}
                         <h3>not available</h3>
@@ -91,6 +93,11 @@
                     {% if simulation.results_model %}
                         <a href="#" class="thumbnail">
                             <img src="{% url 'fits' simulation.id 'model' %}" width="600">
+                            <form action="{{ CYBERSKA_URL }}" method="post">
+                                <input type="hidden" name="title" value="Model image" />
+                                <input type="hidden" name="filename" value="{{ simulation.results_model.file }}">
+                                <input type="submit" class="btn btn-warning"  value="Open in CyberSKA viewer"/>
+                            </form>
                         </a>
                     {% else %}
                         <h3>not available</h3>
@@ -105,6 +112,11 @@
                     {% if simulation.results_residual %}
                         <a href="#" class="thumbnail">
                             <img src="{% url 'fits' simulation.id 'residual' %}" width="600">
+                            <form action="{{ CYBERSKA_URL }}" method="post">
+                                <input type="hidden" name="title" value="Residual image" />
+                                <input type="hidden" name="filename" value="{{ simulation.results_residual.file }}">
+                                <input type="submit" class="btn btn-warning"  value="Open in CyberSKA viewer"/>
+                            </form>
                         </a>
                     {% else %}
                         <h3>not available</h3>

@@ -35,6 +35,18 @@ MIDDLEWARE_CLASSES = (
 )
 
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+    'simqueue.context_processors.settings',
+)
+
+
 ROOT_URLCONF = 'django_kat.urls'
 
 
@@ -80,7 +92,7 @@ LOGIN_REDIRECT_URL = '/'
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
     messages.DEBUG: 'info',
-}
+    }
 
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploaded')
@@ -95,16 +107,16 @@ LOGGING = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
+            },
         },
-    },
     'loggers': {
         'django.request': {
             'handlers': ['console'],
             'propagate': True,
             'level': 'DEBUG',
-        }
+            }
     },
-}
+    }
 
 RESULTS_DIR = os.path.join(BASE_DIR, 'results')
 
