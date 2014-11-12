@@ -12,13 +12,15 @@
 
 run:
 
+    $ sudo apt-get update
     $ sudo apt-get install -y docker.io python-pip git
     $ sudo pip install fig
     $ git clone https://github.com/ska-sa/ceiling-kat
+    $ cd ceiling-kat
     $ cp fig_example.yml fig.yml
     $ edit fig.yml   # set all the environment variables
-    $ fig up -d
-    $ fig run django python ./manage.py syncdb   # this will populate the database with empty tables
+    $ sudo fig up -d
+    $ sudo fig run django python ./manage.py syncdb   # this will populate the database with empty tables
 
 And answer the questions. Yes, you want to create a superuser.
 
@@ -29,8 +31,8 @@ This will start a webserver on port 80.
 in the root folder run:
 
     $ git pull
-    $ fig build
-    $ fig run django python ./manage.py syncdb    # this will update the running database
+    $ sudo fig build
+    $ sudo fig run django python ./manage.py syncdb    # this will update the running database
 
 ## Development setup
 
