@@ -4,15 +4,22 @@
 
 {%  block content %}
 
-    <h1>Details for simulation {{ simulation.id }}</h1>
+    <h1>Details for simulation {{ simulation.id }} </h1>
+    <h2>{{ simulation.name }}</h2>
 
     <form>
         {% csrf_token %}
         <div class="btn-group btn-group-lg">
-            <button type="submit" formmethod="post" formaction="{% url 'reschedule' simulation.id %}" class="btn btn-warning">Reschedule</button>
+            <button type="submit"
+                    formmethod="post"
+                    formaction="{% url 'reschedule' simulation.id %}"
+                    class="btn btn-warning"
+                    {% if not simulation.can_reschedule %}
+                    disabled="disabled"
+                    {% endif %}
+                    >Reschedule</button>
             <a href="{% url 'detail' simulation.id %}" class="btn btn-info btn-lg" role="button">Refresh</a>
             <a href="{% url 'delete' simulation.id %}" class="btn btn-danger btn-lg" role="button">Delete</a>
-            <a href="{% url 'config' simulation.id %}" class="btn btn-default btn-lg" role="button">Config</a>
 
         </div>
     </form>
@@ -28,19 +35,34 @@
     <div class="row">
         <div class="col-md-6">
             <div class="panel panel-primary">
-                <div class="panel-heading">Dirty image</div>
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>Dirty image</b>
+                        </div>
+                        {% if simulation.results_dirty %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URL }}" method="post">
+                                    <input type="hidden" name="title" value="Dirty image" />
+                                    {% if simulation.results_dirty %}
+                                        <input type="hidden" name="filename" value="{{ simulation.results_dirty.file }}">
+                                        <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                    {% endif %}
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
                 <div class="panel-body">
                     {% if simulation.results_dirty %}
                         <a href="#" class="thumbnail">
                             <img src="{% url 'fits' simulation.id 'dirty' %}" width="600">
-                            <form action="{{ CYBERSKA_URL }}" method="post">
-                                <input type="hidden" name="title" value="Dirty image" />
-                                <input type="hidden" name="filename" value="{{ simulation.results_dirty.file }}">
-                                <input type="submit" class="btn btn-warning"  value="Open in CyberSKA viewer"/>
-                            </form>
                         </a>
                     {% else %}
-                        <h3>not available</h3>
+                        <h5>not available</h5>
                     {% endif %}
                 </div>
             </div>
@@ -48,19 +70,33 @@
 
         <div class="col-md-6">
             <div class="panel panel-primary">
-                <div class="panel-heading">Restored image</div>
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>Restored image</b>
+                        </div>
+                        {% if simulation.results_restored %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URL }}" method="post">
+                                    <input type="hidden" name="title" value="Restored image" />
+                                    <input type="hidden" name="filename" value="{{ simulation.results_restored.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
                 <div class="panel-body">
                     {% if simulation.results_restored %}
                         <a href="#" class="thumbnail">
                             <img src="{% url 'fits' simulation.id 'restored' %}" width="600">
-                            <form action="{{ CYBERSKA_URL }}" method="post">
-                                <input type="hidden" name="title" value="Restored image" />
-                                <input type="hidden" name="filename" value="{{ simulation.results_restored.file }}">
-                                <input type="submit" class="btn btn-warning"  value="Open in CyberSKA viewer"/>
-                            </form>
                         </a>
                     {% else %}
-                        <h3>not available</h3>
+                        <h5>not available</h5>
                     {% endif %}
                 </div>
             </div>
@@ -69,16 +105,14 @@
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-primary">
-                <div class="panel-heading">Job properties</div>
+                <div class="panel-heading"><b>Job properties</b></div>
                 <div class="panel-body">
                     <ul>
-                        <li><b>ID:</b> {{ simulation.id }}</li>
-                        <li><b>status:</b> <span class="label label-{{ simulation.get_state_display|status_label  }}">{{ simulation.get_state_display }}</span></li>
-                        <li><b>celery status:</b> <span class="label label-default">{{ simulation.get_task_status }}</span></li>
+                        <li><b>status:</b> <span class="label label-{{ simulation.get_task_status|status_label  }}">{{ simulation.get_task_status }}</span></li>
                         <li><b>start:</b> {{ simulation.started }}</li>
-                        <li><b>finished:</b> {{ simulation.finished }}</li>
-                        <li><b>duration:</b> {{ simulation.duration }}</li>
-                        <li><b>name:</b> {{ simulation.name }}</li>
+                        <li><b>finished:</b> {% if simulation.finished %}{{ simulation.finished }}{% endif %}</li>
+                        <li><b>duration:</b> {% if simulation.finished %}{{ simulation.duration }}{% endif %}</li>
+
                     </ul>
                 </div>
             </div>
@@ -88,52 +122,89 @@
 
         <div class="col-md-4">
             <div class="panel panel-primary">
-                <div class="panel-heading">Model image</div>
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>Model image</b>
+                        </div>
+                        {% if simulation.results_model %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URL }}" method="post">
+                                    <input type="hidden" name="title" value="Model image" />
+                                    <input type="hidden" name="filename" value="{{ simulation.results_model.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
                 <div class="panel-body">
                     {% if simulation.results_model %}
                         <a href="#" class="thumbnail">
                             <img src="{% url 'fits' simulation.id 'model' %}" width="600">
-                            <form action="{{ CYBERSKA_URL }}" method="post">
-                                <input type="hidden" name="title" value="Model image" />
-                                <input type="hidden" name="filename" value="{{ simulation.results_model.file }}">
-                                <input type="submit" class="btn btn-warning"  value="Open in CyberSKA viewer"/>
-                            </form>
                         </a>
                     {% else %}
-                        <h3>not available</h3>
+                        <h5>not available</h5>
                     {% endif %}
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="panel panel-primary">
-                <div class="panel-heading">Residual image</div>
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>Residual</b>
+                        </div>
+                        {% if simulation.results_residual %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URL }}" method="post">
+                                    <input type="hidden" name="title" value="Residual image" />
+                                    <input type="hidden" name="filename" value="{{ simulation.results_residual.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
                 <div class="panel-body">
                     {% if simulation.results_residual %}
                         <a href="#" class="thumbnail">
                             <img src="{% url 'fits' simulation.id 'residual' %}" width="600">
-                            <form action="{{ CYBERSKA_URL }}" method="post">
-                                <input type="hidden" name="title" value="Residual image" />
-                                <input type="hidden" name="filename" value="{{ simulation.results_residual.file }}">
-                                <input type="submit" class="btn btn-warning"  value="Open in CyberSKA viewer"/>
-                            </form>
                         </a>
                     {% else %}
-                        <h3>not available</h3>
+                        <h5>not available</h5>
                     {% endif %}
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="panel panel-primary">
-                <div class="panel-heading">Uvcov image</div>
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>uccov image</b>
+                        </div>
+                        {% if simulation.results_uvcov %}
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_uvcov.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
                 <div class="panel-body">
                     {% if simulation.results_dirty %}
                         <a href="#" class="thumbnail">
                             <img src="{{ MEDIA_URL }}{{ simulation.results_uvcov }}" width="500">
                         </a>
                     {% else %}
-                        <h3>not available</h3>
+                        <h5>not available</h5>
                     {% endif %}
                 </div>
             </div>
@@ -144,9 +215,9 @@
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-primary">
-                <div class="panel-heading">Log file</div>
+                <div class="panel-heading"><b>Console output</b></div>
                 <div class="panel-body">
-                    <div class="well" style="font-family:monospace;">{{ simulation.log|linebreaksbr }}</div>
+                    <div class="well" style="font-family:monospace;">{{ simulation.console|linebreaksbr }}</div>
                 </div>
             </div>
         </div>
@@ -154,7 +225,17 @@
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-primary">
-                <div class="panel-heading">Config file</div>
+                <div class="panel-heading"><b>Log file</b></div>
+                <div class="panel-body">
+                    <div class="well" style="font-family:monospace;">{% if simulation.log %}{{ simulation.log.file.read|linebreaksbr }}{%  endif %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><b>Config file</b></div>
                 <div class="panel-body">
                     <div class="well" style="font-family:monospace;">{{ config|linebreaksbr }}</div>
                 </div>

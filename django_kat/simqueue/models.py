@@ -1,6 +1,7 @@
 from django.db.models import Model, CharField, FileField, BooleanField,\
     FloatField, IntegerField, DateTimeField, TextField
 from celery.result import AsyncResult
+import celery.states
 
 
 class Simulation(Model):
@@ -20,7 +21,8 @@ class Simulation(Model):
     sky_type = CharField(choices=SKY_TYPES, max_length=1, default='T')
     sky_model = FileField(blank=True, upload_to='sky')
     tdl_conf = FileField('TDL Configuration File', blank=True, upload_to='tdl')
-    tdl_section = CharField(blank=True, max_length=200)
+    tdl_section = CharField(blank=True, max_length=200,
+                            default='turbo-sim:default')
     make_psf = BooleanField(default=True, blank=True)
     add_noise = BooleanField(default=True, blank=True)
     vis_noise_std = FloatField("Noise Standard Deviation", default=0)
@@ -29,7 +31,8 @@ class Simulation(Model):
 
     # observation setup
     ms_hours = FloatField('Synthesis time', default=0.25, help_text='in hours')
-    ms_dtime = IntegerField('Integration time', default=10, help_text='in seconds')
+    ms_dtime = IntegerField('Integration time', default=10,
+                            help_text='in seconds')
     ms_freq0 = FloatField('Start frequency', default=1400e6, help_text='in Hz')
     ms_dfreq = FloatField('Channel width', default=50e6, help_text='in Hz')
     ms_nchan = IntegerField('Channels per band', default=1,
@@ -122,27 +125,23 @@ class Simulation(Model):
     # status of the task
     SCHEDULED = 'S'
     RUNNING = 'R'
-    STOPPED = 'T'
-    ABORTED = 'A'
     CRASHED = 'C'
     FINISHED = 'F'
 
     STATE_TYPES = (
         (SCHEDULED, 'scheduled'),
         (RUNNING, 'running'),
-        (STOPPED, 'stopped'),
-        (ABORTED, 'aborted'),
         (CRASHED, 'crashed'),
         (FINISHED, 'finished'),
     )
     state = CharField(choices=STATE_TYPES, max_length=1, default=SCHEDULED)
     started = DateTimeField(blank=True, null=True)
     finished = DateTimeField(blank=True, null=True)
-    log = TextField(blank=True, null=True)
+    log = FileField(blank=True, null=True)
+    console = TextField(blank=True, null=True)
     task_id = CharField(max_length=36, null=True, blank=True)
 
     # results
-    result_dir = CharField(blank=True, null=True, max_length=11)
     results_uvcov = FileField(blank=True, upload_to='uvcov', null=True)
     results_dirty = FileField(blank=True, upload_to='dirty', null=True)
     results_model = FileField(blank=True, upload_to='model', null=True)
@@ -166,14 +165,41 @@ class Simulation(Model):
         self.log = ""
         self.save(update_fields=["state", "started", "finished"])
 
+    def clear(self):
+        self.results_uvcov = None
+        self.results_dirty = None
+        self.results_model = None
+        self.results_residual = None
+        self.results_restored = None
+        self.log = None
+        self.console = ""
+        self.save(update_fields=["results_uvcov", "results_dirty",
+                                        "results_model", "results_residual",
+                                        "results_restored", "log", "console"])
+
     def get_task_status(self):
-        if self.task_id:
-            try:
-                return AsyncResult(self.task_id).status
-            except OSError as e:
-                return "can't connect to broker: " + str(e)
-        else:
+        if not self.task_id:
             return 'NO TASK ID'
+        try:
+            broker_status = AsyncResult(self.task_id).status
+            # somehow the job is running but status is PENDING
+            if broker_status == celery.states.PENDING and \
+                            self.state == self.RUNNING:
+                return celery.states.STARTED
+            elif broker_status == celery.states.SUCCESS and \
+                self.state == self.CRASHED:
+                return celery.states.FAILURE
+            return broker_status
+        except OSError as e:
+            return "can't connect to broker: " + str(e)
+
+    def can_reschedule(self):
+        """
+        We want only to be able reschedule jobs that are finished
+        """
+        return self.get_task_status() in (celery.states.SUCCESS,
+                                          celery.states.FAILURE,
+                                          celery.states.REVOKED)
 
     def duration(self):
         if self.finished and self.started:

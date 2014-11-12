@@ -2,11 +2,11 @@
 # global settings
 name={{ object.name }}
 skytype={{ object.get_sky_type_display }}
-sky_model={{ object.sky_model }}
+sky_model={% if object.sky_model %}/sky_model{% endif %}
 
 upload_tdl={% if object.tdl_conf %}True{% else %}False{% endif %}
-tdl_conf={{ object.tdl_conf }}
-tdl_section={{ object.tdl_section }}
+tdlconf={% if object.tdl_conf %}/tdl_conf{% endif %}
+tdlsection={{ object.tdl_section }}
 make_psf={{ object.make_psf }}
 add_noise={{ object.add_noise }}
 vis_noise_std={{ object.vis_noise_std }}

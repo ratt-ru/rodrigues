@@ -26,3 +26,6 @@ DOCKER_URI = 'tcp://192.168.59.103:2375'
 
 
 CYBERSKA_URL = "http://192.168.59.103:8081/v1/viz"
+
+
+#DOCKER_CMD = 'echo "testing docker command"'

@@ -4,5 +4,4 @@ ADD casarc /root/.casarc
 ADD . /code
 WORKDIR /code
 RUN mkdir /results
-ADD runner.py /
-
+cmd pyxis CFG=/sims.cfg LOG=/results/output.log OUTFILE=/results/results OUTDIR=/results azishe

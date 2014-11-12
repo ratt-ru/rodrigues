@@ -1,21 +1,22 @@
 import logging
 
+import matplotlib
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import HttpResponseRedirect
 from django.http import Http404
 from django.views.generic.edit import CreateView
 from django.views.generic import ListView, DetailView, DeleteView
 from django.http import HttpResponse
-import matplotlib
 
+from .tasks import schedule_simulation
 from .models import Simulation
 from .forms import SimulateForm
 from .mixins import LoginRequiredMixin
 from .config import generate_config
-from .tasks import schedule_simulation
 
 matplotlib.use('agg')
 import aplpy
+
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +72,7 @@ class Reschedule(LoginRequiredMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
             self.object = self.get_object()
+            self.object.clear()
             schedule_simulation(self.object, request)
             return HttpResponseRedirect(reverse('detail',
                                                 args=(self.object.id,)))

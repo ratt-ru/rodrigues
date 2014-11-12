@@ -19,4 +19,4 @@ all_ = (admin_url, simqueue_url, login_url, logout_url, root_url)
 urlpatterns = patterns('', *all_)
 
 
-#urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
