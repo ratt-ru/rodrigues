@@ -15,17 +15,6 @@ from .config import generate_config
 logger = logging.getLogger(__name__)
 
 
-# (filename in container, field in database)
-files = (
-    ('results-uvcov.png', 'results_uvcov'),
-    ('results.dirty.fits', 'results_dirty'),
-    ('results.model.fits', 'results_model'),
-    ('results.residual.fits', 'results_residual'),
-    ('results.restored.fits', 'results_restored'),
-    ('output.log', 'log'),
-)
-
-
 def docker_copy(client, container_id, path, target="."):
     """
     Copy is not implemented in docker-py, so we do it ourself.
@@ -81,18 +70,10 @@ def run_docker(client, dockerfile_dir, image_name, simulation):
         console += row
         simulation.console = console
         simulation.save()
-    try:
-        container = client.create_container(image=image_name,
-                                            command=settings.DOCKER_CMD)
-    except (DockerException, RequestException) as e:
-        logging.error("can't create container: " + str(e))
-        return True, console, False
 
-    try:
-        client.start(container)
-    except (DockerException, RequestException) as e:
-        logging.error("can't create container: " + str(e))
-        return True, console, False
+    container = client.create_container(image=image_name,
+                                        command=settings.DOCKER_CMD)
+    client.start(container)
 
     # capture logs
     for line in client.attach(container=container, stream=True,
@@ -111,7 +92,26 @@ def run_docker(client, dockerfile_dir, image_name, simulation):
     return False, console, container
 
 
+# (filename in container, field in database)
+files = (
+    ('results-uvcov.png', 'results_uvcov'),
+    ('results.dirty.fits', 'results_dirty'),
+    ('results.model.fits', 'results_model'),
+    ('results.residual.fits', 'results_residual'),
+    ('results.restored.fits', 'results_restored'),
+    ('output.log', 'log'),
+)
+
+
 def extract_files(client, temp_dir, container, simulation):
+    """
+    Extract files from a container
+
+    :param client: Docker client
+    :param temp_dir:  where to put the files
+    :param container: from which container to take the files
+    :param simulation: which simulation Django object to update
+    """
 
     for filename, fieldname in files:
         try:

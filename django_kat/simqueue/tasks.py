@@ -8,7 +8,9 @@ from celery import shared_task
 from django.contrib import messages
 from pytz import timezone
 import docker
+from docker.errors import DockerException
 from django.conf import settings
+from requests import RequestException, ConnectionError
 
 from .models import Simulation
 from .dockering import prepare_dockerfile, run_docker, extract_files
@@ -30,10 +32,13 @@ def simulate(simulation_id):
     prepare_dockerfile(temp_dir, simulation)
     client = docker.Client(settings.DOCKER_URI)
     simulation_name = 'simulation_' + str(simulation.id)
-    failed, console, container = run_docker(client=client,
-                                            dockerfile_dir=temp_dir,
-                                            image_name=simulation_name,
-                                            simulation=simulation)
+    try:
+        failed, console, container = run_docker(client=client,
+                                                dockerfile_dir=temp_dir,
+                                                image_name=simulation_name,
+                                                simulation=simulation)
+    except (DockerException, RequestException, ConnectionError) as e:
+        logging.error("can't start container: " + str(e))
 
     if failed:
         simulation.state = simulation.CRASHED
