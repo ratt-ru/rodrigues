@@ -42,26 +42,24 @@ OUTFILE_Template = '${DESTDIR>/}${MS:BASE}${-<LABEL}'
 LOG_Template = lambda: II("${DESTDIR>/}log-${MS:BASE}.txt") if MS else II("${OUTDIR>/}log-ska1sims.txt");
 
 WEIGHTS = "uniform"
-FOV = 120 # FOV for uniform/robust weighting, in arcmin
-TAPER = 0 # gaussian taper, in arcsec
 
-XW = False
-XWEIGHTS0 = "natural"
-XWEIGHTS = "uniform"
-XFOVS = 10,120
-XTAPERS = "",",taper=1",",taper=3"
 
-if XW:
-  WEIGHTS = XWEIGHTS0;
-  for w in XWEIGHTS:
-    for fov in XFOVS:
-      for taper in XTAPERS:
-        WEIGHTS += ":%s,fov=%s"%(w,fov)+taper;
-# FoV parameter normalized to this frequency value -- use Non for no normalization
-FOVNORM = 1e+9
+OBSDIR = 'observatories'
+_OBS = {
+      'meerkat':'MeerKAT64_ANTENNAS',
+      'kat-7':'KAT7_ANTENNAS',
+      'vla-a':'VLAA_ANTENNAS',
+      'wsrt':'WSRT_ANTENNAS'
+}
 
-UVBINS = 0,5,10,25,50,75,100,125,150,175,200;
-UVSTEP = 0
+KATDIR = 'katalog'
+_KATALOG = {
+         'rand_pnts':'random_pts.txt',
+         'rand_mix':'random.txt',
+         'rand_mix_fits':'random.fits',
+         '3c147_no_core':'3c147_field_no_3c147.lsm.html',
+         '3c147_field':'3c147.lsm.html',
+}
 
 MEASURE_PSF = False
 MEASURE_SIDELOBES = False
@@ -92,88 +90,140 @@ CFG = 'meerkat_sims.cfg'
 CHANNELIZE = 0
 NCHAN = 1
 def str2bool(val):
-    if val.lower() in 'true yes 1':
+    if val.lower() in 'true yes 1'.split():
         return True
-    else: return False
+    else: 
+        return False
+
+STAND_ALONE_DECONV = ['moresane']
 
 def readCFG(cfg='$CFG'):
-  cfg_std = open(II(cfg))
-  params = {}
-  for line in cfg_std.readlines():
-    if not line.startswith('#'):
-       line = line.strip()
-       key = line.split('=')[0]
-       val = line.split('=')[-1]
-       if not line.endswith('='):
-         val = val.split(' ')[0]
-         params[key] = val
-  options = dict(ms_={},cr_={},im_={},dc_={})
-  for key in params.keys():
-   found = False
-   for item in options.keys():
-     if not found:
-      if key.startswith(item):
-        found=True
-        options[item][key.split(item)[-1]] = params[key].lower()
-        del params[key]
-  if params['skytype'] == 'tiggerlsm': 
-    v.LSM = params['skyname']
-    v.TDLSEC = 'turbo-sim:custom'
-  elif params['skytype'].upper() == 'FITS' : v.FITS = params['skyname']
-  else : v.USING_SIAMESE = True
-  if str2bool(params['add_noise']): 
-    v.NOISE = None #eval(params['vis_noise_std'])
-  v.MAKE_PSF = str2bool(params['make_psf'])
-  v.OUTPUT_TYPE = params['output']
-  #v.COLUMN = params['column'].upper()
-  v.CLEAN = str2bool(params['clean'])
-  own_tdl = str2bool(params['upload_tdl'])
-  if own_tdl:
-    v.TDLCONF = params['tdlconf']
-    v.TDLSEC = params['tdlsection']
-  try: v.CHANNELIZE = int(params['channelise'])
-  except ValueError : v.CHANNELIZE = 0
-  return options
+    cfg_std = open(II(cfg))
+    params = {}
+    for line in cfg_std.readlines():
+        if not line.startswith('#'):
+            line = line.strip()
+            key = line.split('=')[0]
+            key = key.replace('__','-')
+            val = line.split('=')[-1]
+            if not line.endswith('='):
+                val = val.split(' ')[0]
+                params[key] = val
+
+    options = dict(ms_={},cr_={},im_={},lwimager_={},wsclean_={},casa_={},moresane_={})
+    for key in params.keys():
+        found = False
+        for item in options.keys():
+            if not found:
+                if key.startswith(item):
+                    found=True
+                    options[item][key.split(item)[-1]] = params[key].lower()
+                    del params[key]
+    global OBSERVATORY,POSITIONS,MS_LABEL
+    OBSERVATORY = params['observatory']
+    POSITIONS = '%s/%s'%(OBSDIR,_OBS[OBSERVATORY])
+    if OBSERVATORY.startswith('vla'):
+       MS_LABEL = OBSERVATORY
+       OBSERVATORY = 'VLA'
+    global FITS,TIGGER,TDLSEC,KATALOG
+    skytype = params['skytype'].lower()
+    if skytype in ['tiggerlsm','ascii']:  
+        TIGGER = True
+        v.LSM = params['skyname']
+        TDLSEC = 'turbo-sim:custom'
+    elif skytype =='fits':
+        FITS = True
+        v.LSM = params['skyname']
+    elif skytype=='katalog':
+        TDLSEC = 'turbo-sim:custom'
+        KATALOG = True
+        v.LSM = '%s/%s'%(KATDIR,_KATALOG[params['katalog_id']])
+        if LSM.endswith('.fits'):
+            FITS = True
+        else:
+            TIGGER = True
+
+    if str2bool(params['add_noise']): 
+        if str2bool(params['noise_defaults']):
+            v.NOISE = None
+        else: float(params['vis_noise_std']) 
+
+    global MAKE_PSF,OUTPUT_TYPE,COLUMN,DECONV
+    MAKE_PSF = str2bool(params['make_psf'])
+    OUTPUT_TYPE = params['output']
+    COLUMN = params['column'].upper()
+    DECONV = str2bool(params['deconvolve'])
+    _deconv = params['deconv_alg']
+
+    own_tdl = str2bool(params['upload_tdl'])
+    if own_tdl:
+        v.TDLCONF = params['tdlconf']
+        v.TDLSEC = params['tdlsection']
+    _imager = params['imager']
+
+    global CHANNELIZE
+    CHANNELIZE = int(params['channelise'])
+
+    return options,_imager,_deconv
+
+
+def d_or_h_ms2deg(coord):
+    tmp = ''
+    if coord.startswith('-'):
+       sign = -1
+    else:
+       sign = 1
+    for i in coord:
+        if i.isdigit():
+            tmp += i
+        else:
+            tmp += ' '
+    coord = map(float,tmp.split())
+    deg = 0
+    for i,val in enumerate(coord):
+        deg += val*60**i
+    return sign*deg
 
 _SEFD = {}
 _SEFD['MKT'] = {'1b':831,'2':551}
 
 def get_sefd(freq=650e6):
-  freq0 = freq*1e-6 # work in MHz
-  if np.logical_and(freq0>=580,freq0<=1020): band = '1b'
-  elif np.logical_and(freq0>=900,freq0<=1670): band = '2'
-  else : 
-    warn('$freq0 MHz is is not within MeerKAT frequency range. Using SEFD for band 1b')
-    band = '1b'
-  return _SEFD['MKT'][band]
+    freq0 = freq*1e-6 # work in MHz
+    if np.logical_and(freq0>=580,freq0<=1020): 
+        band = '1b'
+    elif np.logical_and(freq0>=900,freq0<=1670): 
+        band = '2'
+    else : 
+        warn('$freq0 MHz is is not within MeerKAT frequency range. Using SEFD for band 1b')
+        band = '1b'
+    return _SEFD['MKT'][band]
 
 def clearstats ():
-  if exists(STATSFILE):
-    info("removing $STATSFILE");
-    x.sh("rm $STATSFILE");
+    if exists(STATSFILE):
+        info("removing $STATSFILE");
+        x.sh("rm $STATSFILE");
 
 import fcntl
 
 def _statsfile ():
-  """Initializes stats file (if not existing), returns open file""";
-  ff = file(STATSFILE,"a");
-  fcntl.flock(ff,fcntl.LOCK_EX);
-  # seek to end of file, if empty, make header
-  ff.seek(0,2);
-  if not ff.tell():
-    ff.write("""# auto-generated noise stats file\n""");
-    ff.write("""settings = dict(%s)\n"""%",".join([ "%s=%s"%(key,repr(val)) for key,val in globals().iteritems()
+    """Initializes stats file (if not existing), returns open file""";
+    ff = file(STATSFILE,"a");
+    fcntl.flock(ff,fcntl.LOCK_EX);
+    # seek to end of file, if empty, make header
+    ff.seek(0,2);
+    if not ff.tell():
+        ff.write("""# auto-generated noise stats file\n""");
+        ff.write("""settings = dict(%s)\n"""%",".join([ "%s=%s"%(key,repr(val)) for key,val in globals().iteritems()
                 if not callable(val) and key.upper() == key ]));
-    ff.write("noisestats = {}\n");
-  return ff;
+        ff.write("noisestats = {}\n");
+    return ff;
 
 def _writestat (name,value,*qualifiers):
-  ff = _statsfile();
-  subsets = list(STATQUALS) + list(qualifiers);
-  subsets = ','.join(map(repr,subsets));
-  ff.write("noisestats.setdefault('%s',{})[%s] = %s\n"%(name,subsets,repr(value)));
-  fcntl.flock(ff,fcntl.LOCK_UN);
-
+    ff = _statsfile();
+    subsets = list(STATQUALS) + list(qualifiers);
+    subsets = ','.join(map(repr,subsets));
+    ff.write("noisestats.setdefault('%s',{})[%s] = %s\n"%(name,subsets,repr(value)));
+    fcntl.flock(ff,fcntl.LOCK_UN);
 
 def compute_vis_noise (noise=0,sefd=SEFD):
   """Computes nominal per-visibility noise"""
@@ -550,27 +600,13 @@ define("SCWEIGHTFOV","512arcsec","weight_fov for simcube");
 define("SCROBUST","","robustness parameter for simcube");
 define("SCTAPER",1,"taper for simcube, in arcsec. 0 for none");
 
-def simcube (cube,nchan=None,npix=4096,cellsize=".5arcsec",niter=100000,padding=1.5,threshold=".2mJy",predict=True,dirty=False,restore=False,noise=0,resume=False,label=None,column='DATA',channelize=1,wprojplanes=0):
-  if label: v.LABEL = label
-  tab = ms.ms(subtable='SPECTRAL_WINDOW')
-  nchan = nchan or tab.getcol('NUM_CHAN')[0]
-  ms.CHANRANGE = 0,nchan-1;
-  imager.wprojplanes = wprojplanes;
-  imager.IMAGE_CHANNELIZE = 1;
-  if predict:
-    imager.predict_vis(image=cube,padding=padding,copy=False,column=column);
-  if noise > 0:
-    simnoise(addToCol=column,noise=noise)
-  if dirty:
-   info('Weights are%s'%WEIGHTS)
-   for weight in WEIGHTS.split(':'):
-     opts,weight_txt,quals = get_weight_opts(weight)
-     restore.update(opts)
-     dirty_image = II("${OUTFILE}-$weight.dirty.fits")
-     model_image = II("${OUTFILE}-$weight.model.fits")
-     residual_image = II("${OUTFILE}-$weight.residual.fits")
-     restored_image = II("${OUTFILE}-$weight.restored.fits")
-     imager.make_image(dirty=dirty,restore=restore,channelize=channelize,column=column if restore==False else "CORRECTED_DATA",dirty_image=dirty_image,model_image=model_image,residual_image=residual_image,restored_image=restored_image,**opts);
+def predict_from_fits (cube,padding=1.5,noise=0,column='DATA',wprojplanes=0):
+    ms.set_default_spectral_info()
+    import im.lwimager
+    im.lwimager.predict_vis(image=cube,padding=padding,copy=False,column=column,wprojplanes=wprojplanes);
+    if noise > 0:
+        simnoise(addToCol=column,noise=noise)
+#document_globals(simcube,"SC*");
 
 def flag_stepped_timeslot (step=3):
   """Flags every Nth timeslot"""
@@ -584,7 +620,6 @@ def flag_stepped_timeslot (step=3):
   frow = frow.reshape([nt,nb]);
   frow[::step,:] = True;
   tab.putcol("FLAG_ROW",frow.reshape((nr,)));
-document_globals(simcube,"SC*");
 
 def fitsInfo(fits):
   hdr = pyfits.open(fits)[0].header

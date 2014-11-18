@@ -1,80 +1,142 @@
-import ms,mqt,lsm,imager
+import ms
+import mqt
+import lsm
+import im
+from simms import simms
+
 MAKE_PSF = False
 mqt.MULTITHREAD = 8
-COLUMN = 'DATA'
 FITS = False
+TIGGER = False
+KATALOG = False
 CLEAN = False
 LSM = None
 NOISE = None
 USING_SIAMESE = False
-def simulate(msname='$MS',lsmname='$LSM',tdlconf='$TDLCONF',section='$TDLSEC',freq0=1400e6,options={},**kw):
-  """ Simulates visibilities into an MS """
-  v.MS,v.LSM = interpolate_locals('msname lsmname')
-  if LSM: 
-    options['tiggerlsm.filename'] = LSM
-  options['noise_stddev'] = NOISE or compute_vis_noise(sefd=get_sefd(freq0))
-  options['ms_sel.output_column'] = COLUMN
-  options['ms_sel.msname'] = msname
-  if USING_SIAMESE : 
-      section = 'turbo-sim:default'
-  options['ms_sel.select_channels'] = 0
-  mqt.run('turbo-sim.py',job='_tdl_job_1_simulate_MS',config=tdlconf,section=section,options=options)
+COLUMN = 'CORRECTED_DATA'
+TDLSEC = 'turbo-sim:default'
+CHANNELIZE = 0
+MS_LABEL = None
 
-def image(msname='$MS',lsmname='$LSM',use_imager='LWIMAGER',restore=False,options={},**kw):
-  """ Images MS"""
-  imager.cellsize = '1arcsec' 
-  if restore : 
-     if COLUMN!='CORRECTED_DATA' :ms.copycol(fromcol=COLUMN) # Copy content of DATA to CORRECTED_DATA if making clean map
-     v.COLUMN = 'CORRECTED_DATA' # make sure to image corrected data
-  if NCHAN>1 : 
-    start = 1
-    step = CHANNELIZE or NCHAN
-    temp = dict(nchan=NCHAN,img_nchan=(NCHAN-1)/step,chanstart=0,img_chanstart=1,chanstep=1,img_chanstep=step)
-    options.update(temp)
-  imager.make_image(restore=restore,column=COLUMN,restore_lsm=False,**options)
+OBSERVATORY = None
+POSITIONS = None
 
-def make_psf(options={}):
-  """ make PSF map"""
-  compute_psf_and_noise(noise_map=False)
+#TODO: Ask Gijs to install moresane in container 
+im.MORESANE_PATH = '/home/makhathini/PyMORESANE/pymoresane.py'
 
-def azishe(cfg='$CFG',make_image=True,psf='$MAKE_PSF'):
-  if CLEAN : v.COLUMN = 'CORRECTED_DATA'
-  _cfg = readCFG(cfg)
-  ms_opts = _cfg['ms_']
-  cr_opts = _cfg['cr_']
-  im_opts = _cfg['im_']
-  clean_opts = _cfg['dc_']
-  # ------------convret ra from degrees to hms for MAKEMS------------
-  ra = float(ms_opts['ra'])
-  ra = ra * 24/360.
-  hrs = ra - ra%1
-  mins_tmp  = (ra - hrs)%1 * 60
-  mins = mins_tmp - mins_tmp%1
-  secs = (mins_tmp - mins)*60
-  ra_str = '%d:%d:%.2f'%(hrs,mins,secs)
-  ms_opts['ra'] = ra_str
-  #--------------------------------------------------------
-  freq0 = float(ms_opts['freq0'])
-  nchan =  int(ms_opts['nchan'])
-  if nchan>1 : 
-   ms_opts['nchan'],shift = int(ms_opts['nchan']) + 1,True
-   nchan +=1
-  else: shift = False
-  v.NCHAN = nchan
-  makems(shift=shift,**ms_opts) # simulate empty MS
-  ms.CHANRANGE = 0,nchan-1,1
-  simulate(freq0=freq0)
-  #imager.CHANNELIZE = 1
-  restore = CLEAN
-  if restore : 
-    restore = clean_opts
-    if clean_opts['operation'] != 'multiscale' : 
-      if 'nscales' in clean_opts.keys(): del clean_opts['nscales']
-      if 'uservector' in clean_opts.keys(): del clean_opts['uservector']
-  try : imager.weight = im_opts['weight']
-  except KeyError : imager.weight= 'uniform'
-  imager.wprojplanes = 128
-  imager.cellsize = '%sarcsec'%(im_opts['cellsize'])
-  imager.stokes = im_opts['stokes'].upper()
-  del im_opts['cellsize'],im_opts['stokes']
-  image(restore=restore,options=im_opts)
+_KATALOG = {
+         'rand_pnts':'random_pts.txt',
+         'rand_mix':'random.txt',
+         '3c147_no_core':'3c147_field_no_3c147.lsm.html',
+         '3c147_field':'3c147.lsm.html',
+}
+
+def simulate(msname='$MS',lsmname='$LSM',column='$COLUMN',tdlconf='$TDLCONF',section='$TDLSEC',freq0=1400e6,options={},**kw):
+    """ Simulates visibilities into an MS """
+    msname,lsmname,column,section,tdlconf = interpolate_locals('msname lsmname column section tdlconf')
+
+    noise = NOISE or compute_vis_noise(sefd=get_sefd(freq0))
+    if TIGGER:
+        options['tiggerlsm.filename'] = lsmname
+        options['noise_stddev'] = noise
+        options['ms_sel.output_column'] = column
+        options['ms_sel.msname'] = msname
+        mqt.run('turbo-sim.py',job='_tdl_job_1_simulate_MS',config=tdlconf,section=section,options=options)
+    elif FITS:
+       predict_from_fits(lsmname,wprojplanes=128,column=COLUMN)
+
+def azishe(cfg='$CFG',make_image=True):
+    """ The driver for simulator """
+
+    cfg = interpolate_locals('cfg')
+    _cfg,_imager,_deconv = readCFG(cfg)
+    # get options for component parts
+    ms_opts = _cfg['ms_']
+    cr_opts = _cfg['cr_']
+    im_opts = _cfg['im_']
+
+
+    freq0 = float(ms_opts['freq0'])*1e6
+    del ms_opts['freq0']
+    dfreq = float(ms_opts['dfreq'])*1e3
+    del ms_opts['dfreq']
+    
+    for opt in 'hours start_time nchan dtime'.split():
+        if opt=='nchan':
+            ms_opts[opt] = int(ms_opts[opt])
+        else:
+            ms_opts[opt] = float(ms_opts[opt])
+            
+    if not os.path.exists(MAKEMS_OUT):
+        x.mkdir(MAKEMS_OUT)
+     
+    msname = simms.simms(freq0=freq0,label=MS_LABEL or OBSERVATORY,dfreq=dfreq,pos=POSITIONS,pos_type='casa',
+                         tel=OBSERVATORY,outdir=MAKEMS_OUT,**ms_opts)
+    v.MS = msname
+    
+    #plot uv-coverage
+    if not os.path.exists(DESTDIR): x.sh('mkdir -p $DESTDIR ')
+    ms.plot_uvcov(ms=.1,width=10,height=10,dpi=150,save="$OUTFILE-uvcov.png")
+    
+    tmp_std = tempfile.NamedTemporaryFile(suffix='.fits' if FITS else '.lsm.html')
+    tmp_std.flush()
+    tmp_file = tmp_std.name
+    nchan =  int(ms_opts['nchan'])
+    if TIGGER:
+        x.sh('tigger-convert --recenter=J2000,%s,%s $LSM $tmp_file -f'%(ms_opts['ra'],ms_opts['dec']))
+        v.LSM = tmp_file
+    elif FITS:
+	ra = d_or_h_ms2deg(ms_opts['ra'])
+        dec = d_or_h_ms2deg(ms_opts['dec'])
+        hdu = pyfits.open(LSM)[0]
+        hdr = hdu.header
+        data = hdu.data
+        hdr['CRVAL1'] = ra
+        hdr['CRVAL2'] = dec
+        pyfits.writeto(tmp_file,data,hdr,clobber=True)
+        v.LSM = tmp_file
+    ms.set_default_spectral_info()
+    simulate(freq0=freq0)
+    tmp_std.close()
+
+    im.IMAGE_CHANNELIZE = CHANNELIZE
+    # Set these here to have a standard way of accepting them in the form
+    for opt in 'npix cellsize weight robust wprojplanes stokes weight_fov mode'.split():
+        if opt in im_opts.keys():
+            if opt == 'stokes':
+                setattr(im,opt,im_opts[opt].upper())
+            elif opt in ['npix']:
+                setattr(im,opt,int(im_opts[opt]))
+            elif opt in ['robust']:
+                setattr(im,opt,float(im_opts[opt]))
+            elif opt == 'cellsize':
+                setattr(im,opt,im_opts[opt]+'arcsec')
+            elif opt == 'weight_fov':
+                setattr(im,opt,im_opts[opt]+'arcmin')
+            else: 
+                setattr(im,opt,im_opts[opt])
+            del im_opts[opt]
+   
+    # Cater for csclean,clark and such
+    if _deconv not in STAND_ALONE_DECONV :
+        _deconv = _imager
+    restore = _cfg['%s_'%_deconv] if DECONV else False
+    if _deconv in 'wsclean casa lwimager'.split():
+        im.threshold = restore['threshold']+'Jy'
+        del restore['threshold']
+    for key,val in restore.iteritems():
+        if val.lower() in 'true yes 1':
+            restore[key] = True
+        elif val.lower() in 'false no 0':
+            del restore[key]
+
+    if _imager=='casa':
+        for key,val in restore.iteritems():
+            if key in ['niter']:
+               restore[key] = int(val)
+            else:
+               try: restore[key] = float(val)
+               except ValueError: "do nothing"
+    __import__('im.%s'%_imager)
+    call_imager = eval('im.%s.make_image'%_imager)
+    call_imager(dirty=False,restore=restore,algorithm=_deconv,restore_lsm=False,psf=MAKE_PSF,**im_opts)
