@@ -3,27 +3,33 @@ from .models import Simulation
 
 
 # global settings
-global_ = (
+telescope = (
     'name',
+    'observatory',
+    'sefd',
+    'output',
+)
+
+# set skymodel
+sky = (
     'sky_type',
     'sky_model',
     'tdl_conf',
     'tdl_section',
-    'make_psf',
+    'katalog_id',
     'add_noise',
     'vis_noise_std',
-    'output',
 )
 
 # observation setup
 observation = (
     'ms_hours',
+    'ms_start_time',
     'ms_dtime',
     'ms_freq0',
     'ms_dfreq',
     'ms_nchan',
-    'ms_nband',
-    'ms_write_auto_corr',
+#    'ms_write_auito_corr',
     'ms_dec',
     'ms_ra',
 )
@@ -48,34 +54,90 @@ imaging = (
     'im_npix',
     'im_cellsize',
     'im_weight',
+    'im_robust',
     'im_weight_fov',
     'im_wprojplanes',
     'im_mode',
     'im_spwid',
     'channelise',
     'im_stokes',
+    'make_psf',
 )
 
-# deconvolution settings
-deconvolution = (
-    'deconvolve',
-    'dc_operation',
-    'dc_uservector',
-    'dc_nscales',
-    'dc_niter',
-    'dc_threshold',
+
+lwimager = (
+    'lwimager_niter',
+    'lwimager_threshold',
+    'lwimager_operation',
+    'lwimager_nscales',
+    'lwimager_uservector',
+    'lwimager_cyclefactor',
 )
 
-fields = global_ + observation + dish + corruptions + imaging + deconvolution
+wsclean = (
+    'wsclean_niter',
+    'wsclean_gain',
+    'wsclean_mgain',
+    'wsclean_threshold',
+    'wsclean_joinpolarizations',
+    'wsclean_joinchannels',
+    'wsclean_multiscale',
+    'wsclean_multiscale_dash_scale_dash_bias',
+    'wsclean_multiscale_dash_threshold_dash_bias',
+    'wsclean_cleanborder',
+    'wsclean_smallpsf',
+    'wsclean_nonegative',
+    'wsclean_nonegative',
+    'wsclean_beamsize', 
+)
 
+casa = (
+    'casa_niter',
+    'casa_gain',
+    'casa_threshold',
+    'casa_psfmode',
+    'casa_imagermode',
+    'casa_gridmode',
+    'casa_nterms',
+    'casa_reffreq',
+    'casa_multiscale',
+    'casa_negcomponent',
+    'casa_smallscalebias',
+    'casa_restoringbeam',
+    'casa_cyclefactor',
+    'casa_cyclespeedup',
+)
+
+moresane = (
+    'moresane_scalecount',
+    'moresane_startscale',
+    'moresane_stopscale',
+    'moresane_sigmalevel',
+    'moresane_loopgain',
+    'moresane_tolerance',
+    'moresane_accuracy',
+    'moresane_majorloopmiter',
+    'moresane_minorloopmiter',
+    'moresane_decommode',
+    'moresane_convmode',
+    'moresane_enforcepositivity',
+    'moresane_edgesupression',
+    'moresane_edgeoffset',
+    'moresane_mfs',
+    'moresane_spi_dash_sigmalevel',
+)
+
+fields = telescope + sky + observation + dish + corruptions + imaging + lwimager + wsclean + casa
 
 class SimulateForm(BetterModelForm):
     class Meta:
         model = Simulation
         fields = fields
 
-        fieldsets = [('global', {'fields': global_,
-                                 'description': 'Global settings'}),
+        fieldsets = [('telescope', {'fields': telescope,
+                                 'description': 'Observatory'}),
+                     ('sky', {'fields': sky,
+                                      'description': 'Sky Model'}),
                      ('observation', {'fields': observation,
                                       'description': 'Observation setup'}),
                      ('imaging', {'fields': imaging,
@@ -85,8 +147,12 @@ class SimulateForm(BetterModelForm):
                      ('corruptions', {'fields': corruptions,
                                       'description': 'Corruptions'}),
 
-                     ('deconvolution', {'fields': deconvolution,
-                                        'description': 'deconvolution settings'}),
+                     ('lwimager', {'fields': lwimager,
+                                        'description': 'LWIMAGER deconvolution settings'}),
+                     ('wsclean', {'fields': wsclean,
+                                        'description': 'WSCLEAN deconvolution settings'}),
+                     ('casa', {'fields': casa,
+                                        'description': 'CASA deconvolution settings'}),
+                     ('moresane', {'fields': moresane,
+                                        'description': 'MORESANE deconvolution settings'}),
                      ]
-
-
