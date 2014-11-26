@@ -1,14 +1,10 @@
 FROM gijzelaerr/papino-meqtrees
-RUN apt-get install -y time
+RUN apt-get install -y time git
 ADD casarc /root/.casarc
-
-RUN git clone https://github.com/SpheMakh/pyxis
-WORKDIR /pyxis
-RUN git checkout devel
-RUN export PATH=./pyxis/Pyxis/bin:$PATH
-RUN export PYTHONPATH=./pyxis:$PYTHONPATH
 
 ADD . /code
 WORKDIR /code
+RUN git clone -b devel https://github.com/SpheMakh/pyxis
 RUN mkdir /results
-cmd pyxis CFG=/sims.cfg LOG=/results/output.log OUTFILE=/results/results OUTDIR=/results azishe
+cmd ./runsim.sh
+# cmd pyxis CFG=/sims.cfg LOG=/results/output.log OUTFILE=/results/results OUTDIR=/results azishe

@@ -12,4 +12,7 @@ force-build:
 	docker build -t $(IMAGE_NAME) --no-cache=true .
 
 run:
-	docker run -v `pwd`:/results $(IMAGE_NAME) pyxis CFG=webkat_default.cfg azishe OUTDIR=/results
+#	docker run -v `pwd`:/results $(IMAGE_NAME) pyxis CFG=webkat_default.cfg azishe OUTDIR=/results
+	docker run -v `pwd`:/results $(IMAGE_NAME) ./runsim.sh
+	
+	
