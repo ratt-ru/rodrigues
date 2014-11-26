@@ -120,7 +120,7 @@ def readCFG(cfg='$CFG'):
                     options[item][key.split(item)[-1]] = params[key].lower()
                     del params[key]
     global OBSERVATORY,POSITIONS,MS_LABEL
-    OBSERVATORY = params['observatory']
+    OBSERVATORY = params['observatory'].lower()
     POSITIONS = '%s/%s'%(OBSDIR,_OBS[OBSERVATORY])
     if OBSERVATORY.startswith('vla'):
        MS_LABEL = OBSERVATORY
@@ -147,10 +147,9 @@ def readCFG(cfg='$CFG'):
         TDLSEC = 'turbo-sim:custom'
         v.LSM = 'katalog/%s.lsm.html'%skytype
 
-    if str2bool(params['add_noise']): 
-        if str2bool(params['noise_defaults']):
-            v.NOISE = None
-        else: float(params['vis_noise_std']) 
+    if str2bool(params['add_noise']):
+        visnoise = float(params['vis_noise_std']) 
+        v.NOISE = visnoise if visnoise else None;
 
     global MAKE_PSF,OUTPUT_TYPE,COLUMN
     MAKE_PSF = str2bool(params['make_psf'])
