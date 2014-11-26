@@ -15,7 +15,8 @@ add_noise={{ object.add_noise }}
 vis_noise_std={{ object.vis_noise_std }}
 
 ## observation setup
-ms_hours={{ object.ms_hours }}
+ms_synthesis={{ object.ms_synthesis }}
+ms_scan_length={{ object.ms_scan_length }}
 ms_dtime={{ object.ms_dtime }}
 ms_freq0={{ object.ms_freq0 }}
 ms_dfreq={{ object.ms_dfreq }}
@@ -47,7 +48,7 @@ im_weight_fov={{ object.im_weight_fov }}
 im_wprojplanes={{ object.im_wprojplanes }}
 im_mode={{ object.get_im_mode_display }}
 im_spwid={{ object.im_spwid }}
-channelise={{ object.get_channelise_display }}
+channelise={{ object.channelise }}
 im_stokes={{ object.im_stokes }}
 make_psf={{ object.make_psf }}
 
