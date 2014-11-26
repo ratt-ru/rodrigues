@@ -20,12 +20,14 @@ class Simulation(Model):
     OBSERVATORIES = (
         ('MK','MeerKAT'),
         ('K7','KAT-7'),
-        ('JA','VLA-A'),
+        ('JA','JVLA-A'),
     )
 
     KATALOG = (
-        ('K1','rand_pnts'), 
-        ('K2','rand_mix'),
+        ('NV','nvss6deg'), 
+        ('S3','scubed1deg'), 
+#        ('K1','rand_pnts'), 
+#        ('K2','rand_mix'),
         ('K3','3c147_field'),
         ('K4','3c147_field_no_core'),
     )
@@ -43,13 +45,18 @@ class Simulation(Model):
     # sky setup
     sky_type = CharField(choices=SKY_TYPES, max_length=1, default='T')
     sky_model = FileField(blank=True, upload_to='sky')
-    tdl_conf = FileField('TDL Configuration File', blank=True, upload_to='tdl')
-    tdl_section = CharField(blank=True, max_length=200)
-    katalog_id = CharField(blank=True,
-                           default='RM1',
+#    tdl_conf = FileField('TDL Configuration File', blank=True, upload_to='tdl')
+#    tdl_section = CharField(blank=True, max_length=200)
+    katalog_id = CharField('KATALOG',blank=True,
+                           default='NV',
                            choices=KATALOG,
                            max_length=64,
                            help_text='Choose from our sky catalogs')
+    radius = FloatField('Radius',default=0.5,blank=True,
+                  help_text='Radius of degrees')
+    fluxrange = CharField('Flux range',default='0.001-1',
+                  max_length=32,
+                  help_text='Flux range in Jy')
     ms_dec = CharField('Declination', 
                        default='-30d0m0s',
                        help_text='in dms',
@@ -96,6 +103,14 @@ class Simulation(Model):
     cr_pointing_error = FloatField(default=0)
     cr_rfi = FloatField(default=0)
 
+    IMAGERS = (
+        ('LW', 'LWIMAGER'),
+        ('WS', 'WSCLEAN'),
+        ('CA', 'CASA'),
+    )
+
+
+
     WEIGHTING_TYPES = (
         ('N', 'Natural'),
         ('U', 'Uniform'),
@@ -116,6 +131,9 @@ class Simulation(Model):
 #    )
 
     # imaging settings
+    imager = CharField('Imager',default='LW',
+                       choices=IMAGERS,
+                       max_length=32)
     im_npix = IntegerField('Image size', default=512, help_text='in pixels')
     im_cellsize = FloatField('Pixel size', help_text='in arcseconds',
                              default=1)
@@ -125,16 +143,16 @@ class Simulation(Model):
                            default=0,
                            help_text='Briggs robust parameter')
     im_weight_fov = FloatField('Weight FoV', help_text='in arcminutes',
-                               blank=True)
+                               blank=True,null=True)
     im_wprojplanes = IntegerField('w-Projection planes', default=0)
     im_mode = CharField('Imaging mode', choices=IMAGING_TYPES, max_length=1,
                         default='C')
     im_spwid = CharField('Spectral window', default=0, max_length=32)
     channelise = FloatField('Image channelise',
                            default=0,
-                           help_text='0 => average all, 1 per channel, etc.')
+                           help_text='0 means average all, 1 per channel, etc.')
     im_stokes = CharField('Stokes', default='I', max_length=4)
-    make_psf = BooleanField(default=True, blank=True)
+    make_psf = BooleanField('Make PSF',default=True, blank=True)
 
     CLEAN_TYPES = (
         ('C', 'csclean'),
@@ -145,7 +163,8 @@ class Simulation(Model):
 
 
     # lwimager
-    lwimager_niter = IntegerField('Niter',default=1000)
+    lwimager = BooleanField('Deconvolve with me!',default=False)
+    lwimager_niter = IntegerField('NITER',default=1000)
     lwimager_gain = FloatField('Loop gain',default=0.1)
     lwimager_threshold = FloatField('Clean Threshold',default=0,
                                help_text='In Jy')
@@ -165,7 +184,8 @@ class Simulation(Model):
                               max_length=64)
 
     # wsclean
-    wsclean_niter = IntegerField('Niter',default=1000)
+    wsclean = BooleanField('Deconvolve with me!',default=False)
+    wsclean_niter = IntegerField('NITER',default=1000)
     wsclean_gain = FloatField('Minor loop gain',default=0.1)
     wsclean_mgain = FloatField('Major loop gain',default=0.1)
     wsclean_threshold = FloatField('Clean Threshold',default=0,
@@ -208,9 +228,10 @@ class Simulation(Model):
     )
 
     #casa
-    casa_niter = IntegerField('Niter',default=1000)
+    casa = BooleanField('Deconvolve with me!',default=False)
+    casa_niter = IntegerField('NITER',default=1000)
     casa_threshold = FloatField('Threshold',default=0)
-    casa_gain = FloatField('Gain',
+    casa_gain = FloatField('Loop Gain',
                            default='0.1',
                            help_text='Clean Loop gain')
     casa_psfmode = CharField('PSF mode',
@@ -226,7 +247,8 @@ class Simulation(Model):
                               blank=True,
                               choices=GRID_MODE,
                               default='W',
-                              max_length=32)
+                              max_length=32,
+                              help_text='A-projection only works JVLA')
     casa_nterms = IntegerField('NTERMS',
                              default=1,
                              help_text='See CASA clean task')
@@ -254,6 +276,7 @@ class Simulation(Model):
         ('L','linear'),
     )
 
+    moresane = BooleanField('Deconvolve with me!',default=False)
     moresane_scalecount = IntegerField('Scale count',
                           blank=True,null=True,
                           help_text='See MORESANE help')

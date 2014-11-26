@@ -14,9 +14,11 @@ telescope = (
 sky = (
     'sky_type',
     'sky_model',
-    'tdl_conf',
-    'tdl_section',
+#    'tdl_conf',
+#    'tdl_section',
     'katalog_id',
+    'radius',
+    'fluxrange',
     'add_noise',
     'vis_noise_std',
 )
@@ -51,6 +53,7 @@ corruptions = (
 
 # imaging settings
 imaging = (
+    'imager',
     'im_npix',
     'im_cellsize',
     'im_weight',
@@ -66,7 +69,9 @@ imaging = (
 
 
 lwimager = (
+    'lwimager',
     'lwimager_niter',
+    'lwimager_gain',
     'lwimager_threshold',
     'lwimager_operation',
     'lwimager_nscales',
@@ -75,6 +80,7 @@ lwimager = (
 )
 
 wsclean = (
+    'wsclean',
     'wsclean_niter',
     'wsclean_gain',
     'wsclean_mgain',
@@ -87,11 +93,11 @@ wsclean = (
     'wsclean_cleanborder',
     'wsclean_smallpsf',
     'wsclean_nonegative',
-    'wsclean_nonegative',
     'wsclean_beamsize', 
 )
 
 casa = (
+    'casa',
     'casa_niter',
     'casa_gain',
     'casa_threshold',
@@ -109,6 +115,7 @@ casa = (
 )
 
 moresane = (
+    'moresane',
     'moresane_scalecount',
     'moresane_startscale',
     'moresane_stopscale',
@@ -118,7 +125,6 @@ moresane = (
     'moresane_accuracy',
     'moresane_majorloopmiter',
     'moresane_minorloopmiter',
-    'moresane_decommode',
     'moresane_convmode',
     'moresane_enforcepositivity',
     'moresane_edgesupression',
@@ -127,7 +133,7 @@ moresane = (
     'moresane_spi_dash_sigmalevel',
 )
 
-fields = telescope + sky + observation + dish + corruptions + imaging + lwimager + wsclean + casa
+fields = telescope + sky + observation + imaging + lwimager + wsclean + casa + moresane # + dish + curruptions
 
 class SimulateForm(BetterModelForm):
     class Meta:
@@ -142,10 +148,10 @@ class SimulateForm(BetterModelForm):
                                       'description': 'Observation setup'}),
                      ('imaging', {'fields': imaging,
                                   'description': 'imaging settings'}),
-                     ('dish', {'fields': dish,
-                               'description': 'dish settings'}),
-                     ('corruptions', {'fields': corruptions,
-                                      'description': 'Corruptions'}),
+#                     ('dish', {'fields': dish,
+#                               'description': 'dish settings'}),
+#                     ('corruptions', {'fields': corruptions,
+#                                      'description': 'Corruptions'}),
 
                      ('lwimager', {'fields': lwimager,
                                         'description': 'LWIMAGER deconvolution settings'}),
