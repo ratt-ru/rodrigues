@@ -60,10 +60,10 @@ def prepare_dockerfile(directory, simulation):
                         os.path.join(directory, 'sky_model'))
         dockerfile.write('ADD sky_model /\n')
 
-    if simulation.tdl_conf:
-        shutil.copyfile(simulation.tdl_conf.file.name,
-                        os.path.join(directory, 'tdl_conf'))
-        dockerfile.write('ADD tdl_conf /\n')
+#    if simulation.tdl_conf:
+#        shutil.copyfile(simulation.tdl_conf.file.name,
+#                        os.path.join(directory, 'tdl_conf'))
+#        dockerfile.write('ADD tdl_conf /\n')
 
     dockerfile.close()
 
