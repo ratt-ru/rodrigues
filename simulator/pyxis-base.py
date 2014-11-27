@@ -48,12 +48,14 @@ OBSDIR = 'observatories'
 _OBS = {
       'meerkat':'MeerKAT64_ANTENNAS',
       'kat-7':'KAT7_ANTENNAS',
-      'vla-a':'VLAA_ANTENNAS',
+      'jvla-a':'VLAA_ANTENNAS',
       'wsrt':'WSRT_ANTENNAS'
 }
 
 KATDIR = 'katalog'
 _KATALOG = {
+         'nvss6deg':'nvss6deg.lsm.html',
+         'scubed1deg':'scubed1deg.lsm.html',
          'rand_pnts':'random_pts.txt',
          'rand_mix':'random.txt',
          'rand_mix_fits':'random.fits',
@@ -122,7 +124,7 @@ def readCFG(cfg='$CFG'):
     global OBSERVATORY,POSITIONS,MS_LABEL
     OBSERVATORY = params['observatory'].lower()
     POSITIONS = '%s/%s'%(OBSDIR,_OBS[OBSERVATORY])
-    if OBSERVATORY.startswith('vla'):
+    if OBSERVATORY.startswith('jvla'):
        MS_LABEL = OBSERVATORY
        OBSERVATORY = 'VLA'
 
@@ -154,16 +156,16 @@ def readCFG(cfg='$CFG'):
     global MAKE_PSF,OUTPUT_TYPE,COLUMN
     MAKE_PSF = str2bool(params['make_psf'])
     OUTPUT_TYPE = params['output']
-    COLUMN = params['column'].upper()
+    #COLUMN = params['column'].upper()
     _deconv = []
     for dcv in 'lwimager wsclean moresane casa'.split():
        if str2bool(params[dcv]):
-          _deconv.append(dcv)
+          _deconv.append(dcv.lower())
     
-    own_tdl = str2bool(params['upload_tdl'])
-    if own_tdl:
-        v.TDLCONF = params['tdlconf']
-        v.TDLSEC = params['tdlsection']
+#    own_tdl = str2bool(params['upload_tdl'])
+#    if own_tdl:
+#        v.TDLCONF = params['tdlconf']
+#        v.TDLSEC = params['tdlsection']
 
     global RADIUS,FLUXRANGE
     RADIUS = float(params['radius'])
@@ -172,7 +174,7 @@ def readCFG(cfg='$CFG'):
         FLUXRANGE = map(float,FLUXRANGE)
     elif len(FLUXRANGE)==1:
         FLUXRANGE = [0,float(FLUXRANGE[0])]
-    _imager = params['imager']
+    _imager = params['imager'].lower()
 
     global CHANNELIZE
     CHANNELIZE = int(params['channelise'])

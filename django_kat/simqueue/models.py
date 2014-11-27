@@ -70,8 +70,9 @@ class Simulation(Model):
                                help_text='Generates from SEFD if 0')
 
     # observation setup
-    ms_hours = FloatField('Synthesis time', default=0.25, help_text='in hours')
-    ms_start_time = FloatField('Initial hour angle', default=-0.125, help_text='in hours')
+    ms_synthesis = FloatField('Synthesis time', default=0.25, help_text='in hours')
+    ms_scan_length = FloatField('Scan length',blank=True, default=0.25, help_text='in hours')
+    ms_start_time = FloatField('Initial hour angle',blank=True, default=-0.125, help_text='in hours')
     ms_dtime = IntegerField('Integration time', default=10,
                             help_text='in seconds')
     ms_freq0 = FloatField('Start frequency', default=700, help_text='in MHz')
@@ -148,11 +149,11 @@ class Simulation(Model):
     im_mode = CharField('Imaging mode', choices=IMAGING_TYPES, max_length=1,
                         default='C')
     im_spwid = CharField('Spectral window', default=0, max_length=32)
-    channelise = FloatField('Image channelise',
+    channelise = IntegerField('Image channelise',
                            default=0,
                            help_text='0 means average all, 1 per channel, etc.')
     im_stokes = CharField('Stokes', default='I', max_length=4)
-    make_psf = BooleanField('Make PSF',default=True, blank=True)
+    make_psf = BooleanField('Make PSF',default=False, blank=True)
 
     CLEAN_TYPES = (
         ('C', 'csclean'),

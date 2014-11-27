@@ -25,7 +25,8 @@ sky = (
 
 # observation setup
 observation = (
-    'ms_hours',
+    'ms_synthesis',
+    'ms_scan_length',
     'ms_start_time',
     'ms_dtime',
     'ms_freq0',

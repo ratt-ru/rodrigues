@@ -17,6 +17,7 @@ vis_noise_std={{ object.vis_noise_std }}
 ## observation setup
 ms_synthesis={{ object.ms_synthesis }}
 ms_scan_length={{ object.ms_scan_length }}
+ms_start_time={{ object.ms_start_time }}
 ms_dtime={{ object.ms_dtime }}
 ms_freq0={{ object.ms_freq0 }}
 ms_dfreq={{ object.ms_dfreq }}
