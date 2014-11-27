@@ -9,7 +9,7 @@
 
 ### On a fresh Ubuntu 14.04 machine
 
-First make sure you have the latest docker installed (not the docker.io package).
+First make sure you have the latest docker (>= 1.3) installed (not the docker.io package).
 
 https://docs.docker.com/installation/ubuntulinux/#ubuntu-trusty-1404-lts-64-bit
 
