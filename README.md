@@ -7,13 +7,16 @@
 
 ## Installation
 
-
 ### On a fresh Ubuntu 14.04 machine
+
+First make sure you have the latest docker installed (not the docker.io package).
+
+https://docs.docker.com/installation/ubuntulinux/#ubuntu-trusty-1404-lts-64-bit
 
 run:
 
     $ sudo apt-get update
-    $ sudo apt-get install -y docker.io python-pip git
+    $ sudo apt-get install -y python-pip git
     $ sudo pip install fig
     $ git clone https://github.com/ska-sa/ceiling-kat
     $ cd ceiling-kat
@@ -42,7 +45,6 @@ You need:
    * Python 3
    * Python PIP (`$ sudo apt-get install python3-pip`)
    * RabbitMQ (`$ sudo apt-get install rabbitmq-server`)
-   * docker (`$ sudo apt-get install docker.io`)
    * postgres (`$ sudo apt-get install postgresql postgresql-server-dev-all`)
 
 Now to install the requirered libraries run inside the surf_kat folder:
