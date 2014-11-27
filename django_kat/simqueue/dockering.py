@@ -18,10 +18,10 @@ logger = logging.getLogger(__name__)
 # (filename in container, field in database)
 files = (
     ('results-uvcov.png', 'results_uvcov'),
-    ('results-lwimager.dirty.fits', 'results_dirty'),
-    ('results-lwimager.model.fits', 'results_model'),
-    ('results-lwimager.residual.fits', 'results_residual'),
-    ('results-lwimager.restored.fits', 'results_restored'),
+    ('results-lwimager.dirty.fits', 'results_lwimager_dirty'),
+    ('results-lwimager.model.fits', 'results_lwimager_model'),
+    ('results-lwimager.residual.fits', 'results_lwimager_residual'),
+    ('results-lwimager.restored.fits', 'results_lwimager_restored'),
     ('results-casa.dirty.fits', 'results_casa_dirty'),
     ('results-casa.model.fits', 'results_casa_model'),
     ('results-casa.residual.fits', 'results_casa_residual'),

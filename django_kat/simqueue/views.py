@@ -83,7 +83,9 @@ class SimulationFits(DetailView):
     visualises Filefield model files using aplpy
     """
     model = Simulation
-    fits_fields = ['dirty', 'model', 'residual', 'restored']
+    fits_fields = ['lwimager_dirty', 'lwimager_model', 'lwimager_residual', 'lwimager_restored',
+    'casa_dirty', 'casa_model', 'casa_residual', 'casa_restored' ]
+    
 
     def render_to_response(self, context, **kwargs):
         field = self.kwargs['field']

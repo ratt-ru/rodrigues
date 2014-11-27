@@ -9,6 +9,7 @@ WORKDIR /code
 #WORKDIR /code/wsclean-1.4/build
 #RUN cmake ..
 #RUN make
+
 WORKDIR /code
 RUN svn co https://svn.cv.nrao.edu/svn/casa-data/distro/geodetic
 RUN git clone -b devel https://github.com/SpheMakh/pyxis

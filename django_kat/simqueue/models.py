@@ -330,10 +330,14 @@ class Simulation(Model):
 
     # results
     results_uvcov = FileField(blank=True, upload_to='uvcov', null=True)
-    results_dirty = FileField(blank=True, upload_to='dirty', null=True)
-    results_model = FileField(blank=True, upload_to='model', null=True)
-    results_residual = FileField(blank=True, upload_to='residual', null=True)
-    results_restored = FileField(blank=True, upload_to='restored', null=True)
+    results_lwimager_dirty = FileField(blank=True, upload_to='lwimager_dirty', null=True)
+    results_lwimager_model = FileField(blank=True, upload_to='lwimager_model', null=True)
+    results_lwimager_residual = FileField(blank=True, upload_to='lwimager_residual', null=True)
+    results_lwimager_restored = FileField(blank=True, upload_to='lwimager_restored', null=True)
+    results_casa_dirty = FileField(blank=True, upload_to='casa_dirty', null=True)
+    results_casa_model = FileField(blank=True, upload_to='casa_model', null=True)
+    results_casa_residual = FileField(blank=True, upload_to='casa_residual', null=True)
+    results_casa_restored = FileField(blank=True, upload_to='casa_restored', null=True)
 
     def __str__(self):
         return "<simulation name='%s' id=%s>" % (self.name, self.id)
@@ -354,15 +358,20 @@ class Simulation(Model):
 
     def clear(self):
         self.results_uvcov = None
-        self.results_dirty = None
-        self.results_model = None
-        self.results_residual = None
-        self.results_restored = None
+        self.results_lwimager_dirty = None
+        self.results_lwimager_model = None
+        self.results_lwimager_residual = None
+        self.results_lwimager_restored = None
+        self.results_casa_dirty = None
+        self.results_casa_model = None
+        self.results_casa_residual = None
+        self.results_casa_restored = None
         self.log = None
         self.console = ""
-        self.save(update_fields=["results_uvcov", "results_dirty",
-                                        "results_model", "results_residual",
-                                        "results_restored", "log", "console"])
+        self.save(update_fields=["results_uvcov", 
+        "results_lwimager_dirty","results_lwimager_model", "results_lwimager_residual", "results_lwimager_restored", 
+        "results_casa_dirty","results_casa_model", "results_casa_residual", "results_casa_restored", 
+        "log", "console"])
 
     def get_task_status(self):
         if not self.task_id:
