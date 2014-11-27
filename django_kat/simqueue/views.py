@@ -88,9 +88,10 @@ class SimulationFits(DetailView):
     
 
     def render_to_response(self, context, **kwargs):
-        field = self.kwargs['field']
-        if field not in self.fits_fields:
-            raise Http404
+        field = self.kwargs['field'];
+#        print ">>>>>>>>>>>>>>> %s"%field;
+#        if field not in self.fits_fields:
+#            raise Http404
         response = HttpResponse(content_type='image/png')
         fig = matplotlib.pyplot.figure()
 

@@ -6,6 +6,6 @@ echo $PATH
 echo $PYTHONPATH
 which pyxis
 if [ -z "$USER"]; then
-  USER=root
+  export USER=root
 fi
 pyxis CFG=/sims.cfg LOG=/results/output.log OUTFILE=/results/results OUTDIR=/results azishe
