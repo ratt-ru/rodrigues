@@ -31,77 +31,6 @@
         </div>
     </div>
 
-
-    <div class="row">
-        <div class="col-md-6">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <b>Dirty image</b>
-                        </div>
-                        {% if simulation.results_lwimager_dirty %}
-                            <div class="col-md-4">
-                                <form action="{{ CYBERSKA_URL }}" method="post">
-                                    <input type="hidden" name="title" value="Dirty image" />
-                                    {% if simulation.results_lwimager_dirty %}
-                                        <input type="hidden" name="filename" value="{{ simulation.results_lwimager_dirty.file }}">
-                                        <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
-                                    {% endif %}
-                                </form>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="{{ simulation.results_lwimager_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
-                            </div>
-                        {%  endif %}
-                    </div>
-                </div>
-                <div class="panel-body">
-                    {% if simulation.results_lwimager_dirty %}
-                        <a href="#" class="thumbnail">
-                            <img src="{% url 'fits' simulation.id 'dirty' %}" width="600">
-                        </a>
-                    {% else %}
-                        <h5>not available</h5>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <b>Restored image</b>
-                        </div>
-                        {% if simulation.results_lwimager_restored %}
-                            <div class="col-md-4">
-                                <form action="{{ CYBERSKA_URL }}" method="post">
-                                    <input type="hidden" name="title" value="Restored image" />
-                                    <input type="hidden" name="filename" value="{{ simulation.results_lwimager_restored.file }}">
-                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
-                                </form>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="{{ simulation.results_lwimager_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
-                            </div>
-
-                        {%  endif %}
-                    </div>
-                </div>
-                <div class="panel-body">
-                    {% if simulation.results_lwimager_restored %}
-                        <a href="#" class="thumbnail">
-                            <img src="{% url 'fits' simulation.id 'restored' %}" width="600">
-                        </a>
-                    {% else %}
-                        <h5>not available</h5>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-primary">
@@ -118,72 +47,8 @@
             </div>
         </div>
     </div>
-    <div class="row">
 
-        <div class="col-md-4">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <b>Model image</b>
-                        </div>
-                        {% if simulation.results_lwimager_model %}
-                            <div class="col-md-4">
-                                <form action="{{ CYBERSKA_URL }}" method="post">
-                                    <input type="hidden" name="title" value="Model image" />
-                                    <input type="hidden" name="filename" value="{{ simulation.results_lwimager_model.file }}">
-                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
-                                </form>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="{{ simulation.results_lwimager_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
-                            </div>
-                        {%  endif %}
-                    </div>
-                </div>
-                <div class="panel-body">
-                    {% if simulation.results_lwimager_model %}
-                        <a href="#" class="thumbnail">
-                            <img src="{% url 'fits' simulation.id 'model' %}" width="600">
-                        </a>
-                    {% else %}
-                        <h5>not available</h5>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <b>Residual</b>
-                        </div>
-                        {% if simulation.results_lwimager_residual %}
-                            <div class="col-md-4">
-                                <form action="{{ CYBERSKA_URL }}" method="post">
-                                    <input type="hidden" name="title" value="Residual image" />
-                                    <input type="hidden" name="filename" value="{{ simulation.results_lwimager_residual.file }}">
-                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
-                                </form>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="{{ simulation.results_lwimager_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
-                            </div>
-                        {%  endif %}
-                    </div>
-                </div>
-                <div class="panel-body">
-                    {% if simulation.results_lwimager_residual %}
-                        <a href="#" class="thumbnail">
-                            <img src="{% url 'fits' simulation.id 'residual' %}" width="600">
-                        </a>
-                    {% else %}
-                        <h5>not available</h5>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+    <div class="row">
         <div class="col-md-4">
             <div class="panel panel-primary">
                 <div class="panel-heading">
@@ -209,7 +74,278 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>LWIMAGER: Dirty image</b>
+                        </div>
+                        {% if simulation.results_lwimager_dirty %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URL }}" method="post">
+                                    <input type="hidden" name="title" value="Dirty image" />
+                                    {% if simulation.results_lwimager_dirty %}
+                                        <input type="hidden" name="filename" value="{{ simulation.results_lwimager_dirty.file }}">
+                                        <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                    {% endif %}
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_lwimager_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if simulation.results_lwimager_dirty %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' simulation.id 'dirty' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>LWIMAGER: Restored image</b>
+                        </div>
+                        {% if simulation.results_lwimager_restored %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URL }}" method="post">
+                                    <input type="hidden" name="title" value="Restored image" />
+                                    <input type="hidden" name="filename" value="{{ simulation.results_lwimager_restored.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_lwimager_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if simulation.results_lwimager_restored %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' simulation.id 'restored' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>LWIMAGER: Model image</b>
+                        </div>
+                        {% if simulation.results_lwimager_model %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URL }}" method="post">
+                                    <input type="hidden" name="title" value="Model image" />
+                                    <input type="hidden" name="filename" value="{{ simulation.results_lwimager_model.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_lwimager_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if simulation.results_lwimager_model %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' simulation.id 'model' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>LWIMAGER: Residual</b>
+                        </div>
+                        {% if simulation.results_lwimager_residual %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URL }}" method="post">
+                                    <input type="hidden" name="title" value="Residual image" />
+                                    <input type="hidden" name="filename" value="{{ simulation.results_lwimager_residual.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_lwimager_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if simulation.results_lwimager_residual %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' simulation.id 'residual' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>CASA: Dirty image</b>
+                        </div>
+                        {% if simulation.results_casa_dirty %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URL }}" method="post">
+                                    <input type="hidden" name="title" value="Dirty image" />
+                                    {% if simulation.results_casa_dirty %}
+                                        <input type="hidden" name="filename" value="{{ simulation.results_casa_dirty.file }}">
+                                        <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                    {% endif %}
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_casa_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if simulation.results_casa_dirty %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' simulation.id 'dirty' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>CASA: Restored image</b>
+                        </div>
+                        {% if simulation.results_casa_restored %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URL }}" method="post">
+                                    <input type="hidden" name="title" value="Restored image" />
+                                    <input type="hidden" name="filename" value="{{ simulation.results_casa_restored.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_casa_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if simulation.results_casa_restored %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' simulation.id 'restored' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>CASA: Model image</b>
+                        </div>
+                        {% if simulation.results_casa_model %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URL }}" method="post">
+                                    <input type="hidden" name="title" value="Model image" />
+                                    <input type="hidden" name="filename" value="{{ simulation.results_casa_model.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_casa_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if simulation.results_casa_model %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' simulation.id 'model' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>CASA: Residual</b>
+                        </div>
+                        {% if simulation.results_casa_residual %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URL }}" method="post">
+                                    <input type="hidden" name="title" value="Residual image" />
+                                    <input type="hidden" name="filename" value="{{ simulation.results_casa_residual.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ simulation.results_casa_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if simulation.results_casa_residual %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' simulation.id 'residual' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">
