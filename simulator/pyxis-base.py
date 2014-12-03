@@ -3,6 +3,7 @@ import cPickle
 import numpy
 import pyfits,pyrap.tables
 import math
+
 from scipy.ndimage.measurements import *
 # important to import from Pyxis, as this takes care of missing displays etc.
 
@@ -62,6 +63,7 @@ _KATALOG = {
          '3c147_no_core':'3c147_field_no_3c147.lsm.html',
          '3c147_field':'3c147.lsm.html',
 }
+_SKYTYPE = {'tigger-lsm':'.lsm.html','ascii':'.txt','fits':'.fits'}
 
 MEASURE_PSF = False
 MEASURE_SIDELOBES = False
@@ -110,7 +112,8 @@ def readCFG(cfg='$CFG'):
             val = line.split('=')[-1]
             if not line.endswith('='):
                 val = val.split(' ')[0]
-                params[key] = val
+                if val.lower()!='none':
+                    params[key] = val
 
     options = dict(ms_={},cr_={},im_={},lwimager_={},wsclean_={},casa_={},moresane_={})
     for key in params.keys():
@@ -130,13 +133,15 @@ def readCFG(cfg='$CFG'):
 
     global FITS,TIGGER,TDLSEC,KATALOG,SELECT
     skytype = params['skytype'].lower()
-    if skytype in ['tiggerlsm','ascii']:  
+    if skytype in ['tigger-lsm','ascii']:  
         TIGGER = True
-        v.LSM = params['skyname']
+        v.LSM = params['sky_model']+_SKYTYPE[skytype]
+        x.sh('cp %s $LSM'%(params['sky_model']))
         TDLSEC = 'turbo-sim:custom'
     elif skytype =='fits':
         FITS = True
-        v.LSM = params['skyname']
+        v.LSM = params['skyname']+_SKYTYPE[skytype]
+        x.sh('cp %s $LSM'%(params['sky_model']))
     elif skytype=='katalog':
         TDLSEC = 'turbo-sim:custom'
         v.LSM = '%s/%s'%(KATDIR,_KATALOG[params['katalog_id']])

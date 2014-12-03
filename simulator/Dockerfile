@@ -1,14 +1,15 @@
 FROM gijzelaerr/papino-meqtrees
-RUN apt-get install -y time git subversion policycoreutils ipython cmake
+RUN apt-get install -y time git subversion policycoreutils cmake
 ADD casarc /root/.casarc
 
 ADD . /code
 WORKDIR /code
-#RUN tar -xjvf wsclean-1.4.tar.bz2
-#RUN mkdir -p /code/wsclean-1.4/build
-#WORKDIR /code/wsclean-1.4/build
-#RUN cmake ..
-#RUN make
+RUN apt-get build-dep -y wsclean 
+RUN git clone http://git.code.sf.net/p/wsclean/code wsclean
+RUN mkdir -p /code/wsclean/wsclean/build
+WORKDIR /code/wsclean/wsclean/build
+RUN cmake ..
+RUN make -j 8
 
 WORKDIR /code
 RUN svn co https://svn.cv.nrao.edu/svn/casa-data/distro/geodetic

@@ -77,8 +77,8 @@ class Simulation(Model):
                             help_text='in seconds')
     ms_freq0 = FloatField('Start frequency', default=700, help_text='in MHz')
     ms_dfreq = FloatField('Channel width', default=50e3, help_text='in kHz')
-    ms_nchan = IntegerField('Channels per band', default=1,
-                            help_text='Number of frequency channels per band')
+    ms_nchan = IntegerField('Channels', default=1,
+                            help_text='Number of frequency channels')
 #    ms_write_auto_corr = BooleanField('Include Autocorrelations',
 #                                      help_text='Include autocorrelation in data',
 #                                      default=True)
@@ -93,10 +93,9 @@ class Simulation(Model):
     )
 
     # dish settings
-    ds_amp_phase_gains = FloatField('Amplitude Phase Gains', default=1)
     ds_parallactic_angle_rotation = BooleanField('Parallactic Angle Rotation',
-                                                 default=True)
-    ds_primary_beam = CharField(choices=BEAM_TYPES, max_length=1, default='M')
+                                                 default=True,help_text='Can not be applied to FITS skymodels at the moment.')
+    ds_primary_beam = CharField('Primary Beam',choices=BEAM_TYPES, max_length=1, default='M')
     ds_feed_angle = FloatField("Feed angle", default=0)
 
     # corruptions
@@ -124,12 +123,6 @@ class Simulation(Model):
         ('V', 'velocity'),
         ('F', 'frequency'),
     )
-#TODO: Can we allow user to enter integer value if custom is selected?
-#    CHANNELISE_TYPES = (
-#        ('NCHAN', 'Average all'),
-#        ('1', 'Image every channel'),
-#        ('custom', 'Custom'),
-#    )
 
     # imaging settings
     imager = CharField('Imager',default='LW',
@@ -148,12 +141,12 @@ class Simulation(Model):
     im_wprojplanes = IntegerField('w-Projection planes', default=0)
     im_mode = CharField('Imaging mode', choices=IMAGING_TYPES, max_length=1,
                         default='C')
-    im_spwid = CharField('Spectral window', default=0, max_length=32)
+#    im_spwid = CharField('Spectral window', default=0, max_length=32)
     channelise = IntegerField('Image channelise',
                            default=0,
                            help_text='0 means average all, 1 per channel, etc.')
     im_stokes = CharField('Stokes', default='I', max_length=4)
-    make_psf = BooleanField('Make PSF',default=False, blank=True)
+#    make_psf = BooleanField('Make PSF',default=False, blank=True)
 
     CLEAN_TYPES = (
         ('C', 'csclean'),
@@ -173,7 +166,7 @@ class Simulation(Model):
     lwimager_operation = CharField('Clean algorithm',
                               choices=CLEAN_TYPES,
                               default='C',
-                              max_length=32)
+                              max_length=1)
     lwimager_cyclefactor = FloatField('Cycle factor',default=1.5)
     lwimager_cyclespeedup = FloatField('Cycle speed up',default=-1)
     lwimager_stoppointmode = FloatField('Stop point mode,',default=-1)
@@ -253,7 +246,8 @@ class Simulation(Model):
     casa_nterms = IntegerField('NTERMS',
                              default=1,
                              help_text='See CASA clean task')
-    casa_reffreq = FloatField('MFS ref Frequency',blank=True,null=True)
+    casa_reffreq = FloatField('MFS ref Frequency',blank=True,null=True,
+                             help_text='in MHz')
     casa_multiscale = CharField('Multiscale',
                                 blank=True,null=True,
                                 help_text='Deconvolution scales in pixels',
@@ -284,8 +278,8 @@ class Simulation(Model):
     moresane_subregion = IntegerField('Sub region',
                           blank=True,null=True,
                           help_text='Inner region to deconvolve in pixels')
-    moresane_startscale = FloatField('Start scale',default=1)
-    moresane_stopscale = FloatField('Stop scale',default=20)
+    moresane_startscale = IntegerField('Start scale',default=1)
+    moresane_stopscale = IntegerField('Stop scale',default=20)
     moresane_sigmalevel = FloatField('Threshold level',
                           default=3,
                           help_text='in sigma above noise')
@@ -300,7 +294,7 @@ class Simulation(Model):
                           max_length=32)
     moresane_enforcepositivity = BooleanField('Enforce Positivity',default=False)
     moresane_edgesupression = BooleanField('Edge Suppression',default=False)
-    moresane_edgeoffset = FloatField('Edge offset',default=0)
+    moresane_edgeoffset = IntegerField('Edge offset',default=0)
     moresane_mfs = BooleanField('MFS map',
                           default=False,
                           help_text='Comes with an spi map') 
@@ -330,14 +324,24 @@ class Simulation(Model):
 
     # results
     results_uvcov = FileField(blank=True, upload_to='uvcov', null=True)
-    results_lwimager_dirty = FileField(blank=True, upload_to='lwimager_dirty', null=True)
+    results_dirty = FileField(blank=True, upload_to='dirty', null=True)
+    results_psf = FileField(blank=True, upload_to='psf', null=True)
+#    results_lwimager_dirty = FileField(blank=True, upload_to='lwimager_dirty', null=True)
     results_lwimager_model = FileField(blank=True, upload_to='lwimager_model', null=True)
     results_lwimager_residual = FileField(blank=True, upload_to='lwimager_residual', null=True)
     results_lwimager_restored = FileField(blank=True, upload_to='lwimager_restored', null=True)
-    results_casa_dirty = FileField(blank=True, upload_to='casa_dirty', null=True)
+#    results_casa_dirty = FileField(blank=True, upload_to='casa_dirty', null=True)
     results_casa_model = FileField(blank=True, upload_to='casa_model', null=True)
     results_casa_residual = FileField(blank=True, upload_to='casa_residual', null=True)
     results_casa_restored = FileField(blank=True, upload_to='casa_restored', null=True)
+#    results_wsclean_dirty = FileField(blank=True, upload_to='wsclean_dirty', null=True)
+    results_wsclean_model = FileField(blank=True, upload_to='wsclean_model', null=True)
+    results_wsclean_residual = FileField(blank=True, upload_to='wsclean_residual', null=True)
+    results_wsclean_restored = FileField(blank=True, upload_to='wsclean_restored', null=True)
+#    results_moresane_dirty = FileField(blank=True, upload_to='moresane_dirty', null=True)
+    results_moresane_model = FileField(blank=True, upload_to='moresane_model', null=True)
+    results_moresane_residual = FileField(blank=True, upload_to='moresane_residual', null=True)
+    results_moresane_restored = FileField(blank=True, upload_to='moresane_restored', null=True)
 
     def __str__(self):
         return "<simulation name='%s' id=%s>" % (self.name, self.id)
@@ -358,19 +362,33 @@ class Simulation(Model):
 
     def clear(self):
         self.results_uvcov = None
-        self.results_lwimager_dirty = None
+        self.results_psf = None
+        self.results_dirty = None
+#        self.results_lwimager_dirty = None
         self.results_lwimager_model = None
         self.results_lwimager_residual = None
         self.results_lwimager_restored = None
-        self.results_casa_dirty = None
+#        self.results_casa_dirty = None
         self.results_casa_model = None
         self.results_casa_residual = None
         self.results_casa_restored = None
+#        self.results_wsclean_dirty = None
+        self.results_wsclean_model = None
+        self.results_wsclean_residual = None
+        self.results_wsclean_restored = None
+#        self.results_moresane_dirty = None
+        self.results_moresane_model = None
+        self.results_moresane_residual = None
+        self.results_moresane_restored = None
+
+
         self.log = None
         self.console = ""
-        self.save(update_fields=["results_uvcov", 
-        "results_lwimager_dirty","results_lwimager_model", "results_lwimager_residual", "results_lwimager_restored", 
-        "results_casa_dirty","results_casa_model", "results_casa_residual", "results_casa_restored", 
+        self.save(update_fields=["results_uvcov","results_dirty","results_psf",
+        "results_lwimager_model", "results_lwimager_residual", "results_lwimager_restored", 
+        "results_casa_model", "results_casa_residual", "results_casa_restored", 
+        "results_wsclean_model", "results_wsclean_residual", "results_wsclean_restored", 
+        "results_moresane_model", "results_moresane_residual", "results_moresane_restored", 
         "log", "console"])
 
     def get_task_status(self):

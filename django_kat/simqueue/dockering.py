@@ -18,14 +18,24 @@ logger = logging.getLogger(__name__)
 # (filename in container, field in database)
 files = (
     ('results-uvcov.png', 'results_uvcov'),
-    ('results-lwimager.dirty.fits', 'results_lwimager_dirty'),
+    ('results-psf.fits', 'results_psf'),
+    ('results-dirty.fits', 'results_dirty'),
+#    ('results-lwimager.dirty.fits', 'results_lwimager_dirty'),
     ('results-lwimager.model.fits', 'results_lwimager_model'),
     ('results-lwimager.residual.fits', 'results_lwimager_residual'),
     ('results-lwimager.restored.fits', 'results_lwimager_restored'),
-    ('results-casa.dirty.fits', 'results_casa_dirty'),
+#    ('results-casa.dirty.fits', 'results_casa_dirty'),
     ('results-casa.model.fits', 'results_casa_model'),
     ('results-casa.residual.fits', 'results_casa_residual'),
     ('results-casa.restored.fits', 'results_casa_restored'),
+#    ('results-wsclean.dirty.fits', 'results_wsclean_dirty'),
+    ('results-wsclean.model.fits', 'results_wsclean_model'),
+    ('results-wsclean.residual.fits', 'results_wsclean_residual'),
+    ('results-wsclean.restored.fits', 'results_wsclean_restored'),
+#    ('results-moresane.dirty.fits', 'results_moresane_dirty'),
+    ('results-moresane.model.fits', 'results_moresane_model'),
+    ('results-moresane.residual.fits', 'results_moresane_residual'),
+    ('results-moresane.restored.fits', 'results_moresane_restored'),
     ('output.log', 'log'),
 )
 
@@ -80,22 +90,34 @@ def run_docker(client, dockerfile_dir, image_name, simulation):
     """
     console = ""
 
-    for row in client.build(path=dockerfile_dir, tag=image_name):
-        logger.info(row)
-        console += row
-        simulation.console = console
-        simulation.save()
+    try:
+        rows = client.build(path=dockerfile_dir, tag=image_name)
+        for row in rows:
+            logger.info(row)
+            console += row
+            simulation.console = console
+            simulation.save()
+    except Exception as e:
+        error = "can't build container: " + str(e)
+        logging.error(error)
+        console += error
+        return True, console, False
+
     try:
         container = client.create_container(image=image_name,
                                             command=settings.DOCKER_CMD)
-    except (DockerException, RequestException) as e:
-        logging.error("can't create container: " + str(e))
+    except Exception as e:
+        error = "can't create container: " + str(e)
+        logging.error(error)
+        console += error
         return True, console, False
 
     try:
         client.start(container)
-    except (DockerException, RequestException) as e:
-        logging.error("can't create container: " + str(e))
+    except Exception as e:
+        error = "can't start container: " + str(e)
+        logging.error(error)
+        console += error
         return True, console, False
 
     # capture logs

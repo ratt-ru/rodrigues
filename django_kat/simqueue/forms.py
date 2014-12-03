@@ -62,10 +62,10 @@ imaging = (
     'im_weight_fov',
     'im_wprojplanes',
     'im_mode',
-    'im_spwid',
+#    'im_spwid',
     'channelise',
     'im_stokes',
-    'make_psf',
+#    'make_psf',
 )
 
 
@@ -78,6 +78,7 @@ lwimager = (
     'lwimager_nscales',
     'lwimager_uservector',
     'lwimager_cyclefactor',
+    'lwimager_cyclespeedup',
 )
 
 wsclean = (

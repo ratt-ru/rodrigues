@@ -83,15 +83,16 @@ class SimulationFits(DetailView):
     visualises Filefield model files using aplpy
     """
     model = Simulation
-    fits_fields = ['lwimager_dirty', 'lwimager_model', 'lwimager_residual', 'lwimager_restored',
-    'casa_dirty', 'casa_model', 'casa_residual', 'casa_restored' ]
+    fits_fields = ['dirty','psf','lwimager_dirty', 'lwimager_model', 'lwimager_residual', 'lwimager_restored',
+    'casa_model', 'casa_residual', 'casa_restored',
+    'wsclean_model', 'wsclean_residual', 'wsclean_restored',
+    'moresane_model', 'moresane_residual', 'moresane_restored',]
     
 
     def render_to_response(self, context, **kwargs):
         field = self.kwargs['field'];
-#        print ">>>>>>>>>>>>>>> %s"%field;
-#        if field not in self.fits_fields:
-#            raise Http404
+        if field not in self.fits_fields:
+            raise Http404
         response = HttpResponse(content_type='image/png')
         fig = matplotlib.pyplot.figure()
 

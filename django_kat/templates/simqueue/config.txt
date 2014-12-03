@@ -51,7 +51,7 @@ im_mode={{ object.get_im_mode_display }}
 im_spwid={{ object.im_spwid }}
 channelise={{ object.channelise }}
 im_stokes={{ object.im_stokes }}
-make_psf={{ object.make_psf }}
+#make_psf={{ object.make_psf }}
 
 ## lwimager
 lwimager={{ object.lwimager }}
@@ -113,6 +113,3 @@ moresane_edgesupression={{ object.moresane_edgesupression }}
 moresane_edgeoffset={{ object.moresane_edgeoffset }}
 moresane_mfs={{ object.moresane_mfs }}
 moresane_spi_dash_sigmalevel={{ object.moresane_spi_dash_sigmalevel }}
-
-
-

@@ -23,15 +23,12 @@ TOTAL_SYNTHESIS = None
 OBSERVATORY = None
 POSITIONS = None
 
-#TODO: Ask Gijs to install moresane in container 
-im.MORESANE_PATH = '/home/makhathini/PyMORESANE/pymoresane.py'
-
-_KATALOG = {
-         'rand_pnts':'random_pts.txt',
-         'rand_mix':'random.txt',
-         '3c147_no_core':'3c147_field_no_3c147.lsm.html',
-         '3c147_field':'3c147.lsm.html',
-}
+#_KATALOG = {
+#         'rand_pnts':'random_pts.txt',
+#         'rand_mix':'random.txt',
+#         '3c147_no_core':'3c147_field_no_3c147.lsm.html',
+#         '3c147_field':'3c147.lsm.html',
+#}
 
 def simulate(msname='$MS',lsmname='$LSM',column='$COLUMN',tdlconf='$TDLCONF',section='$TDLSEC',options={},**kw):
     """ Simulates visibilities into an MS """
@@ -43,8 +40,12 @@ def simulate(msname='$MS',lsmname='$LSM',column='$COLUMN',tdlconf='$TDLCONF',sec
         options['ms_sel.output_column'] = column
         options['ms_sel.msname'] = msname
         mqt.run('turbo-sim.py',job='_tdl_job_1_simulate_MS',config=tdlconf,section=section,options=options)
+#        tab = ms.ms()
+#        data = tab.getcol('CORRECTED_DATA')[:50]
+#        info('>>>>>>\n $data')
+        
     elif FITS:
-       predict_from_fits(lsmname,wprojplanes=128,column=COLUMN)
+       predict_from_fits(lsmname,wprojplanes=128,column=column)
 
 def azishe(cfg='$CFG',make_image=True):
     """ The driver for simulator """
@@ -119,6 +120,9 @@ def azishe(cfg='$CFG',make_image=True):
 
     global NOISE
     NOISE = compute_vis_noise(sefd=get_sefd(freq0)) * scalenoise
+    # make noise map. noise map will be 512x512 pixels 
+    noise = measure_image_noise(make_psf=False,noise=NOISE,add_noise=True,npix=512)
+
     simulate()
     tmp_std.close()
 
@@ -140,22 +144,19 @@ def azishe(cfg='$CFG',make_image=True):
                 setattr(im,opt,im_opts[opt])
             del im_opts[opt]
 
-    # make noise map. noise map will be 512x512 pixels 
-    noise = measure_image_noise(make_psf=False,noise=NOISE,add_noise=True,npix=512)
+    im.IMAGER = _imager
 
-    if not _deconv:
-        __import__('im.%s'%_imager)
-        call_imager = eval('im.%s.make_image'%_imager)
-        call_imager(dirty=True,restore=False,restore_lsm=False,psf=MAKE_PSF,**im_opts)
+    __import__('im.%s'%_imager)
+    call_imager = eval('im.%s.make_image'%_imager)
+    im.wsclean.make_image(dirty=True,psf=MAKE_PSF,psf_image='${OUTFILE}-psf.fits',dirty_image='${OUTFILE}-dirty.fits',**im_opts)
 
     for deconv in _deconv:
         restore = _cfg['%s_'%deconv]
         for key,val in restore.items():
-            if val.lower() in 'true yes 1':
+            if val.lower() in 'true yes':
                 restore[key] = True
-            elif val.lower() in 'false no 0':
+            elif val.lower() in 'false no':
                 del restore[key]
-
         if deconv in 'wsclean casa lwimager'.split():
             _imager = deconv
             try:
@@ -176,8 +177,8 @@ def azishe(cfg='$CFG',make_image=True):
                    try: restore[key] = float(val)
                    except ValueError: "do nothing"
         if deconv in STAND_ALONE_DECONV :
-            im_opts['algorithm'] = devonv
+            im_opts['algorithm'] = deconv
 
         __import__('im.%s'%_imager)
         call_imager = eval('im.%s.make_image'%_imager)
-        call_imager(dirty=True,restore=restore,restore_lsm=False,psf=MAKE_PSF,**im_opts)
+        call_imager(dirty=False,imager=deconv,restore=restore,restore_lsm=False,**im_opts)
