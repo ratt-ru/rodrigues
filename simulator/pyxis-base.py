@@ -158,8 +158,7 @@ def readCFG(cfg='$CFG'):
         visnoise = float(params['vis_noise_std']) 
         v.NOISE = visnoise if visnoise else None;
 
-    global MAKE_PSF,OUTPUT_TYPE,COLUMN
-    MAKE_PSF = str2bool(params['make_psf'])
+    global OUTPUT_TYPE,COLUMN
     OUTPUT_TYPE = params['output']
     #COLUMN = params['column'].upper()
     _deconv = []

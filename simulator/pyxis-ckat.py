@@ -4,7 +4,7 @@ import lsm
 import im
 from simms import simms
 
-MAKE_PSF = False
+
 mqt.MULTITHREAD = 8
 FITS = False
 TIGGER = False
@@ -148,7 +148,7 @@ def azishe(cfg='$CFG',make_image=True):
 
     __import__('im.%s'%_imager)
     call_imager = eval('im.%s.make_image'%_imager)
-    im.wsclean.make_image(dirty=True,psf=MAKE_PSF,psf_image='${OUTFILE}-psf.fits',dirty_image='${OUTFILE}-dirty.fits',**im_opts)
+    call_imager(dirty=True,psf=True,psf_image='${OUTFILE}-psf.fits',dirty_image='${OUTFILE}-dirty.fits',**im_opts)
 
     for deconv in _deconv:
         restore = _cfg['%s_'%deconv]
