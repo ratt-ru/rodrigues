@@ -6,7 +6,7 @@ FITS = False
 CLEAN = False
 LSM = None
 NOISE = None
-
+USING_SIAMESE = False
 def simulate(msname='$MS',lsmname='$LSM',tdlconf='$TDLCONF',section='$TDLSEC',freq0=1400e6,options={},**kw):
   """ Simulates visibilities into an MS """
   v.MS,v.LSM = interpolate_locals('msname lsmname')
@@ -15,7 +15,8 @@ def simulate(msname='$MS',lsmname='$LSM',tdlconf='$TDLCONF',section='$TDLSEC',fr
   options['noise_stddev'] = NOISE or compute_vis_noise(sefd=get_sefd(freq0))
   options['ms_sel.output_column'] = COLUMN
   options['ms_sel.msname'] = msname
-  if USING_SIAMESE : section = 'turbo-sim:default'
+  if USING_SIAMESE : 
+      section = 'turbo-sim:default'
   options['ms_sel.select_channels'] = 0
   mqt.run('turbo-sim.py',job='_tdl_job_1_simulate_MS',config=tdlconf,section=section,options=options)
 

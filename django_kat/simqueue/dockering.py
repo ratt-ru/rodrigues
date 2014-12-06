@@ -65,15 +65,35 @@ def run_docker(client, dockerfile_dir, image_name, simulation):
     """
     console = ""
 
-    for row in client.build(path=dockerfile_dir, tag=image_name):
-        logger.info(row)
-        console += row
-        simulation.console = console
-        simulation.save()
+   try:
+        rows = client.build(path=dockerfile_dir, tag=image_name)
+        for row in rows:
+            logger.info(row)
+            console += row
+            simulation.console = console
+            simulation.save()
+    except Exception as e:
+        error = "can't build container: " + str(e)
+        logging.error(error)
+        console += error
+        return True, console, False
 
-    container = client.create_container(image=image_name,
-                                        command=settings.DOCKER_CMD)
-    client.start(container)
+    try:
+        container = client.create_container(image=image_name,
+                                            command=settings.DOCKER_CMD)
+    except Exception as e:
+        error = "can't create container: " + str(e)
+        logging.error(error)
+        console += error
+        return True, console, False
+
+    try:
+        client.start(container)
+    except Exception as e:
+        error = "can't start container: " + str(e)
+        logging.error(error)
+        console += error
+        return True, console, False
 
     # capture logs
     for line in client.attach(container=container, stream=True,

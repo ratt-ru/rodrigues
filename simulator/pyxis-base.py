@@ -118,7 +118,7 @@ def readCFG(cfg='$CFG'):
         del params[key]
   if params['skytype'] == 'tiggerlsm': 
     v.LSM = params['skyname']
-    v.TDLSEC = 'turbo-sim:own_lsm'
+    v.TDLSEC = 'turbo-sim:custom'
   elif params['skytype'].upper() == 'FITS' : v.FITS = params['skyname']
   else : v.USING_SIAMESE = True
   if str2bool(params['add_noise']): 
