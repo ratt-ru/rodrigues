@@ -65,7 +65,7 @@ def run_docker(client, dockerfile_dir, image_name, simulation):
     """
     console = ""
 
-   try:
+    try:
         rows = client.build(path=dockerfile_dir, tag=image_name)
         for row in rows:
             logger.info(row)
