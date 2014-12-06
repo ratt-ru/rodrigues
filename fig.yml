@@ -1,0 +1,75 @@
+db:
+  image: postgres:9.3
+
+
+broker:
+  image: dockerfile/rabbitmq
+
+
+mail:
+  build: postfix
+  ports:
+    - 25:25
+  # somehow the docker DNS server can't resolve MX records so we use google
+  dns: 8.8.8.8
+
+
+worker:
+ build: django_kat
+ command: celery worker -A django_kat -l INFO
+ links:
+   - broker
+   - db
+   - mail
+ environment:
+   - DJANGO_SETTINGS_MODULE=django_kat.settings.container
+   - C_FORCE_ROOT=true
+   - SECRET_KEY="doesn't matter"
+ volumes:
+  - /var/run/docker.pid:/var/run/docker.pid
+  - /var/run/docker.sock:/var/run/docker.sock
+  - /var/lib/docker:/var/lib/docker
+  - /code/results
+  - /code/uploaded
+
+
+django:
+  build: django_kat
+  command: uwsgi --socket django_kat.sock --module django_kat.wsgi --chmod-socket=666
+  links:
+    - db
+    - broker
+    - mail
+  environment:
+    - DJANGO_SETTINGS_MODULE=django_kat.settings.container
+    - SECRET_KEY
+    - ALLOWED_HOST
+    - CYBERSKA_URI
+    - ADMIN_EMAIL
+    - DEBUG
+  volumes:
+    - /code
+  volumes_from:
+    - worker
+
+
+viewer:
+  image: gijzelaerr/cyberska_viewer
+  volumes_from:
+    - worker
+  environment:
+    - REDIRECT_URI
+  ports:
+    - 8081:80
+    - 8080:8080
+
+
+nginx:
+  build: nginx
+  volumes_from:
+    - django
+  links:
+    - viewer
+  ports:
+    - 81:80 
+
