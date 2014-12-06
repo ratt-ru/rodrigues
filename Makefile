@@ -11,6 +11,7 @@ IMAGE_PROJECT=google-containers
 DJANGO_FOLDER=django_kat
 
 export DJANGO_SETTINGS_MODULE=django_kat.settings.development
+export SECRET_KEY=blabla
 
 
 .PHONY: all worker amqp django syncdb fig fig_syncdb fig_restart vm_create vm_delete vm_ssh vm_ip

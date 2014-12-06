@@ -3,7 +3,6 @@
 # !!! ALWAYS CHANGE SETTINGS BELOW !!!
 #
 export SERVER_NAME=127.0.0.1
-export SERVER_PORT=81
 export ADMIN_EMAIL="root@localhost"
 export SECRET_KEY="SOME RANDOM STRING"
 

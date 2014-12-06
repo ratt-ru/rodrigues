@@ -71,5 +71,5 @@ nginx:
   links:
     - viewer
   ports:
-    - 81:80 
+    - 80:80 
 
