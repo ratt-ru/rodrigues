@@ -2,9 +2,6 @@
 setsebool -P allow_execheap=1
 export PATH=/code/pyxis/Pyxis/bin:/code/casapy-42.2.30986-1-64b/bin:/code/wsclean/wsclean/build:/code/PyMORESANE/bin:$PATH
 export PYTHONPATH=/code/pyxis:$PYTHONPATH
-echo $PATH
-echo $PYTHONPATH
-which pyxis
 if [ -z "$USER"]; then
   export USER=root
 fi
