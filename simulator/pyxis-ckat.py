@@ -120,8 +120,6 @@ def azishe(cfg='$CFG',make_image=True):
 
     global NOISE
     NOISE = compute_vis_noise(sefd=get_sefd(freq0)) * scalenoise
-    # make noise map. noise map will be 512x512 pixels 
-    noise = measure_image_noise(make_psf=False,noise=NOISE,add_noise=True,npix=512)
 
     simulate()
     tmp_std.close()
@@ -145,10 +143,13 @@ def azishe(cfg='$CFG',make_image=True):
             del im_opts[opt]
 
     im.IMAGER = _imager
-
+    
     __import__('im.%s'%_imager)
     call_imager = eval('im.%s.make_image'%_imager)
-    call_imager(dirty=True,psf=True,psf_image='${OUTFILE}-psf.fits',dirty_image='${OUTFILE}-dirty.fits',**im_opts)
+    dirty_image = II('${OUTFILE}-dirty.fits')
+    call_imager(dirty=True,psf=True,psf_image='${OUTFILE}-psf.fits',dirty_image=dirty_image,**im_opts)
+    noise = madnoise(dirty_image,channelise=CHANNELIZE,freq_axis=0)
+    info('Noise estimate from dirty image: %.3g mJy'%(noise*1e3))
 
     for deconv in _deconv:
         restore = _cfg['%s_'%deconv]

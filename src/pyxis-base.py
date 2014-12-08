@@ -354,7 +354,14 @@ def measure_psf (psffile,arcsec_size=4,savefig=None,title=None):
   #print "Nominal resolution is %.2f by %.2f\""%(rx,ry)
   #print "Corresponding to a max baseline of",0.21/(r0/3600*math.pi/180)
 
-def measure_image_noise (noise=0,scale_noise=1.0,add_noise=False,rowchunk=1000000,use_old_noise_map=False,**kw):
+def madnoise(fitsname,channelise=0,freq_axis=False):
+    """ estimate image noise """
+    cdf = 1.4826 # cumulative distribution function of normal distribution
+    data = imdata(fitsname,channelise=channelise,freq_axis=freq_axis)
+    return np.median( abs( data-np.median(data) ) ) *cdf
+
+
+def measure_image_noise (noise=0,scale_noise=1.0,add_noise=False,rowchunk=1000000,use_old_noise_map=False,mad=False,**kw):
     info(' >>> Making noise map')
     if add_noise:
         simnoise(rowchunk=rowchunk,scale_noise=scale_noise,noise=noise) 
@@ -367,7 +374,7 @@ def measure_image_noise (noise=0,scale_noise=1.0,add_noise=False,rowchunk=100000
         else: make_noise_map = True
     if make_noise_map:
         imager.make_image(column='MODEL_DATA',dirty_image=noiseimage,**kw)
-    noise = pyfits.open(noiseimage)[0].data.std();
+    noise = pyfits.open(noiseimage)[0].data.std()
     info(">>>   rms pixel noise is %g uJy"%(noise*1e+6))
     return noise
 
@@ -617,6 +624,16 @@ def flag_stepped_timeslot (step=3):
   frow[::step,:] = True;
   tab.putcol("FLAG_ROW",frow.reshape((nr,)));
 
+def imdata(fitsname,channelise=0,freq_axis=False):
+    hdu = pyfits.open(fitsname)
+    hdr = hdu[0].header
+    data = hdu[0].data
+    naxis = hdr['NAXIS']
+    img = [0]*(naxis-2) + [slice(None)]*2
+    if channelise and freq_axis is not False:
+        img[freq_axis] = range(channelise)
+    return data[img]
+   
 def fitsInfo(fits):
   hdr = pyfits.open(fits)[0].header
   ra = hdr['CRVAL1'] 
