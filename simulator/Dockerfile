@@ -1,7 +1,6 @@
 FROM gijzelaerr/papino-meqtrees
 RUN apt-get install -y time git subversion policycoreutils cmake
 ADD casarc /root/.casarc
-ADD ../src /code
 
 ADD . /code
 WORKDIR /code

@@ -163,6 +163,8 @@ class Simulation(Model):
     lwimager_threshold = FloatField('Clean Threshold',default=0,
                                help_text='In Jy')
     
+    lwimager_sigmalevel = FloatField('Clean sigma level',default=0,
+                               help_text='In sigma above noise')
     lwimager_operation = CharField('Clean algorithm',
                               choices=CLEAN_TYPES,
                               default='C',
@@ -184,6 +186,8 @@ class Simulation(Model):
     wsclean_mgain = FloatField('Major loop gain',default=0.1)
     wsclean_threshold = FloatField('Clean Threshold',default=0,
                                help_text='In Jy')
+    wsclean_sigmalevel = FloatField('Clean sigma level',default=0,
+                               help_text='In sigma above noise')
     wsclean_joinpolarizations = BooleanField('Join polarizations',default=False)
     wsclean_joinchannels = BooleanField('Join channels',default=False)
     wsclean_multiscale = BooleanField('Multiscale clean',default=False)
@@ -225,6 +229,8 @@ class Simulation(Model):
     casa = BooleanField('Deconvolve with me!',default=False)
     casa_niter = IntegerField('NITER',default=1000)
     casa_threshold = FloatField('Threshold',default=0)
+    casa_sigmalevel = FloatField('Clean sigma level',default=0,
+                               help_text='In sigma above noise')
     casa_gain = FloatField('Loop Gain',
                            default='0.1',
                            help_text='Clean Loop gain')

@@ -5,4 +5,4 @@ export PYTHONPATH=/code/pyxis:$PYTHONPATH
 if [ -z "$USER"]; then
   export USER=root
 fi
-pyxis -s ../src -s . CFG=/sims.cfg LOG=/results/output.log OUTFILE=/results/results OUTDIR=/results azishe
+pyxis -s /code/src -s . CFG=/sims.cfg LOG=/results/output.log OUTFILE=/results/results OUTDIR=/results azishe
