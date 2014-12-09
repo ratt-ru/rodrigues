@@ -57,4 +57,4 @@ INSTALLED_APPS = INSTALLED_APPS + (
 """
 
 
-CYBERSKA_URL = os.environ.get('CYBERSKA_URL', 'please set CYBERSKA_URL in fig.yml')
+CYBERSKA_URI = os.environ.get('CYBERSKA_URI', 'please set CYBERSKA_URI in fig.yml')
