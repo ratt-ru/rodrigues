@@ -20,13 +20,12 @@ worker:
   - /var/run/docker.pid:/var/run/docker.pid
   - /var/run/docker.sock:/var/run/docker.sock
   - /var/lib/docker:/var/lib/docker
-  - /code/results
-  - /code/uploaded
+  - django_kat:/code
 
 
 django:
   build: django_kat
-  command: uwsgi --socket django_kat.sock --module django_kat.wsgi --chmod-socket=666
+  command: uwsgi --socket /socket/django_kat.sock --module django_kat.wsgi --chmod-socket=666
   links:
     - db
     - broker
@@ -65,3 +64,15 @@ nginx:
   ports:
     - 80:80 
 
+
+#initialise:
+#  build: django_kat
+#  command: python3 ./manage.py syncdb --noinput
+#  links:
+#    - django
+#    - db
+#  volumes:
+#    - django_kat:/code
+#  environment:
+#    - DJANGO_SETTINGS_MODULE=django_kat.settings.container
+#    - SECRET_KEY

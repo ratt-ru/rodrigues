@@ -98,7 +98,7 @@ MESSAGE_TAGS = {
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploaded')
 MEDIA_URL = '/media/'
 
-DOCKER_IMAGE = 'gijzelaerr/simulator'
+DOCKER_IMAGE = 'skasa/simulator'
 DOCKER_CMD = './runsim.sh'
 # DOCKER_CMD = 'pyxis CFG=/sims.cfg LOG=/results/output.log OUTFILE=/results/results OUTDIR=/results azishe'
 

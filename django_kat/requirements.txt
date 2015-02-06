@@ -5,9 +5,7 @@ psycopg2
 django-debug-toolbar
 pytz
 uwsgi
-flower
 django-celery
 aplpy
 matplotlib
 django-form-utils==1.0.2
-raven
