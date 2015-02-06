@@ -12,7 +12,6 @@ worker:
  links:
    - broker
    - db
-   - mail
  environment:
    - DJANGO_SETTINGS_MODULE=django_kat.settings.container
    - C_FORCE_ROOT=true
@@ -31,7 +30,6 @@ django:
   links:
     - db
     - broker
-    - mail
   environment:
     - DJANGO_SETTINGS_MODULE=django_kat.settings.container
     - SECRET_KEY
@@ -57,7 +55,9 @@ viewer:
 
 
 nginx:
-  build: nginx
+  image: nginx:latest
+  volumes:
+    - nginx.conf:/etc/nginx/nginx.conf:ro
   volumes_from:
     - django
   links:
