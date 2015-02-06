@@ -38,7 +38,7 @@ django:
     - ADMIN_EMAIL
     - DEBUG
   volumes:
-    - /code
+    - django_kat:/code
   volumes_from:
     - worker
 
