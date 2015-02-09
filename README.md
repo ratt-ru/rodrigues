@@ -1,9 +1,4 @@
-![logo](./art/logo_new.jpg)
-
-# ceiling-kat - a web based radio telescope calibration simulation
-
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/ska-sa/ceiling-kat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+# RODRIGUES - a web based radio telescope calibration simulation
 
 ## Installation
 
