@@ -6,49 +6,38 @@ broker:
   image: dockerfile/rabbitmq
 
 
-mail:
-  build: postfix
-  ports:
-    - 25:25
-  # somehow the docker DNS server can't resolve MX records so we use google
-  dns: 8.8.8.8
-
-
 worker:
- build: django_kat
- command: celery worker -A django_kat -l INFO
+ build: .
+ command: celery worker -A rodrigues -l INFO
  links:
    - broker
    - db
-   - mail
  environment:
-   - DJANGO_SETTINGS_MODULE=django_kat.settings.container
+   - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
    - C_FORCE_ROOT=true
    - SECRET_KEY="doesn't matter"
  volumes:
   - /var/run/docker.pid:/var/run/docker.pid
   - /var/run/docker.sock:/var/run/docker.sock
   - /var/lib/docker:/var/lib/docker
-  - /code/results
-  - /code/uploaded
+  - .:/code
 
 
 django:
-  build: django_kat
-  command: uwsgi --socket django_kat.sock --module django_kat.wsgi --chmod-socket=666
+  build: .
+  command: uwsgi --socket /socket/rodrigues.sock --module rodrigues.wsgi --chmod-socket=666
   links:
     - db
     - broker
-    - mail
   environment:
-    - DJANGO_SETTINGS_MODULE=django_kat.settings.container
-    - SECRET_KEY
+    - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
+    - SECRET_KEY="change me"
     - ALLOWED_HOST
     - CYBERSKA_URI
     - ADMIN_EMAIL
     - DEBUG
   volumes:
-    - /code
+    - .:/code
   volumes_from:
     - worker
 
@@ -65,11 +54,26 @@ viewer:
 
 
 nginx:
-  build: nginx
+  image: nginx:latest
+  volumes:
+    - nginx.conf:/etc/nginx/nginx.conf:ro
   volumes_from:
     - django
   links:
     - viewer
   ports:
     - 80:80 
+
+
+initialise:
+  build: .
+  command: make migrate_sleep
+  links:
+    - django
+    - db
+  volumes:
+    - .:/code
+  environment:
+    - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
+    - SECRET_KEY="doesn't matter"
 

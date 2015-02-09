@@ -1,0 +1,118 @@
+
+## Observatory
+name={{ object.name }}
+observatory={{ object.get_observatory_display }}
+sefd={{ object.sefd }}
+output={{ object.get_output_display }}
+
+## sky setup
+skytype={{ object.get_sky_type_display }}
+sky_model={% if object.sky_model %}/sky_model{% endif %}
+katalog_id={{ object.get_katalog_id_display }}
+radius={{ object.radius }}
+fluxrange={{ object.fluxrange }}
+add_noise={{ object.add_noise }}
+vis_noise_std={{ object.vis_noise_std }}
+
+## observation setup
+ms_synthesis={{ object.ms_synthesis }}
+ms_scan_length={{ object.ms_scan_length }}
+ms_start_time={{ object.ms_start_time }}
+ms_dtime={{ object.ms_dtime }}
+ms_freq0={{ object.ms_freq0 }}
+ms_dfreq={{ object.ms_dfreq }}
+ms_nchan={{ object.ms_nchan }}
+ms_nband={{ object.ms_nband }}
+#ms_writeAutoCorr={{ object.ms_write_auto_corr }}
+ms_dec={{ object.ms_dec }}
+ms_ra={{ object.ms_ra }}
+
+
+## dish settings
+#ds_amp_phase_gains={{ object.ds_amp_phase_gains }}
+#ds_parallactic_angle_rotation={{ object.ds_parallactic_angle_rotation }}
+#ds_primary_beam={{ object.get_ds_primary_beam_display }}
+#ds_feed_angle={{ object.ds_feed_angle }}
+
+## corruptions
+#cr_amp_phase_gains={{ object.cr_amp_phase_gains }}
+#cr_pointing_error={{ object.cr_pointing_error }}
+#cr_rfi={{ object.cr_rfi }}
+
+## imaging settings
+imager={{ object.get_imager_display }}
+im_npix={{ object.im_npix }}
+im_cellsize={{ object.im_cellsize }}
+im_weight={{ object.get_im_weight_display }}
+im_robust={{ object.robust }}
+im_weight_fov={{ object.im_weight_fov }}
+im_wprojplanes={{ object.im_wprojplanes }}
+im_mode={{ object.get_im_mode_display }}
+im_spwid={{ object.im_spwid }}
+channelise={{ object.channelise }}
+im_stokes={{ object.im_stokes }}
+#make_psf={{ object.make_psf }}
+
+## lwimager
+lwimager={{ object.lwimager }}
+lwimager_niter={{ object.lwimager_niter }}
+lwimager_gain={{ object.lwimager_gain }}
+lwimager_threshold={{ object.lwimager_threshold }}
+lwimager_sigmalevel={{ object.lwimager_sigmalevel }}
+lwimager_operation={{ object.get_lwimager_operation_display }}
+lwimager_nscales={{ object.lwimager_uservector }}
+lwimager_uservector={{ object.lwimager_cyclefactor }}
+
+## wsclean
+wsclean={{ object.wsclean }}
+wsclean_niter={{ object.wsclean_niter }}
+wsclean_gain={{ object.wsclean_gain }}
+wsclean_mgain={{ object.wsclean_mgain }}
+wsclean_threshold={{ object.wsclean_threshold }}
+wsclean_sigmalevel={{ object.wsclean_sigmalevel }}
+wsclean_joinpolarizations={{ object.wsclean_joinpolarizations }}
+wsclean_joinchannels={{ object.wsclean_joinchannels }}
+wsclean_multiscale={{ object.wsclean_multiscale }}
+wsclean_multiscale_dash_scale_dash_bias={{ object.wsclean_multiscale_dash_scale_dash_bias }}
+wsclean_multiscale_dash_threshold_dash_bias={{ object.wsclean_multiscale_dash_threshold_dash_bias }}
+wsclean_cleanborder={{ object.wsclean_cleanborder }}
+wsclean_smallpsf={{ object.wsclean_smallpsf }}
+wsclean_smallpsf={{ object.wsclean_smallpsf }}
+wsclean_nonegative={{ object.wsclean_nonegative }}
+wsclean_beamsize={{ wsclean_beamsize }}
+
+## casa
+casa={{ object.casa }}
+casa_niter={{ object.casa_niter }}
+casa_gain={{ object.casa_gain }}
+casa_threshold={{ object.casa_threshold }}
+casa_sigmalevel={{ object.casa_sigmalevel }}
+casa_psfmode={{ object.get_casa_psfmode_display }}
+casa_imagermode={{ object.get_casa_imagermode_display }}
+casa_gridmode={{ object.casa_get_gridmode_display }}
+casa_nterms={{ object.casa_nterms }}
+casa_reffreq={{ object.casa_reffreq }}
+casa_multiscale={{ object.casa_multiscale }}
+casa_negcomponent={{ object.casa_negcomponent }}
+casa_smallscalebias={{ object.casa_smallscalebias }}
+casa_restoringbeam={{ object.casa_restoringbeam }}
+casa_cyclefactor={{ object.casa_cyclefactor }}
+casa_cyclespeedup={{ object.casa_cyclespeedup }}
+
+## moresane
+moresane={{ object.moresane }}
+moresane_scalecount={{ object.moresane_scalecount }}
+moresane_startscale={{ object.moresane_startscale }}
+moresane_stopscale={{ object.moresane_stopscale }}
+moresane_sigmalevel={{ object.moresane_sigmalevel }}
+moresane_loopgain={{ object.moresane_loopgain }}
+moresane_tolerance={{ object.moresane_tolerance }}
+moresane_accuracy={{ object.moresane_accuracy }}
+moresane_majorloopmiter={{ object.moresane_majorloopmiter }}
+moresane_minorloopmiter={{ object.moresane_minorloopmiter }}
+moresane_convmode={{ object.get_moresane_convmode_display }}
+moresane_enforcepositivity={{ object.moresane_enforcepositivity }}
+moresane_edgesupression={{ object.moresane_edgesupression }}
+moresane_edgeoffset={{ object.moresane_edgeoffset }}
+moresane_mfs={{ object.moresane_mfs }}
+moresane_spi_dash_sigmalevel={{ object.moresane_spi_dash_sigmalevel }}

@@ -45,11 +45,19 @@ coverage.xml
 # Rope
 .ropeproject
 
-# Django stuff:
-*.log
-*.pot
-
 # Sphinx documentation
 doc/_build/
 
+# django stuff
+*.log
+*.pot
+
+db.sqlite3
+.idea
+static_serve
+results/
+uploaded/
+
+# Sphinx documentation
+doc/_build/
 
