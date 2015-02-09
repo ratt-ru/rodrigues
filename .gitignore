@@ -53,3 +53,7 @@ coverage.xml
 doc/_build/
 
 
+# ignore stuff from rodrigues branch
+results/
+rodrigues/
+uploaded/
