@@ -18,24 +18,17 @@ run:
     $ sudo apt-get update
     $ sudo apt-get install -y python-pip git
     $ sudo pip install fig
-    $ git clone https://github.com/ska-sa/ceiling-kat
-    $ cd ceiling-kat
-    $ cp fig_example.yml fig.yml
-    $ edit fig.yml   # set all the environment variables
+    $ git clone https://github.com/ska-sa/rodrigues && cd rodrigues
+    $ edit run.sh   # set all the environment variables
     $ sudo fig up -d
-    $ sudo fig run django python ./manage.py syncdb   # this will populate the database with empty tables
-
-And answer the questions. Yes, you want to create a superuser.
 
 This will start a webserver on port 80.
 
-## Updating a deployed django_kat
+## Creating superuser
 
-in the root folder run:
+to login in the web application you need a (super) user:
 
-    $ git pull
-    $ sudo fig build
-    $ sudo fig run django python ./manage.py syncdb    # this will update the running database
+    $ fig run django python3 manage.py createsuperuser
 
 ## Development setup
 
@@ -47,17 +40,17 @@ You need:
    * RabbitMQ (`$ sudo apt-get install rabbitmq-server`)
    * postgres (`$ sudo apt-get install postgresql postgresql-server-dev-all`)
 
-Now to install the requirered libraries run inside the surf_kat folder:
+Now to install the requirered libraries run inside the rodrigues folder:
 
     $ pip3 install -r requirements.txt
 
 Now you are ready to start the pipeline. To start the django server you first need to populate the database:
 
-    $ DJANGO_SETTINGS_MODULE=django_kat.settings.development python3 ./manage.py syncdb
+    $ DJANGO_SETTINGS_MODULE=rodrigues.settings.development python3 ./manage.py migrate
 
 Now you can run a development webserver using:
 
-    $ DJANGO_SETTINGS_MODULE=django_kat.settings.development python3 ./manage.py runserver
+    $ DJANGO_SETTINGS_MODULE=rodrigues.settings.development python3 ./manage.py runserver
 
 To run the scheduled simulations you need to run a broker and celery worker:
 

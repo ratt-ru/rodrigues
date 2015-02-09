@@ -7,37 +7,37 @@ broker:
 
 
 worker:
- build: django_kat
- command: celery worker -A django_kat -l INFO
+ build: .
+ command: celery worker -A rodrigues -l INFO
  links:
    - broker
    - db
  environment:
-   - DJANGO_SETTINGS_MODULE=django_kat.settings.container
+   - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
    - C_FORCE_ROOT=true
    - SECRET_KEY="doesn't matter"
  volumes:
   - /var/run/docker.pid:/var/run/docker.pid
   - /var/run/docker.sock:/var/run/docker.sock
   - /var/lib/docker:/var/lib/docker
-  - django_kat:/code
+  - .:/code
 
 
 django:
-  build: django_kat
-  command: uwsgi --socket /socket/django_kat.sock --module django_kat.wsgi --chmod-socket=666
+  build: .
+  command: uwsgi --socket /socket/rodrigues.sock --module rodrigues.wsgi --chmod-socket=666
   links:
     - db
     - broker
   environment:
-    - DJANGO_SETTINGS_MODULE=django_kat.settings.container
-    - SECRET_KEY
+    - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
+    - SECRET_KEY="change me"
     - ALLOWED_HOST
     - CYBERSKA_URI
     - ADMIN_EMAIL
     - DEBUG
   volumes:
-    - django_kat:/code
+    - .:/code
   volumes_from:
     - worker
 
@@ -65,14 +65,14 @@ nginx:
     - 80:80 
 
 
-#initialise:
-#  build: django_kat
-#  command: python3 ./manage.py syncdb --noinput
-#  links:
-#    - django
-#    - db
-#  volumes:
-#    - django_kat:/code
-#  environment:
-#    - DJANGO_SETTINGS_MODULE=django_kat.settings.container
-#    - SECRET_KEY
+initialise:
+  build: .
+  command: make migrate_sleep
+  links:
+    - django
+    - db
+  volumes:
+    - .:/code
+  environment:
+    - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
+    - SECRET_KEY="doesn't matter"

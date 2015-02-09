@@ -47,10 +47,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 
-ROOT_URLCONF = 'django_kat.urls'
+ROOT_URLCONF = 'rodrigues.urls'
 
 
-WSGI_APPLICATION = 'django_kat.wsgi.application'
+WSGI_APPLICATION = 'rodrigues.wsgi.application'
 
 
 LANGUAGE_CODE = 'en-us'

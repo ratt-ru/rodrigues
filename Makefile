@@ -1,87 +1,44 @@
 #!make
 
-ZONE=europe-west1-b
-#MACHINE_TYPE=f1-micro
-MACHINE_TYPE=n1-standard-4
-INSTANCE_NAME=ceiling-kat
-IMAGE=container-vm-v20141016
-#IMAGE=coreos-beta-444-5-0-v20141016
-IMAGE_PROJECT=google-containers
-
-DJANGO_FOLDER=django_kat
-
-export DJANGO_SETTINGS_MODULE=django_kat.settings.development
+export DJANGO_SETTINGS_MODULE=rodrigues.settings.development
 
 
-.PHONY: all worker amqp django syncdb fig fig_syncdb fig_restart vm_create vm_delete vm_ssh vm_ip
+.PHONY: worker broker runserver migrate makemigrations fig_migrate fig_makemigrations psql
 
-all:
 
 worker:
-	cd $(DJANGO_FOLDER) && python3 `which celery` -A django_kat worker -l info
+	python3 `which celery` -A rodrigues worker -l info
 
-flower:
-	cd $(DJANGO_FOLDER) && python3 `which celery` -A django_kat flower
 
 broker:
 	rabbitmq-server
 
-django:
-	cd $(DJANGO_FOLDER) && python3 ./manage.py runserver
 
-syncdb:
-	cd $(DJANGO_FOLDER) && python3 ./manage.py syncdb
+runserver:
+	python3 ./manage.py runserver
 
-migrations:
+
+migrate:
+	python3 ./manage.py migrate
+
+
+migrate_sleep: 
+	SECRET_KEY=bla python3 ./manage.py migrate --settings=rodrigues.settings.container
+	sleep infinity
+
+
+makemigrations:
 	cd $(DJANGO_FOLDER) && python3 ./manage.py makemigrations
 
-git_pull:
-	git pull
 
-fig_up:
-	fig up -d
+fig_migrate:
+	fig run django python3 ./manage.py migrate --settings=rodrigues.settings.container
 
-fig_stop:
-	fig stop
-
-fig_build:
-	fig build
-
-fig_syncdb:
-	SECRET_KEY=bla fig run django python3 ./manage.py syncdb --settings=django_kat.settings.container
 
 fig_makemigrations:
-	SECRET_KEY=bla fig run django python3 ./manage.py makemigrations --settings=django_kat.settings.container
+	fig run django python3 ./manage.py makemigrations --settings=rodrigues.settings.container
 
-fig_REINITIALISE:
-	fig stop && fig rm --force && fig build && fig up -d
-
-fig_reload: git_pull fig_stop fig_build fig_up fig_syncdb
-	true
-
-vm_create:
-	gcloud compute instances create $(INSTANCE_NAME) \
-		--image ${IMAGE} \
-		--zone $(ZONE) \
-		--image-project $(IMAGE_PROJECT) \
-		--machine-type ${MACHINE_TYPE}
-
-vm_delete:
-	gcloud compute instances delete --zone $(ZONE) $(INSTANCE_NAME)
-
-vm_ssh:
-	gcloud compute ssh --zone $(ZONE) $(INSTANCE_NAME)
-
-vm_ip:
-	@gcloud compute instances describe $(INSTANCE_NAME) --zone $(ZONE) | grep natIP | awk '{ print $$2 }'
-
-deploy:
-	apt-get update
-	apt-get install -y python-pip
-	pip install fig
-	fig up -d
-	fig run django python3 manage.py syncdb
 
 psql:
-	docker run -it --link ceilingkat_db_1:db1 postgres psql -h db1 -U postgres
+	docker run -it --link rodrigues_db_1:db1 postgres psql -h db1 -U postgres
 
