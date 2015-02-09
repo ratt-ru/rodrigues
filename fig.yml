@@ -76,3 +76,4 @@ initialise:
   environment:
     - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
     - SECRET_KEY="doesn't matter"
+

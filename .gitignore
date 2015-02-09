@@ -55,11 +55,9 @@ doc/_build/
 db.sqlite3
 .idea
 static_serve
-results/tmp*
-uploaded/sky/
-uploaded/tdl/
-uploaded/uvcov/
-uploaded/dirty/
-uploaded/model/
-uploaded/residual/
-uploaded/restored/
+results/
+uploaded/
+
+# Sphinx documentation
+doc/_build/
+
