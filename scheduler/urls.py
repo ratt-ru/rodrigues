@@ -1,16 +1,14 @@
 from django.conf.urls import patterns, url
 
 
-from .views import (ScheduleForm, ListForm)
+from .views import (DynamicFormView, FormsList)
 
 
 
 
-schedule_url = url(r'^new/(?P<form_name>\w+)/$',
-                   ScheduleForm.as_view(), name='new')
-
-list_url = url(r'^$',
-                   ListForm.as_view(), name='list')
+schedule_url = url(r'^new/(?P<form_name>\w+)/$', DynamicFormView.as_view(),
+                   name='new')
+list_url = url(r'^$', FormsList.as_view(), name='list')
 
 
 all_ = (
