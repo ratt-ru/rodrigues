@@ -36,21 +36,6 @@ observation = (
     'ms_ra',
 )
 
-# dish settings
-dish = (
-    'ds_amp_phase_gains',
-    'ds_parallactic_angle_rotation',
-    'ds_primary_beam',
-    'ds_feed_angle',
-)
-
-# corruptions
-corruptions = (
-    'cr_amp_phase_gains',
-    'cr_pointing_error',
-    'cr_rfi',
-)
-
 # imaging settings
 imaging = (
     'imager',
@@ -77,6 +62,7 @@ lwimager = (
     'lwimager_uservector',
     'lwimager_cyclefactor',
     'lwimager_cyclespeedup',
+    'lwimager_stoppointmode',
 )
 
 wsclean = (
@@ -236,18 +222,6 @@ class Form(BetterForm):
         ('J', 'JVLA'),
     )
 
-    # dish settings
-    ds_parallactic_angle_rotation = BooleanField(label='Parallactic Angle Rotation',
-                                                 initial=True,
-                                                 help_text='Can not be applied to FITS skymodels at the moment.')
-    ds_primary_beam = ChoiceField(label='Primary Beam', choices=BEAM_TYPES,
-                                  initial='M')
-    ds_feed_angle = FloatField(label='Feed angle', initial=0)
-
-    # corruptions
-    cr_amp_phase_gains = FloatField(label='Amplitude Phase Gains', initial=1)
-    cr_pointing_error = FloatField(initial=0)
-    cr_rfi = FloatField(initial=0)
 
     IMAGERS = (
         ('LW', 'LWIMAGER'),
@@ -297,7 +271,7 @@ class Form(BetterForm):
 
 
     # lwimager
-    lwimager = BooleanField(label='Deconvolve with me!', initial=False)
+    lwimager = BooleanField(label='Deconvolve with me!', required=False)
     lwimager_niter = IntegerField(label='NITER', initial=1000)
     lwimager_gain = FloatField(label='Loop gain', initial=0.1)
     lwimager_threshold = FloatField(label='Clean Threshold', initial=0,
@@ -317,7 +291,7 @@ class Form(BetterForm):
                                     max_length=64)
 
     # wsclean
-    wsclean = BooleanField(label='Deconvolve with me!', initial=False)
+    wsclean = BooleanField(label='Deconvolve with me!', required=False)
     wsclean_niter = IntegerField(label='NITER', initial=1000)
     wsclean_gain = FloatField(label='Minor loop gain', initial=0.1)
     wsclean_mgain = FloatField(label='Major loop gain', initial=0.1)
@@ -326,22 +300,22 @@ class Form(BetterForm):
     wsclean_sigmalevel = FloatField(label='Clean sigma level', initial=0,
                                     help_text='In sigma above noise')
     wsclean_joinpolarizations = BooleanField(label='Join polarizations',
-                                             initial=False)
-    wsclean_joinchannels = BooleanField(label='Join channels', initial=False)
-    wsclean_multiscale = BooleanField(label='Multiscale clean', initial=False)
+                                             required=False)
+    wsclean_joinchannels = BooleanField(label='Join channels', required=False)
+    wsclean_multiscale = BooleanField(label='Multiscale clean', required=False)
     wsclean_multiscale_dash_threshold_dash_bias = FloatField(label='Multi scale threshold bias', initial=0.7)
     wsclean_multiscale_dash_scale_dash_bias = FloatField(label='Multi scale bias',
                                                          initial=0.6)
     wsclean_cleanborder = FloatField(label='Clean border', initial=5,
                                      help_text='In percentage of image '
                                                'width/height')
-    wsclean_smallpsf = BooleanField(label='Small PSF', initial=False,
+    wsclean_smallpsf = BooleanField(label='Small PSF', required=False,
                                     help_text='Resize the psf to speed up '
                                               'minor clean iterations')
-    wsclean_nonegative = BooleanField(label='No negative', initial=False,
+    wsclean_nonegative = BooleanField(label='No negative', required=False,
                                       help_text='Do not allow negative '
                                                 'components during cleaning')
-    wsclean_stopnegative = BooleanField(label='Stop on negative', initial=False)
+    wsclean_stopnegative = BooleanField(label='Stop on negative', required=False)
     wsclean_beamsize = CharField(label='Restoring beam size', required=False,
                                  help_text='In arcseconds',
                                  max_length=32)
@@ -363,7 +337,7 @@ class Form(BetterForm):
     )
 
     #casa
-    casa = BooleanField(label='Deconvolve with me!', initial=False)
+    casa = BooleanField(label='Deconvolve with me!', required=False)
     casa_niter = IntegerField(label='NITER', initial=1000)
     casa_threshold = FloatField(label='Threshold', initial=0)
     casa_sigmalevel = FloatField(label='Clean sigma level', initial=0,
@@ -411,7 +385,7 @@ class Form(BetterForm):
         ('L', 'linear'),
     )
 
-    moresane = BooleanField(label='Deconvolve with me!', initial=False)
+    moresane = BooleanField(label='Deconvolve with me!', required=False)
     moresane_scalecount = IntegerField(label='Scale count',
                                        required=False,
                                        help_text='See MORESANE help')
@@ -426,17 +400,19 @@ class Form(BetterForm):
     moresane_loopgain = FloatField(label='Loop gain', initial='0.1')
     moresane_tolerance = FloatField(label='Tolerance', initial=.75)
     moresane_accuracy = FloatField(label='Accuracy', initial=1e-6)
-    moresane_majorloopmiter = IntegerField(label='Major loop iterations', initial=100)
-    moresane_minorloopmiter = IntegerField(label='Minor loop iterations', initial=50)
+    moresane_majorloopmiter = IntegerField(label='Major loop iterations',
+                                           initial=100)
+    moresane_minorloopmiter = IntegerField(label='Minor loop iterations',
+                                           initial=50)
     moresane_convmode = ChoiceField(label='Convolution mode',
                                     initial='C',
                                     choices=CONV_TYPES)
     moresane_enforcepositivity = BooleanField(label='Enforce Positivity',
-                                              initial=False)
-    moresane_edgesupression = BooleanField(label='Edge Suppression', initial=False)
+                                              required=False)
+    moresane_edgesupression = BooleanField(label='Edge Suppression',
+                                           required=False)
     moresane_edgeoffset = IntegerField(label='Edge offset', initial=0)
-    moresane_mfs = BooleanField(label='MFS map',
-                                initial=False,
+    moresane_mfs = BooleanField(label='MFS map', required=False,
                                 help_text='Comes with an spi map')
 
     # I use a double underscore to a represent hyphen (for simulator)
