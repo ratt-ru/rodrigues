@@ -1,5 +1,5 @@
 {% load staticfiles %}
-{% load status %}
+
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -12,10 +12,8 @@
 
 <nav class="navbar navbar-default" role="navigation">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{%  url 'list' %}">Ceiling-KAT</a>
+        <a class="navbar-brand" href="">R.O.D.R.G.U.I.S.</a>
         <ul class="nav navbar-nav">
-            <li class="{% block list %}{% endblock %}"><a href="{%  url 'list' %}">List</a></li>
-            <li class="{% block create %}{% endblock %}"><a href="{% url 'create' %}">Create</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
             {% if user.is_staff %}
