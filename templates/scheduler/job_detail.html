@@ -1,0 +1,599 @@
+{% extends "base.html" %}
+
+{%  load status %}
+
+{%  block content %}
+
+    <h1>Details for object.{{ object.id }} </h1>
+    <h2>{{ object.name }}</h2>
+
+    <form>
+        {% csrf_token %}
+        <div class="btn-group btn-group-lg">
+            <button type="submit"
+                    formmethod="post"
+                    formaction="{% url 'job_reschedule' object.id %}"
+                    class="btn btn-warning"
+                    {% if not object.can_reschedule %}
+                    disabled="disabled"
+                    {% endif %}
+                    >Reschedule</button>
+            <a href="{% url 'job_detail' object.id %}" class="btn btn-info btn-lg" role="button">Refresh</a>
+            <a href="{% url 'job_delete' object.id %}" class="btn btn-danger btn-lg" role="button">Delete</a>
+
+        </div>
+    </form>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="btn-group btn-group-lg">
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>UV-Coverage</b>
+                        </div>
+                        {% if object.results_uvcov %}
+                            <div class="col-md-4">
+                                <a href="{{ object.results_uvcov.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_uvcov %}
+                        <a href="#" class="thumbnail">
+                            <img src="{{ MEDIA_URL }}{{ object.results_uvcov }}" width="500">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>PSF image</b>
+                        </div>
+                        {% if object.results_psf %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Residual image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_psf.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_psf.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_psf %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'psf' %}" width="500">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>Dirty image</b>
+                        </div>
+                        {% if object.results_dirty %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Dirty image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_dirty.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_dirty.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_dirty %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'dirty' %}" width="500">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><b>Job properties</b></div>
+                <div class="panel-body">
+                    <ul>
+                        <li><b>status:</b> <span class="label label-{{ object.get_task_status|status_label  }}">{{ object.get_task_status }}</span></li>
+                        <li><b>start:</b> {{ object.started }}</li>
+                        <li><b>finished:</b> {% if object.finished %}{{ object.finished }}{% endif %}</li>
+                        <li><b>duration:</b> {% if object.finished %}{{ object.duration }}{% endif %}</li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>LWIMAGER: Restored image</b>
+                        </div>
+                        {% if object.results_lwimager_restored %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Restored image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_lwimager_restored.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_lwimager_restored.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_lwimager_restored %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'lwimager_restored' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>LWIMAGER: Model image</b>
+                        </div>
+                        {% if object.results_lwimager_model %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Model image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_lwimager_model.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_lwimager_model.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_lwimager_model %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'lwimager_model' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>LWIMAGER: Residual image</b>
+                        </div>
+                        {% if object.results_lwimager_residual %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Residual image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_lwimager_residual.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_lwimager_residual.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_lwimager_residual %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'lwimager_residual' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>WSCLEAN: Restored image</b>
+                        </div>
+                        {% if object.results_wsclean_restored %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Restored image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_wsclean_restored.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_wsclean_restored.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_wsclean_restored %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'wsclean_restored' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                          <p> <b>WSCLEAN: Model image</b> </p>
+                        </div>
+                        {% if object.results_wsclean_model %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Model image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_wsclean_model.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_wsclean_model.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_wsclean_model %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'wsclean_model' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>WSCLEAN: Residual image</b>
+                        </div>
+                        {% if object.results_wsclean_residual %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Residual image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_wsclean_residual.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_wsclean_residual.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_wsclean_residual %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'wsclean_residual' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>CASA: Restored image</b>
+                        </div>
+                        {% if object.results_casa_restored %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Restored image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_casa_restored.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_casa_restored.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_casa_restored %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'casa_restored' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>CASA: Model image</b>
+                        </div>
+                        {% if object.results_casa_model %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Model image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_casa_model.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_casa_model.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_casa_model %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'casa_model' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>CASA: Residual image</b>
+                        </div>
+                        {% if object.results_casa_residual %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Residual image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_casa_residual.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_casa_residual.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_casa_residual %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'casa_residual' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>MORESANE: Restored image</b>
+                        </div>
+                        {% if object.results_moresane_restored %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Restored image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_moresane_restored.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_moresane_restored.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_moresane_restored %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'moresane_restored' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>MORESANE: Model image</b>
+                        </div>
+                        {% if object.results_moresane_model %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Model image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_moresane_model.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_moresane_model.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_moresane_model %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'moresane_model' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <b>MORESANE: Residual image</b>
+                        </div>
+                        {% if object.results_moresane_residual %}
+                            <div class="col-md-4">
+                                <form action="{{ CYBERSKA_URI }}" method="post">
+                                    <input type="hidden" name="title" value="Residual image" />
+                                    <input type="hidden" name="filename" value="{{ object.results_moresane_residual.file }}">
+                                    <input type="submit" class="btn btn-default btn-xs" value="viewer"/>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ object.results_moresane_residual.url }}"><button class="btn btn-default btn-xs">download</button></a>
+                            </div>
+
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {% if object.results_moresane_residual %}
+                        <a href="#" class="thumbnail">
+                            <img src="{% url 'fits' object.id 'moresane_residual' %}" width="300">
+                        </a>
+                    {% else %}
+                        <h5>not available</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><b>Console output</b></div>
+                <div class="panel-body">
+                    <div class="well" style="font-family:monospace;">{{ object.console|linebreaksbr }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><b>Log file</b></div>
+                <div class="panel-body">
+                    <div class="well" style="font-family:monospace;">{% if object.log %}{{ object.log.file.read|linebreaksbr }}{%  endif %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><b>Config file</b></div>
+                <div class="panel-body">
+                    <div class="well" style="font-family:monospace;">{{ config|linebreaksbr }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{%  endblock %}

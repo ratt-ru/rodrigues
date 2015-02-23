@@ -12,7 +12,7 @@ from docker.errors import DockerException
 from django.conf import settings
 from requests import RequestException, ConnectionError
 
-from .models import ScheduledContainer
+from .models import Job
 from .dockering import prepare_dockerfile, run_docker, extract_files
 
 
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def simulate(simulation_id):
-    simulation = ScheduledContainer.objects.get(pk=simulation_id)
+    simulation = Job.objects.get(pk=simulation_id)
     simulation.state = simulation.RUNNING
     simulation.console = "running..."
     simulation.started = datetime.now(timezone(settings.TIME_ZONE))

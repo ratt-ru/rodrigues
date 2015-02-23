@@ -1,19 +1,36 @@
 from django.conf.urls import patterns, url
 
 
-from .views import (DynamicFormView, FormsList)
+from .views import (FormsList, JobCreate, JobDelete, JobDetail, JobReschedule,
+                    JobList)
 
 
+form_list_url = url(r'^job/create/$', FormsList.as_view(),
+                    name='form_list')
 
+job_create_url = url(r'^job/create/(?P<form>\w+)/$', JobCreate.as_view(),
+                     name='job_create')
 
-schedule_url = url(r'^new/(?P<form_name>\w+)/$', DynamicFormView.as_view(),
-                   name='new')
-list_url = url(r'^$', FormsList.as_view(), name='list')
+job_delete_url = url(r'^job/delete/(?P<pk>\d+)/$', JobDelete.as_view(),
+                     name='job_delete')
+
+job_detail_url = url(r'^job/detail/(?P<pk>\d+)/$', JobDetail.as_view(),
+                     name='job_detail')
+
+job_reschedule_url = url(r'^job/reschedule/(?P<pk>\d+)/$',
+                         JobReschedule.as_view(),
+                         name='job_reschedule')
+
+job_list_url = url(r'^$', JobList.as_view(), name='job_list')
 
 
 all_ = (
-    schedule_url,
-    list_url,
+    form_list_url,
+    job_create_url,
+    job_delete_url,
+    job_detail_url,
+    job_reschedule_url,
+    job_list_url,
 )
 
 urlpatterns = patterns('', *all_)

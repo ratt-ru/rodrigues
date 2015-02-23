@@ -6,14 +6,17 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-    <title>{%  block title %}Ceiling cat - watching you simulate{% endblock %}</title>
+    <title>{%  block title %}RODRIGUES - watching you simulate{% endblock %}</title>
 </head>
 <body>
 
 <nav class="navbar navbar-default" role="navigation">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">R.O.D.R.G.U.I.S.</a>
+        <a class="navbar-brand" href="">R.O.D.R.I.G.U.I.S.</a>
         <ul class="nav navbar-nav">
+            <li><a href="{% url 'job_list' %}">List jobs</a></li>
+            <li><a href="{% url 'form_list' %}">Create job</a></li>
+
         </ul>
         <ul class="nav navbar-nav navbar-right">
             {% if user.is_staff %}
@@ -39,13 +42,8 @@
     {% endfor %}
 
 
-    {%  block content %}Developer, you block overwrite content block{% endblock %}
+    {%  block content %}Developer, you should overwrite this content block{% endblock %}
     <hr>
-    <div class="row text-center">
-        <div class="col-md-12">
-            <img src="{% static "ceiling_small.png" %}" alt="surf kat"/>
-        </div>
-    </div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>

@@ -1,3 +1,4 @@
 django-form-utils==1.0.2
 django>=1.7,<=1.8
 django-debug-toolbar
+celery

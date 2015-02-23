@@ -3,7 +3,7 @@ from celery.result import AsyncResult
 import celery.states
 
 
-class ScheduledContainer(Model):
+class Job(Model):
 
     # status of the task
     SCHEDULED = 'S'
@@ -17,6 +17,8 @@ class ScheduledContainer(Model):
         (CRASHED, 'crashed'),
         (FINISHED, 'finished'),
     )
+
+    name = TextField(blank=False)
 
     state = CharField(choices=STATE_TYPES, max_length=1, default=SCHEDULED)
     started = DateTimeField(blank=True, null=True)

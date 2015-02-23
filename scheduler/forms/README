@@ -8,6 +8,9 @@ Each file should contain:
 
   * A variable CONTAINER with the name of the docker container to run
 
+Each form should contain:
+
+  * A 'name' field
 
 
 EXAMPLE:
