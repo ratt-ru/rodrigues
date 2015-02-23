@@ -1,6 +1,6 @@
 #!make
 
-export DJANGO_SETTINGS_MODULE=rodrigues.settings.development
+#export DJANGO_SETTINGS_MODULE=rodrigues.settings.development
 export SECRET_KEY=doesntmatter
 
 

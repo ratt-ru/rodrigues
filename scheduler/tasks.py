@@ -22,10 +22,9 @@ logger = logging.getLogger(__name__)
 @shared_task
 def simulate(simulation_id):
     simulation = Job.objects.get(pk=simulation_id)
-    simulation.state = simulation.RUNNING
-    simulation.console = "running..."
+    simulation.log = "running..."
     simulation.started = datetime.now(timezone(settings.TIME_ZONE))
-    simulation.save(update_fields=["started", "console"])
+    simulation.save(update_fields=["started", "log"])
     logger.info('starting simulation %s' % simulation_id)
 
     temp_dir = tempfile.mkdtemp(dir=settings.RESULTS_DIR)
@@ -39,17 +38,11 @@ def simulate(simulation_id):
                                                 simulation=simulation)
     except (DockerException, RequestException, ConnectionError) as e:
         logging.error("can't start container: " + str(e))
-
-    if failed:
-        simulation.state = simulation.CRASHED
-    else:
-        simulation.state = simulation.FINISHED
-    simulation.console = console
+    simulation.log = console
     simulation.finished = datetime.now(timezone(settings.TIME_ZONE))
     if container:
         extract_files(client, temp_dir, container, simulation)
-    simulation.save(update_fields=["finished", "log", "console"
-                                   "results_uvcov"])
+    simulation.save(update_fields=["finished", "log"])
     shutil.rmtree(temp_dir)
 
 

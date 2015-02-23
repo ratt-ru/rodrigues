@@ -39,20 +39,15 @@ def docker_copy(client, container_id, path, target="."):
     tar.extractall(path=target)
 
 
-def prepare_dockerfile(directory, simulation):
+def prepare_dockerfile(directory, job):
     """
-    prepares a docker config from simulation object in directory
+    prepares a docker config from job object in directory
     """
     dockerfile = open(os.path.join(directory, 'Dockerfile'), 'w')
-    dockerfile.write('FROM %s\nADD /sims.cfg /\n' % settings.DOCKER_IMAGE)
+    dockerfile.write('FROM %s\nADD /parameters.json /\n' % job.docker_image)
 
-    with open(os.path.join(directory, 'sims.cfg'), 'w') as sims:
-        sims.write((simulation))
-
-    if simulation.sky_model:
-        shutil.copyfile(simulation.sky_model.file.name,
-                        os.path.join(directory, 'sky_model'))
-        dockerfile.write('ADD sky_model /\n')
+    with open(os.path.join(directory, 'parameters.json'), 'w') as sims:
+        sims.write((job.config))
 
     dockerfile.close()
 
@@ -80,7 +75,7 @@ def run_docker(client, dockerfile_dir, image_name, simulation):
 
     try:
         container = client.create_container(image=image_name,
-                                            command=settings.DOCKER_CMD)
+                                            command='/run.sh')
     except Exception as e:
         error = "can't create container: " + str(e)
         logging.error(error)

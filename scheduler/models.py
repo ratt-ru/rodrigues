@@ -10,6 +10,7 @@ class Job(Model):
     log = FileField(blank=True, null=True)
     task_id = CharField(max_length=36, null=True, blank=True)
     config = TextField()
+    docker_image = TextField()
 
     def __str__(self):
         return "<simulation name='%s' id=%s>" % (self.name, self.id)

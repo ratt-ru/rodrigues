@@ -59,6 +59,7 @@ class JobCreate(FormView, LoginRequiredMixin):
             self.object = Job()
             self.object.config = json.dumps(form.cleaned_data)
             self.object.name = form.data['name']
+            self.object.docker_image = form.docker_image
             self.object.save()
             schedule_simulation(self.object, request)
             return self.form_valid(form)

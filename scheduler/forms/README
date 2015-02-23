@@ -6,11 +6,11 @@ Each file should contain:
 
   * A form_utils.forms.BetterForm subclass named Form
 
-  * A variable CONTAINER with the name of the docker container to run
-
 Each form should contain:
 
   * A 'name' field
+
+  * A 'docker_image' property specifying the docker image name run
 
 
 EXAMPLE:
