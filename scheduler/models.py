@@ -4,23 +4,7 @@ import celery.states
 
 
 class Job(Model):
-
-    # status of the task
-    SCHEDULED = 'S'
-    RUNNING = 'R'
-    CRASHED = 'C'
-    FINISHED = 'F'
-
-    STATE_TYPES = (
-        (SCHEDULED, 'scheduled'),
-        (RUNNING, 'running'),
-        (CRASHED, 'crashed'),
-        (FINISHED, 'finished'),
-    )
-
     name = TextField(blank=False)
-
-    state = CharField(choices=STATE_TYPES, max_length=1, default=SCHEDULED)
     started = DateTimeField(blank=True, null=True)
     finished = DateTimeField(blank=True, null=True)
     log = FileField(blank=True, null=True)
@@ -30,36 +14,23 @@ class Job(Model):
     def __str__(self):
         return "<simulation name='%s' id=%s>" % (self.name, self.id)
 
-    def set_crashed(self, error):
-        self.state = self.CRASHED
-        self.log = error
-        self.started = None
-        self.finished = None
-        self.save(update_fields=["state", "log", "started", "finished"])
-
     def set_scheduled(self):
-        self.state = self.SCHEDULED
         self.started = None
         self.finished = None
         self.log = ""
-        self.save(update_fields=["state", "started", "finished"])
+        self.save(update_fields=["started", "finished"])
 
     def clear(self):
-        self.log = None
+        self.started = None
+        self.finished = None
+        self.log = ""
         self.save()
 
     def get_task_status(self):
         if not self.task_id:
-            return 'NO TASK ID'
+            return celery.states.FAILURE
         try:
             broker_status = AsyncResult(self.task_id).status
-            # somehow the job is running but status is PENDING
-            if broker_status == celery.states.PENDING and \
-                            self.state == self.RUNNING:
-                return celery.states.STARTED
-            elif broker_status == celery.states.SUCCESS and \
-                self.state == self.CRASHED:
-                return celery.states.FAILURE
             return broker_status
         except OSError as e:
             return "can't connect to broker: " + str(e)

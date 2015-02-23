@@ -1,13 +1,11 @@
 import pkgutil
+import json
 from importlib import import_module
 from django.views.generic.edit import FormView
-from django.views.generic import ListView, DetailView, DeleteView, CreateView
+from django.views.generic import ListView, DetailView, DeleteView
 from django.http import Http404
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import HttpResponseRedirect
-from django.http import HttpResponse
-import json
-
 import scheduler.forms
 from .models import Job
 from .mixins import LoginRequiredMixin
@@ -32,18 +30,13 @@ class JobList(ListView):
 class JobDetail(DetailView):
     model = Job
 
-    def get_context_data(self, **kwargs):
-        context = super(JobDetail, self).get_context_data(**kwargs)
-        #context['config'] = generate_config(self.object)
-        return context
-
 
 class JobDelete(DeleteView):
     model = Job
     success_url = reverse_lazy('job_list')
 
 
-class JobCreate(FormView, LoginRequiredMixin):  # , CreateView):
+class JobCreate(FormView, LoginRequiredMixin):
     model = Job
     success_url = reverse_lazy('job_list')
     template_name = 'scheduler/job_create.html'
@@ -67,6 +60,7 @@ class JobCreate(FormView, LoginRequiredMixin):  # , CreateView):
             self.object.config = json.dumps(form.cleaned_data)
             self.object.name = form.data['name']
             self.object.save()
+            schedule_simulation(self.object, request)
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -77,11 +71,12 @@ class JobReschedule(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         super(JobReschedule, self).get(self, request, *args, **kwargs)
-        return HttpResponseRedirect(reverse('detail', args=(self.object.id,)))
+        return HttpResponseRedirect(reverse('job_detail',
+                                            args=(self.object.id,)))
 
     def post(self, request, *args, **kwargs):
             self.object = self.get_object()
             self.object.clear()
             schedule_simulation(self.object, request)
-            return HttpResponseRedirect(reverse('detail',
+            return HttpResponseRedirect(reverse('job_detail',
                                                 args=(self.object.id,)))

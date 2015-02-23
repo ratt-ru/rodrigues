@@ -4,6 +4,7 @@ Django settings for rodrigues project.
 
 
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -68,3 +69,19 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
+
+
+# used to map django errors to bootstrap classes
+from django.contrib.messages import constants as messages
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+    messages.DEBUG: 'info',
+    }
+
+
+BROKER_URL = 'amqp://'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_RESULT_BACKEND = 'amqp'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

@@ -25,7 +25,7 @@ def simulate(simulation_id):
     simulation.state = simulation.RUNNING
     simulation.console = "running..."
     simulation.started = datetime.now(timezone(settings.TIME_ZONE))
-    simulation.save(update_fields=["started", "console", "state"])
+    simulation.save(update_fields=["started", "console"])
     logger.info('starting simulation %s' % simulation_id)
 
     temp_dir = tempfile.mkdtemp(dir=settings.RESULTS_DIR)
@@ -48,7 +48,7 @@ def simulate(simulation_id):
     simulation.finished = datetime.now(timezone(settings.TIME_ZONE))
     if container:
         extract_files(client, temp_dir, container, simulation)
-    simulation.save(update_fields=["finished", "log", "console", "state",
+    simulation.save(update_fields=["finished", "log", "console"
                                    "results_uvcov"])
     shutil.rmtree(temp_dir)
 
@@ -64,7 +64,8 @@ def schedule_simulation(simulation, request):
                                                    str(e))
         messages.error(request, error)
         logger.error(error)
-        simulation.set_crashed(error)
+        simulation.log = error
+        simulation.save()
     else:
         simulation.task_id = async.task_id
         simulation.save(update_fields=["task_id"])
