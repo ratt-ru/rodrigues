@@ -8,13 +8,6 @@ import os
 BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..')
 
 
-SECRET_KEY = 'j@pj!2g&hp2&#c4w*h(sdq%v_j1tss%q-6x%8-k759obo_wm^4'
-
-
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
-
-
 ALLOWED_HOSTS = []
 
 
@@ -26,7 +19,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'scheduler',
-#    'debug_toolbar.apps.DebugToolbarConfig',
+
 )
 
 MIDDLEWARE_CLASSES = (
@@ -37,8 +30,20 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
 )
+
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+    'scheduler.context_processors.settings',
+)
+
 
 ROOT_URLCONF = 'rodrigues.urls'
 
@@ -58,7 +63,7 @@ TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Johannesburg'
 
 USE_I18N = True
 
@@ -68,6 +73,8 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+STATIC_ROOT = os.path.join(BASE_DIR, "static_serve")
 
 
 # used to map django errors to bootstrap classes
@@ -87,3 +94,24 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'amqp'
 
 RESULTS_DIR = os.path.join(BASE_DIR, 'results')
+
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            },
+        },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG',
+            }
+    },
+    }
+
+
+LOGIN_REDIRECT_URL = '/'

@@ -1,0 +1,66 @@
+db:
+  image: postgres:9.3
+
+
+broker:
+  image: dockerfile/rabbitmq
+
+
+worker:
+ build: .
+ command: celery worker -A rodrigues -l INFO
+ links:
+   - broker
+   - db
+ environment:
+   - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
+   - SECRET_KEY="doesn't matter"
+ volumes:
+  - /var/run/docker.pid:/var/run/docker.pid
+  - /var/run/docker.sock:/var/run/docker.sock
+  - /var/lib/docker:/var/lib/docker
+  - .:/code
+
+
+django:
+  build: .
+  command: uwsgi --socket /socket/rodrigues.sock --module rodrigues.wsgi --chmod-socket=666
+  links:
+    - db
+    - broker
+  environment:
+    - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
+    - SECRET_KEY
+    - ALLOWED_HOST
+    - CYBERSKA_URI
+    - ADMIN_EMAIL
+    - DEBUG
+  volumes:
+    - .:/code
+  volumes_from:
+    - worker
+
+
+viewer:
+  image: gijzelaerr/cyberska_viewer
+  volumes_from:
+    - worker
+  environment:
+    - REDIRECT_URI
+  ports:
+    - 8081:80
+    - 8080:8080
+
+
+nginx:
+  image: nginx:latest
+  volumes:
+    - nginx.conf:/etc/nginx/nginx.conf:ro
+  volumes_from:
+    - django
+  links:
+    - viewer
+  ports:
+    - 80:80 
+
+

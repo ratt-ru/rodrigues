@@ -18,20 +18,23 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def simulate(job_id):
+    client = docker.Client(**settings.DOCKER_SETTINGS)
+    client.version()
+
     job = Job.objects.get(pk=job_id)
     job.log = "running..."
     job.started = datetime.now(timezone(settings.TIME_ZONE))
     job.save(update_fields=["started", "log"])
     logger.info('starting job %s' % job_id)
 
-    temp_dir = tempfile.mkdtemp(dir=settings.RESULTS_DIR)
-    input = os.path.join(temp_dir, 'input')
-    output = os.path.join(temp_dir, 'output')
-    os.mkdir(input)
-    os.mkdir(output)
+    input = tempfile.mkdtemp(dir=settings.RESULTS_DIR,
+                             prefix='input-%s-' % job_id)
+    output = tempfile.mkdtemp(dir=settings.RESULTS_DIR,
+                              prefix='output-%s-' % job_id)
+
     with open(os.path.join(input, 'parameters.json'), 'w') as sims:
         sims.write((job.config))
-    client = docker.Client(**settings.DOCKER_SETTINGS)
+
     logging.info("creating container from image %s" % job.docker_image)
     try:
         container = client.create_container(image=job.docker_image,
@@ -45,11 +48,19 @@ def simulate(job_id):
 
     client.start(container, binds={input: {'bind': '/input', 'ro': True},
                                    output: {'bind': '/output'}})
+
     status = client.wait(container)
     job.log += client.logs(container).decode()
-    logger.info('simulate finished')
+    if status:
+        msg = "simulation crashed"
+        logger.warning(msg)
+        job.log += msg
+    else:
+        msg = "simulation finished"
+        logger.info(msg)
+        job.log += msg
     job.finished = datetime.now(timezone(settings.TIME_ZONE))
-    job.save(update_fields=["finished", "log"])
-    shutil.rmtree(temp_dir)
+    job.save()
+    shutil.rmtree(input)
 
 
