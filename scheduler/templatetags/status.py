@@ -1,21 +1,16 @@
 from django import template
-import celery.states
+from celery import states
 
 register = template.Library()
 
 status_trans = {
-    'scheduled': 'default',
-    'running': 'primary',
-    'stopped': 'warning',
-    'crashed': 'danger',
-    'finished': 'success',
-    celery.states.PENDING: 'default',
-    celery.states.RECEIVED: 'primary',
-    celery.states.STARTED: 'primary',
-    celery.states.SUCCESS: 'success',
-    celery.states.FAILURE: 'danger',
-    celery.states.REVOKED: 'warning',
-    celery.states.RETRY: 'warning',
+    states.PENDING: 'default',
+    states.RECEIVED: 'primary',
+    states.STARTED: 'primary',
+    states.SUCCESS: 'success',
+    states.FAILURE: 'danger',
+    states.REVOKED: 'warning',
+    states.RETRY: 'warning',
 }
 
 

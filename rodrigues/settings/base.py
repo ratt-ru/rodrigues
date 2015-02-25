@@ -5,7 +5,7 @@ Django settings for rodrigues project.
 
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..')
 
 
 SECRET_KEY = 'j@pj!2g&hp2&#c4w*h(sdq%v_j1tss%q-6x%8-k759obo_wm^4'
@@ -16,7 +16,6 @@ TEMPLATE_DEBUG = DEBUG
 
 
 ALLOWED_HOSTS = []
-
 
 
 INSTALLED_APPS = (
@@ -79,15 +78,12 @@ MESSAGE_TAGS = {
     }
 
 
-BROKER_URL = 'amqp://'
+BROKER_URL = 'amqp://localhost/'
 CELERY_TIMEZONE = TIME_ZONE
-CELERY_RESULT_BACKEND = 'amqp'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
 
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'amqp'
 
 RESULTS_DIR = os.path.join(BASE_DIR, 'results')
-
-
-DOCKER_URI = 'tcp://192.168.59.103:2375'

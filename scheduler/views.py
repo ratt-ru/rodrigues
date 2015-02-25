@@ -1,17 +1,45 @@
 import pkgutil
 import json
 from importlib import import_module
+import socket
+import logging
+
+from django.contrib import messages
 from django.views.generic.edit import FormView
 from django.views.generic import ListView, DetailView, DeleteView
 from django.http import Http404
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import HttpResponseRedirect
+
 import scheduler.forms
-from .models import Job
-from .mixins import LoginRequiredMixin
-from .tasks import schedule_simulation
+from scheduler.models import Job
+from scheduler.mixins import LoginRequiredMixin
+from scheduler.tasks import simulate
+
+
+logger = logging.getLogger(__name__)
+
 
 forms_module = scheduler.forms
+
+
+def schedule_simulation(job, request):
+    """
+    schedule a simulation task, catch error if problem, log in all cases.
+    """
+    try:
+        async = simulate.delay(job_id=job.id)
+    except (OSError, socket.error) as e:
+        error = "can't start simulation %s: %s" % (job.id,
+                                                   str(e))
+        messages.error(request, error)
+        logger.error(error)
+        job.log = error
+        job.save()
+    else:
+        job.task_id = async.task_id
+        job.save(update_fields=["task_id"])
+        job.set_scheduled()
 
 
 def list_forms():
@@ -77,7 +105,8 @@ class JobReschedule(LoginRequiredMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
             self.object = self.get_object()
-            self.object.clear()
             schedule_simulation(self.object, request)
             return HttpResponseRedirect(reverse('job_detail',
                                                 args=(self.object.id,)))
+
+
