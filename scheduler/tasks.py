@@ -31,6 +31,7 @@ def simulate(job_id):
                              prefix='input-%s-' % job_id)
     output = tempfile.mkdtemp(dir=settings.RESULTS_DIR,
                               prefix='output-%s-' % job_id)
+    job.results_dir = os.path.basename(output)
 
     with open(os.path.join(input, 'parameters.json'), 'w') as sims:
         sims.write((job.config))

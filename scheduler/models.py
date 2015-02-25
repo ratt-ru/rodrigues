@@ -11,6 +11,7 @@ class Job(Model):
     task_id = CharField(max_length=36, null=True, blank=True)
     config = TextField()
     docker_image = TextField()
+    results_dir = TextField()
 
     # status of the task
     SCHEDULED = 'S'

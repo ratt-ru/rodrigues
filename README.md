@@ -15,17 +15,26 @@ run:
     $ sudo apt-get install -y python-pip git
     $ sudo pip install fig
     $ git clone https://github.com/ska-sa/rodrigues && cd rodrigues
-    $ edit run.sh   # set all the environment variables
-    $ sudo ./run.sh
+    $ SECRET_KEY=secretkey fig up
+
+Replace `secretkey` with something secret and random, it is used to create HTTP sessions.
+
+
 
 This will start a webserver on port 80.
 
-## Creating superuser
+There are more environment variables you may need to set:
+ - **ALLOWED_HOST** (default: rodrigues.meqtrees.net)
+ - **CYBERSKA_URI** (no default)
+ - **ADMIN_EMAIL**
+ - **DEBUG** set to true to enable debugging mode (default: off)
 
-to login in the web application you need a (super) user:
 
-    $ fig run django python3 manage.py createsuperuser
+## Initialise DB
 
+First time you run this app you need to create and populate the database
+
+    $ fig run worker python3 manage.py syncdb
 
 
 ## Development setup
@@ -51,7 +60,7 @@ First you need to inform Django that you want to use the development settings:
 Now you are ready to start the pipeline. To start the django server you first
 need to populate the database:
 
-    $ python3 ./manage.py migrate
+    $ python3 ./manage.py syncdb
 
 
 Now you can run a development webserver using:

@@ -9,6 +9,7 @@ if 'tls' in DOCKER_SETTINGS:
     DOCKER_SETTINGS['tls'].assert_hostname = False
 
 
+RESULTS_DIR = os.path.join(BASE_DIR, 'results')
 
 
 SECRET_KEY = "something stupid"

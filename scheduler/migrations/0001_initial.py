@@ -13,15 +13,16 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Job',
             fields=[
-                ('id', models.AutoField(primary_key=True, auto_created=True, verbose_name='ID', serialize=False)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
                 ('name', models.TextField()),
                 ('started', models.DateTimeField(null=True, blank=True)),
                 ('finished', models.DateTimeField(null=True, blank=True)),
                 ('log', models.TextField(blank=True)),
-                ('task_id', models.CharField(max_length=36, null=True, blank=True)),
+                ('task_id', models.CharField(null=True, blank=True, max_length=36)),
                 ('config', models.TextField()),
                 ('docker_image', models.TextField()),
-                ('state', models.CharField(default='S', max_length=1, choices=[('S', 'scheduled'), ('R', 'running'), ('C', 'crashed'), ('F', 'finished')])),
+                ('results_dir', models.TextField()),
+                ('state', models.CharField(default='S', choices=[('S', 'scheduled'), ('R', 'running'), ('C', 'crashed'), ('F', 'finished')], max_length=1)),
             ],
             options={
             },

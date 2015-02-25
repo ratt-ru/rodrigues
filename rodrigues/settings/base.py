@@ -11,7 +11,7 @@ BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..')
 ALLOWED_HOSTS = []
 
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -19,8 +19,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'scheduler',
-
-)
+]
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -93,7 +92,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'amqp'
 
-RESULTS_DIR = os.path.join(BASE_DIR, 'results')
+
 
 
 LOGGING = {
