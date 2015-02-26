@@ -3,13 +3,19 @@ import json
 from importlib import import_module
 import socket
 import logging
+import os
 
 from django.contrib import messages
 from django.views.generic.edit import FormView
-from django.views.generic import ListView, DetailView, DeleteView
+from django.views.generic import ListView, DetailView, DeleteView, View
 from django.http import Http404
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import HttpResponseRedirect
+from django.http import HttpResponse
+from django.conf import settings
+
+import matplotlib
+import aplpy
 
 import scheduler.forms
 from scheduler.models import Job
@@ -109,4 +115,29 @@ class JobReschedule(LoginRequiredMixin, DetailView):
             return HttpResponseRedirect(reverse('job_detail',
                                                 args=(self.object.id,)))
 
+
+class FitsView(View):
+    """
+    Returns an rendered image. uses path keyword argument. Only
+    allowes files which are in te settings.RESULTS_DIR folder somewhere.
+    """
+    def render_to_response(self, context, **kwargs):
+        path = self.kwargs['path']
+        fullpath = os.path.realpath(os.path.join(settings.RESULTS_DIR, path))
+        if not fullpath.startswith(settings.RESULTS_DIR):
+            raise Http404
+        if not os.access(fullpath, os.R_OK):
+            raise Http404
+        response = HttpResponse(content_type='image/png')
+        fig = matplotlib.pyplot.figure()
+
+        try:
+            plot = aplpy.FITSFigure(fullpath, figure=fig,
+                                    auto_refresh=False)
+        except IOError as e:
+            matplotlib.pyplot.text(0.1, 0.8, str(e))
+        else:
+            plot.show_colorscale()
+        fig.canvas.print_figure(response, format='png')
+        return response
 
