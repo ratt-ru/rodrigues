@@ -27,9 +27,9 @@ def simulate(job_id):
     job.save(update_fields=["started", "log"])
     logger.info('starting job %s' % job_id)
 
-    input = tempfile.mkdtemp(dir=settings.RESULTS_DIR,
+    input = tempfile.mkdtemp(dir=settings.MEDIA_ROOT,
                              prefix='input-%s-' % job_id)
-    output = tempfile.mkdtemp(dir=settings.RESULTS_DIR,
+    output = tempfile.mkdtemp(dir=settings.MEDIA_ROOT,
                               prefix='output-%s-' % job_id)
     job.results_dir = os.path.basename(output)
 

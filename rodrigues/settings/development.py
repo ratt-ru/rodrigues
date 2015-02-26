@@ -9,9 +9,6 @@ if 'tls' in DOCKER_SETTINGS:
     DOCKER_SETTINGS['tls'].assert_hostname = False
 
 
-RESULTS_DIR = os.path.join(BASE_DIR, 'results')
-
-
 SECRET_KEY = "something stupid"
 
 DEBUG = True
@@ -35,3 +32,7 @@ DOCKER_URI = 'tcp://192.168.59.103:2375'
 
 
 CYBERSKA_URI = "http://192.168.59.103:8081/v1/viz"
+
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'

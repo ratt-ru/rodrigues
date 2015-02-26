@@ -55,7 +55,7 @@ doc/_build/
 db.sqlite3
 .idea
 static_serve
-results/
+media/
 uploaded/
 
 # Sphinx documentation
