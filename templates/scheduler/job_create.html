@@ -4,23 +4,39 @@
 
 {%  block content %}
 
-    <h1>Create new simulation</h1>
+    <style>
+        *, *:before, *:after {box-sizing:  border-box !important;}
 
+
+        .row {
+            -moz-column-width: 25em;
+            -webkit-column-width: 25em;
+            -moz-column-gap: .5em;
+            -webkit-column-gap: .5em;
+
+        }
+
+        .item {
+            display: inline-block;
+        }
+    </style>
+
+
+    <h1>Create new simulation</h1>
 
     <form method="post" action="" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="row">
-            <div class="col-md-12">
-                {% if form.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        The form contains errors:
-                    {{  form.errors }}
-                    </div>
-                {% endif %}
+        {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                The form contains errors:
+                {{  form.errors }}
+            </div>
+        {% endif %}
 
+        <div id="container" class="js-masonry" data-masonry-options='{ "columnWidth": 200, "itemSelector": ".item" }'>
+            <div class="row">
                 {% for fieldset in form.fieldsets %}
-                    {% cycle '<div class="row">' '' '' %}
-                    <div class="col-md-4">
+                    <div class="item">
                         <div class="panel panel-primary">
                             <div class="panel-heading">{{ fieldset.description }}</div>
                             <div class="panel-body">
@@ -42,18 +58,14 @@
                             </div>
                         </div>
                     </div>
-                    {% cycle '' '' '</div>' %}
                 {% endfor %}
 
 
-
-            </div>
-        </div>
-
-
-        <div class="row">
-            <div class="col-md-offset-10 col-md-1">
-                <input type="submit" value="Submit simulation" class="btn btn-success btn-large"/>
+                <div class="item">
+                    <div class="col-md-offset-10 col-md-1">
+                        <input type="submit" value="Submit simulation" class="btn btn-success btn-large"/>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
