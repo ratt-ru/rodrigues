@@ -16,7 +16,7 @@
 
         }
 
-        .item {
+        .panel {
             display: inline-block;
         }
     </style>
@@ -36,32 +36,30 @@
         <div id="container" class="js-masonry" data-masonry-options='{ "columnWidth": 200, "itemSelector": ".item" }'>
             <div class="row">
                 {% for fieldset in form.fieldsets %}
-                    <div class="item">
-                        <div class="panel panel-primary">
-                            <div class="panel-heading">{{ fieldset.description }}</div>
-                            <div class="panel-body">
-                                <table class="table table-striped table-condensed">
-                                    {% for field in fieldset %}
-                                        <tr>
-                                            <th>
-                                                <label for="id_name">{{ field.label }}</label>
-                                            </th>
-                                            <td>{{ field }}<br />
-                                                <span class="helptext">{{ field.help_text }}</span>
-                                                {% for error in field.errors %}
-                                                    <div class="alert alert-danger" role="alert">{{ error }}</div>
-                                                {%  endfor %}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
-                            </div>
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">{{ fieldset.description }}</div>
+                        <div class="panel-body">
+                            <table class="table table-striped table-condensed">
+                                {% for field in fieldset %}
+                                    <tr>
+                                        <th>
+                                            <label for="id_name">{{ field.label }}</label>
+                                        </th>
+                                        <td>{{ field }}<br />
+                                            <span class="helptext">{{ field.help_text }}</span>
+                                            {% for error in field.errors %}
+                                                <div class="alert alert-danger" role="alert">{{ error }}</div>
+                                            {%  endfor %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
                         </div>
+
                     </div>
                 {% endfor %}
 
-
-                <div class="item">
+                <div class="panel">
                     <div class="col-md-offset-10 col-md-1">
                         <input type="submit" value="Submit simulation" class="btn btn-success btn-large"/>
                     </div>
