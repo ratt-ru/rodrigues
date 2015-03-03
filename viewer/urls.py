@@ -4,8 +4,8 @@ from django.conf.urls import patterns, url
 from .views import (FitsView)
 
 
-fits_url = url(r'^(?P<path>(\w.)+)/$', FitsView.as_view(),
-                     name='job_create')
+fits_url = url(r'^(?P<path>[\w._]+)/$', FitsView.as_view(),
+                     name='fits')
 
 
 all_ = (
