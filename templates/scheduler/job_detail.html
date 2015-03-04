@@ -138,7 +138,9 @@
                         <li><b>finished:</b> {% if object.finished %}{{ object.finished }}{% endif %}</li>
                         <li><b>duration:</b> {% if object.finished %}{{ object.duration }}{% endif %}</li>
                         <li><b>docker_image:</b> {{ object.docker_image }}</li>
-
+                        <li><b>results_dir:</b> {{ object.results_dir }}</li>
+                        <li><a href="{%  url 'listdir' object.id %}">view results</a></li>
+                    <li><a href="{%  url 'preview' object.id %}">preview results</a></li>
                     </ul>
                 </div>
             </div>

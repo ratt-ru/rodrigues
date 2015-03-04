@@ -72,8 +72,7 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
-STATIC_ROOT = os.path.join(BASE_DIR, "static_serve")
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 # used to map django errors to bootstrap classes

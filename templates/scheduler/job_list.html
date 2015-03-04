@@ -8,7 +8,7 @@
 
     {% if object_list %}
 
-        <h1>List of simulations</h1>
+        <h1>List of jobs</h1>
 
         <table class="table table-striped table-condensed">
             <thead>
@@ -22,25 +22,25 @@
             </tr>
             </thead>
 
-            {% for simulation in object_list %}
+            {% for object in object_list %}
                 <tr>
-                    <td><a href="{%  url 'job_detail' simulation.id %}">{{ simulation.id }}</a></td>
-                    <td>{{ simulation.name }}</td>
-                    <td><a href="{%  url 'job_detail' simulation.id %}"><span class="label label-{{ simulation.get_task_status|status_label }}"> {{ simulation.get_task_status }}</span></a></td>
-                    <td>{{ simulation.started }}</td>
-                    <td>{{ simulation.finished }}</td>
+                    <td><a href="{%  url 'listdir' object.id %}">{{ object.id }}</a></td>
+                    <td>{{ object.name }}</td>
+                    <td><a href="{%  url 'listdir' object.id %}"><span class="label label-{{ object.get_task_status|status_label }}"> {{ object.get_task_status }}</span></a></td>
+                    <td>{{ object.started }}</td>
+                    <td>{{ object.finished }}</td>
                     <td>
                         <div class="btn-group">
                             <form>
                                 {% csrf_token %}
 
-                                <a href="{% url 'job_delete' simulation.id %}">
+                                <a href="{% url 'job_delete' object.id %}">
                                     <button type="button" class="btn btn-danger btn-sm">
                                         <span class="glyphicon glyphicon-remove"></span>
                                     </button>
                                 </a>
 
-                                <button type="submit" formmethod="post" formaction="{% url 'job_reschedule' simulation.id %}" class="btn btn-warning btn-sm">
+                                <button type="submit" formmethod="post" formaction="{% url 'job_reschedule' object.id %}" class="btn btn-warning btn-sm">
                                     <span class="glyphicon glyphicon-repeat"></span>
                                 </button>
                             </form>
@@ -55,7 +55,7 @@
 
         <div class="jumbotron">
             <div class="container center-block text-center">
-                <h1>no simulations yet!</h1>
+                <h1>no jobs yet!</h1>
                 <a href="{% url 'form_list'  %}" class="btn btn-success btn-lg" role="button">Create simulation</a>
             </div>
         </div>

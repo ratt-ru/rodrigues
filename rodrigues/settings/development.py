@@ -21,6 +21,11 @@ DATABASES = {
     }
 }
 
+INSTALLED_APPS += [
+    'debug_toolbar',
+]
+
+
 
 BROKER_URL = 'amqp://localhost/'
 

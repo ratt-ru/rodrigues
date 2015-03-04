@@ -11,4 +11,10 @@ ls -a /output
 echo
 cat /input/parameters.json
 echo 
+cp -av /example_files/* /output
+echo
+cp -av input/parameters.json /output
+echo
+cp /bin/bash /output
+echo
 echo "done"
