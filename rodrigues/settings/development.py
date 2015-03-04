@@ -1,7 +1,16 @@
-"""
-development settings
-"""
 from .base import *
+from docker.utils import kwargs_from_env
+
+
+DOCKER_SETTINGS = kwargs_from_env()
+
+# required foor boot2docker
+if 'tls' in DOCKER_SETTINGS:
+    DOCKER_SETTINGS['tls'].assert_hostname = False
+
+
+RESULTS_DIR = os.path.join(BASE_DIR, 'results')
+
 
 SECRET_KEY = "something stupid"
 
@@ -26,6 +35,3 @@ DOCKER_URI = 'tcp://192.168.59.103:2375'
 
 
 CYBERSKA_URI = "http://192.168.59.103:8081/v1/viz"
-
-
-#DOCKER_CMD = 'echo "testing docker command"'

@@ -1,3 +1,8 @@
+storage:
+  image: ubuntu:14.04
+  volumes:
+    - /results
+
 db:
   image: postgres:9.3
 
@@ -7,20 +12,21 @@ broker:
 
 
 worker:
- build: .
- command: celery worker -A rodrigues -l INFO
- links:
-   - broker
-   - db
- environment:
-   - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
-   - C_FORCE_ROOT=true
-   - SECRET_KEY="doesn't matter"
- volumes:
-  - /var/run/docker.pid:/var/run/docker.pid
-  - /var/run/docker.sock:/var/run/docker.sock
-  - /var/lib/docker:/var/lib/docker
-  - .:/code
+  build: .
+  command: celery worker -A rodrigues -l INFO
+  links:
+    - broker
+    - db
+  environment:
+    - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
+    - SECRET_KEY="doesn't matter"
+  volumes:
+    - /var/run/docker.pid:/var/run/docker.pid
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /var/lib/docker:/var/lib/docker
+    - .:/code
+  volumes_from:
+    - storage
 
 
 django:
@@ -31,7 +37,7 @@ django:
     - broker
   environment:
     - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
-    - SECRET_KEY="change me"
+    - SECRET_KEY
     - ALLOWED_HOST
     - CYBERSKA_URI
     - ADMIN_EMAIL
@@ -40,17 +46,20 @@ django:
     - .:/code
   volumes_from:
     - worker
+    - storage
 
 
 viewer:
   image: gijzelaerr/cyberska_viewer
   volumes_from:
     - worker
+    - storage
   environment:
     - REDIRECT_URI
   ports:
     - 8081:80
     - 8080:8080
+
 
 
 nginx:
@@ -64,16 +73,4 @@ nginx:
   ports:
     - 80:80 
 
-
-initialise:
-  build: .
-  command: make migrate_sleep
-  links:
-    - django
-    - db
-  volumes:
-    - .:/code
-  environment:
-    - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
-    - SECRET_KEY="doesn't matter"
 

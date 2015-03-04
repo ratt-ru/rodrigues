@@ -7,6 +7,7 @@ export SECRET_KEY=doesntmatter
 .PHONY: worker broker runserver migrate makemigrations fig_migrate fig_makemigrations psql
 
 
+# NOTE: never run the worker in autoreload mode
 worker:
 	python3 `which celery` -A rodrigues worker -l info
 
@@ -21,11 +22,6 @@ runserver:
 
 migrate:
 	python3 ./manage.py migrate
-
-
-migrate_sleep: 
-	SECRET_KEY=bla python3 ./manage.py migrate --settings=rodrigues.settings.container
-	sleep infinity
 
 
 makemigrations:

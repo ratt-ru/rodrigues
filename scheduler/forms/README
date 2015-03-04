@@ -1,0 +1,32 @@
+new forms should be put in this directory.
+
+The name of the form is the filename.
+
+Each file should contain:
+
+  * A form_utils.forms.BetterForm subclass named Form
+
+Each form should contain:
+
+  * A 'name' field
+
+  * A 'docker_image' property specifying the docker image name run
+
+
+EXAMPLE:
+
+"""
+from django.forms import CharField
+from form_utils.forms import BetterForm
+
+CONTAINER = 'ubuntu'
+
+
+class Form(BetterForm):
+    name = CharField()
+
+    def is_valid(self):
+        super(Form, self).is_valid()
+
+        # add more form validation here
+"""

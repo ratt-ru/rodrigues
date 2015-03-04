@@ -8,23 +8,21 @@ from .base import *
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
 
 
 ADMINS = (
-    ('ceiling-kat admin', os.environ.get('ADMIN_EMAIL', 'gijsmolenaar@gmail.com')),
+    ('ceiling-kat admin', os.environ.get('ADMIN_EMAIL',
+                                         'gijsmolenaar@gmail.com')
+    ),
 )
 
-EMAIL_HOST = 'mail'
 
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'gijsmolenaar@gmail.com')
 
-SERVER_EMAIL = 'gijsmolenaar@gmail.com'
-
-
-if os.environ.get('DEBUG', 'false').lower() == 'true':
-    DEBUG = True
 
 TEMPLATE_DEBUG = DEBUG
+
 
 DATABASES = {
     'default': {
@@ -36,25 +34,25 @@ DATABASES = {
     }
 }
 
+
 BROKER_URL = 'amqp://broker/'
 
-ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST', 'ceiling-kat.meqtrees.net')]
+
+ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST', 'rodrigues.meqtrees.net')]
+
 
 DOCKER_URI = 'unix://var/run/docker.sock'
 
 
-# disable sentry for now
-"""
-# Set your DSN value
-RAVEN_CONFIG = {
-    'dsn': os.environ.get('SENTRY_DSN', 'please set SENTRY_DSN in fig.yml'),
+CYBERSKA_URI = os.environ.get('CYBERSKA_URI', 'please set CYBERSKA_URI env var')
+
+
+INSTALLED_APPS += ['debug_toolbar.apps.DebugToolbarConfig']
+
+
+RESULTS_DIR = '/results'
+
+
+DOCKER_SETTINGS = {
+    'base_url': 'unix://var/run/docker.sock',
 }
-
-# Add raven to the list of installed apps
-INSTALLED_APPS = INSTALLED_APPS + (
-    'raven.contrib.django.raven_compat',
-)
-"""
-
-
-CYBERSKA_URI = os.environ.get('CYBERSKA_URI', 'please set CYBERSKA_URI in fig.yml')

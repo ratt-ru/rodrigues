@@ -1,28 +1,25 @@
-import os
-from django.contrib.messages import constants as messages
+"""
+Django settings for rodrigues project.
+"""
 
+
+import os
 
 BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..')
-
-DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 
 
 ALLOWED_HOSTS = []
 
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'simqueue',
-    'debug_toolbar.apps.DebugToolbarConfig',
-    'kombu.transport.django',
-)
-
+    'scheduler',
+]
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -43,27 +40,33 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.static",
     "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
-    'simqueue.context_processors.settings',
+    'scheduler.context_processors.settings',
 )
 
 
 ROOT_URLCONF = 'rodrigues.urls'
 
-
 WSGI_APPLICATION = 'rodrigues.wsgi.application'
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+}
+
+
+TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 
 
 LANGUAGE_CODE = 'en-us'
 
-
 TIME_ZONE = 'Africa/Johannesburg'
-
 
 USE_I18N = True
 
-
 USE_L10N = True
-
 
 USE_TZ = True
 
@@ -73,34 +76,22 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATIC_ROOT = os.path.join(BASE_DIR, "static_serve")
 
 
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR,  'templates'),
-)
-
-
-BROKER_URL = 'amqp://'
-CELERY_TIMEZONE = TIME_ZONE
-CELERY_RESULT_BACKEND = 'amqp'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-
-
-LOGIN_REDIRECT_URL = '/'
-
-
+# used to map django errors to bootstrap classes
+from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
     messages.DEBUG: 'info',
     }
 
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'uploaded')
-MEDIA_URL = '/media/'
+BROKER_URL = 'amqp://localhost/'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
 
-DOCKER_IMAGE = 'skasa/simulator'
-DOCKER_CMD = './runsim.sh'
-# DOCKER_CMD = 'pyxis CFG=/sims.cfg LOG=/results/output.log OUTFILE=/results/results OUTDIR=/results azishe'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'amqp'
+
 
 
 
@@ -121,6 +112,5 @@ LOGGING = {
     },
     }
 
-RESULTS_DIR = os.path.join(BASE_DIR, 'results')
 
-
+LOGIN_REDIRECT_URL = '/'
