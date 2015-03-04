@@ -1,4 +1,5 @@
-from django.db.models import Model, CharField, FileField, DateTimeField, TextField
+
+from django.db.models import Model, CharField, DateTimeField, TextField
 from celery.result import AsyncResult
 import celery.states
 
@@ -10,8 +11,8 @@ class Job(Model):
     log = TextField(blank=True, null=False)
     task_id = CharField(max_length=36, null=True, blank=True)
     config = TextField()
-    docker_image = TextField()
-    results_dir = TextField()
+    docker_image = CharField(max_length=100, null=True, blank=True)
+    results_dir = CharField(max_length=20, null=True, blank=True)
 
     # status of the task
     SCHEDULED = 'S'

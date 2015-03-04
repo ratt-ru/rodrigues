@@ -13,7 +13,8 @@ logout_url = url(r'^accounts/logout/$', logout, name='logout')
 scheduler_url = url(r'^scheduler/', include('scheduler.urls'))
 root_url = url(r'^$', RedirectView.as_view(url=reverse_lazy('job_list')),
                name='root')
+viewer_url = url(r'^viewer/', include('viewer.urls'))
 
-all_ = (admin_url, login_url, logout_url, scheduler_url, root_url)
+all_ = (admin_url, login_url, logout_url, scheduler_url, root_url, viewer_url)
 urlpatterns = patterns('', *all_)
-#urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,37 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="jumbotron">
+        <div class="container center-block text-center">
+            <h1>Can't understand that file!</h1>
+            <h3>That file looks amazing, but I don't know what it is.</h3>
+
+            <div class="panel">
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Project ID</th>
+                        <th>Project name</th>
+                        <th>filename</th>
+                        <th>type</th>
+                    </tr>
+                    </thead>
+                    <tr>
+                        <td>{{ object.id }}</td>
+                        <td>{{ object.name }}</td>
+                        <td>{{ path }}</td>
+                        <td>{{ type }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <a href="{% url 'job_detail' object.id %}"><h4>return to detail view</h4></a>
+        </div>
+
+    </div>
+
+{%  endblock %}
+

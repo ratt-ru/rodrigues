@@ -108,5 +108,3 @@ class JobReschedule(LoginRequiredMixin, DetailView):
             schedule_simulation(self.object, request)
             return HttpResponseRedirect(reverse('job_detail',
                                                 args=(self.object.id,)))
-
-

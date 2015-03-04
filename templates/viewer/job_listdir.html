@@ -1,0 +1,111 @@
+
+{% extends "base.html" %}
+
+{%  load status %}
+
+{% block content %}
+
+    <H1>Results for job #{{ job.id }} ({{ job.name }})</H1>
+
+    <form>
+        {% csrf_token %}
+        <div class="btn-group">
+            <button type="submit"
+                    formmethod="post"
+                    formaction="{% url 'job_reschedule' object.id %}"
+                    class="btn btn-warning"
+                    {% if not object.can_reschedule %}
+                    disabled="disabled"
+                    {% endif %}
+                    >Reschedule</button>
+            <a href="{% url 'job_detail' object.id %}" class="btn btn-info" role="button">Refresh</a>
+            <a href="{% url 'job_delete' object.id %}" class="btn btn-danger" role="button">Delete</a>
+
+        </div>
+    </form>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><b>Job properties</b></div>
+                <div class="panel-body">
+                    <ul>
+                        <li><b>status:</b> <span class="label label-{{ object.get_task_status|status_label  }}">{{ object.get_task_status }}</span></li>
+                        <li><b>start:</b> {{ object.started }}</li>
+                        <li><b>finished:</b> {% if object.finished %}{{ object.finished }}{% endif %}</li>
+                        <li><b>duration:</b> {% if object.finished %}{{ object.duration }}{% endif %}</li>
+                        <li><b>docker_image:</b> {{ object.docker_image }}</li>
+                        <li><b>results_dir:</b> {{ object.results_dir }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><b>Result files</b></div>
+                <div class="panel-body">
+
+
+                    <table class="table table-striped table-condensed">
+                        <thead>
+                        <tr>
+                            <th>name</th>
+                            <th>type</th>
+                            <th>size</th>
+                            <th>modified</th>
+                            <th>actions</th>
+                        </tr>
+                        </thead>
+                        {% for item in dirlist %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.type|truncatechars:60 }}</td>
+                                <td>{{ item.size }}</td>
+                                <td>{{ item.modified }}</td>
+                                <td>
+                                    <a href="{% url 'guesstype' pk=object.id path=item.name %}"><button>view</button></a>
+                                    <a href="{{ MEDIA_URL }}/{{ object.results_dir }}/{{ item.name }}"><button>download</button></a>
+                                </td>
+                            </tr>
+                        {%  endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><b>Images</b></div>
+                <div class="panel-body">
+
+                    {%  for image in images %}
+                        <img src="{% url 'guesstype' pk=object.id path=image %}">
+                    {% endfor %}
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><b>Console output</b></div>
+                <div class="panel-body">
+                    <div class="well" style="font-family:monospace;">{{ object.log|linebreaksbr }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{%  endblock %}
+

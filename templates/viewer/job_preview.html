@@ -1,0 +1,34 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+    <H1>Results for job #{{ job.id }} ({{ job.name }})</H1>
+
+
+    <table class="table table-striped table-condensed">
+        <thead>
+        <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>size</th>
+            <th>modified</th>
+            <th>actions</th>
+        </tr>
+        </thead>
+        {% for item in dirlist %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.type|truncatechars:60 }}</td>
+                <td>{{ item.size }}</td>
+                <td>{{ item.modified }}</td>
+                <td>
+                    <a href="{% url 'guesstype' pk=object.id path=item.name %}"><button>view</button></a>
+                    <a href="{{ MEDIA_URL }}/{{ object.results_dir }}/{{ item.name }}"><button>download</button></a>
+                </td>
+            </tr>
+        {%  endfor %}
+    </table>
+
+{%  endblock %}
+

@@ -49,9 +49,8 @@ CYBERSKA_URI = os.environ.get('CYBERSKA_URI', 'please set CYBERSKA_URI env var')
 
 INSTALLED_APPS += ['debug_toolbar.apps.DebugToolbarConfig']
 
-
-RESULTS_DIR = '/results'
-
+MEDIA_ROOT = '/media/'
+MEDIA_URL = '/media/'
 
 DOCKER_SETTINGS = {
     'base_url': 'unix://var/run/docker.sock',
