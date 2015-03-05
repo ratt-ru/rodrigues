@@ -4,7 +4,7 @@ from collections import namedtuple
 import time
 import magic
 
-from django.views.generic import TemplateView, DetailView
+from django.views.generic import DetailView
 from django.http import Http404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse

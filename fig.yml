@@ -37,7 +37,7 @@ django:
     - broker
   environment:
     - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
-    - SECRET_KEY
+    - SECRET_KEY="change this by defining SECRET_KEY env var"
     - ALLOWED_HOST
     - CYBERSKA_URI
     - ADMIN_EMAIL
