@@ -13,13 +13,11 @@ run:
 
     $ sudo apt-get update
     $ sudo apt-get install -y python-pip git
-    $ sudo pip install fig
+    $ sudo pip install docker-compose
     $ git clone https://github.com/ska-sa/rodrigues && cd rodrigues
-    $ SECRET_KEY=secretkey fig up
+    $ SECRET_KEY=secretkey docker-compose up
 
 Replace `secretkey` with something secret and random, it is used to create HTTP sessions.
-
-
 
 This will start a webserver on port 80.
 
@@ -34,7 +32,7 @@ There are more environment variables you may need to set:
 
 First time you run this app you need to create and populate the database
 
-    $ fig run worker python3 manage.py syncdb
+    $ docker-compose run worker python3 manage.py syncdb
 
 
 ## Development setup

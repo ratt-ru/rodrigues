@@ -71,9 +71,9 @@
                                         <a href="{% url 'guesstype' pk=object.id path=item.name %}"><button class="btn">view</button></a>
                                         <a href="{{ MEDIA_URL }}/{{ object.results_dir }}/{{ item.name }}"><button class="btn">download</button></a>
 
-                                        <form action="{{ CYBERSKA_URI }}" method="post">
+                                        <form action="http://192.168.59.103:8081/v1/viz" method="post">
                                             <input type="hidden" name="title" value="Residual image" />
-                                            <input type="hidden" name="filename" value="{{ simulation.results_psf.file }}">
+                                            <input type="hidden" name="filename" value="{{ MEDIA_ROOT }}/{{ object.results_dir }}/{{ item.name }}">
                                             <input type="submit" class="btn" value="viewer"/>
                                         </form>
                                     </div>
