@@ -1,0 +1,18 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><b>{{ path }}</b></div>
+                <div class="panel-body">
+                    <div class="well" style="font-family:monospace;">{{ content|linebreaksbr }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{%  endblock %}
+

@@ -16,5 +16,11 @@ VOLUME /socket
 RUN mkdir /code
 WORKDIR /code
 
+# required to fetch aplpy from github
+RUN apt-get install -yq git
+
+# fix broker pip
+RUN easy_install3 -U pip
+
 ADD requirements.txt /
-RUN pip3 install -r /requirements.txt
+RUN pip install -r /requirements.txt

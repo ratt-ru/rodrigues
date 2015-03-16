@@ -18,7 +18,7 @@
                     disabled="disabled"
                     {% endif %}
                     >Reschedule</button>
-            <a href="{% url 'job_detail' object.id %}" class="btn btn-info" role="button">Refresh</a>
+            <a href="{% url 'viewer' object.id %}" class="btn btn-info" role="button">Refresh</a>
             <a href="{% url 'job_delete' object.id %}" class="btn btn-danger" role="button">Delete</a>
 
         </div>
@@ -64,11 +64,19 @@
                             <tr>
                                 <td>{{ item.name }}</td>
                                 <td>{{ item.type|truncatechars:60 }}</td>
-                                <td>{{ item.size }}</td>
+                                <td>{{ item.size|filesizeformat }}</td>
                                 <td>{{ item.modified }}</td>
                                 <td>
-                                    <a href="{% url 'guesstype' pk=object.id path=item.name %}"><button>view</button></a>
-                                    <a href="{{ MEDIA_URL }}/{{ object.results_dir }}/{{ item.name }}"><button>download</button></a>
+                                    <div class="btn-group">
+                                        <a href="{% url 'guesstype' pk=object.id path=item.name %}"><button class="btn">view</button></a>
+                                        <a href="{{ MEDIA_URL }}/{{ object.results_dir }}/{{ item.name }}"><button class="btn">download</button></a>
+
+                                        <form action="{{ CYBERSKA_URI }}" method="post">
+                                            <input type="hidden" name="title" value="Residual image" />
+                                            <input type="hidden" name="filename" value="{{ simulation.results_psf.file }}">
+                                            <input type="submit" class="btn" value="viewer"/>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         {%  endfor %}

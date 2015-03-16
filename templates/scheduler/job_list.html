@@ -24,9 +24,9 @@
 
             {% for object in object_list %}
                 <tr>
-                    <td><a href="{%  url 'listdir' object.id %}">{{ object.id }}</a></td>
+                    <td><a href="{%  url 'viewer' object.id %}">{{ object.id }}</a></td>
                     <td>{{ object.name }}</td>
-                    <td><a href="{%  url 'listdir' object.id %}"><span class="label label-{{ object.get_task_status|status_label }}"> {{ object.get_task_status }}</span></a></td>
+                    <td><a href="{%  url 'viewer' object.id %}"><span class="label label-{{ object.get_task_status|status_label }}"> {{ object.get_task_status }}</span></a></td>
                     <td>{{ object.started }}</td>
                     <td>{{ object.finished }}</td>
                     <td>

@@ -30,7 +30,7 @@ def schedule_simulation(job, request):
     try:
         async = simulate.delay(job_id=job.id)
     except (OSError, socket.error) as e:
-        error = "can't start simulation %s: %s" % (job.id,
+        error = "can't connect to broker %s: %s" % (job.id,
                                                    str(e))
         messages.error(request, error)
         logger.error(error)
@@ -52,10 +52,6 @@ class FormsList(ListView):
 
 
 class JobList(ListView):
-    model = Job
-
-
-class JobDetail(DetailView):
     model = Job
 
 

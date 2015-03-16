@@ -1,7 +1,7 @@
 storage:
   image: ubuntu:14.04
   volumes:
-    - /results
+    - /storage
 
 db:
   image: postgres:9.3
@@ -44,12 +44,13 @@ django:
     - DEBUG
   volumes:
     - .:/code
+    - /socket
   volumes_from:
     - worker
     - storage
 
 
-viewer:
+skaviewer:
   image: gijzelaerr/cyberska_viewer
   volumes_from:
     - worker
@@ -69,7 +70,7 @@ nginx:
   volumes_from:
     - django
   links:
-    - viewer
+    - skaviewer
   ports:
     - 80:80 
 

@@ -34,11 +34,18 @@ def simulate(job_id):
         logger.error(msg)
         raise
 
-    input = tempfile.mkdtemp(dir=settings.MEDIA_ROOT,
-                             prefix='input-%s-' % job_id)
-    output = tempfile.mkdtemp(dir=settings.MEDIA_ROOT,
-                              prefix='output-%s-' % job_id)
-    job.results_dir = os.path.basename(output)
+    tempdir = tempfile.mkdtemp(dir=settings.MEDIA_ROOT,
+                               prefix=str(job_id))
+
+    # Nginx container runs as unprivileged
+    os.chmod(tempdir, 755)
+
+    input = os.path.join(tempdir, 'input')
+    output = os.path.join(tempdir, 'output')
+    os.mkdir(input)
+    os.mkdir(output)
+
+    job.results_dir = os.path.basename(tempdir)
     job.save(update_fields=["results_dir"])
 
     with open(os.path.join(input, 'parameters.json'), 'w') as sims:
@@ -47,7 +54,9 @@ def simulate(job_id):
     logging.info("creating container from image %s" % job.docker_image)
     try:
         container = client.create_container(image=job.docker_image,
-                                            command='/run.sh')
+                                            command='/run.sh ' + tempdir,
+
+                                            )
     except requests.exceptions.ConnectionError as e:
         msg = "cant create container: %s" % str(e)
         logging.error(msg)
@@ -55,8 +64,12 @@ def simulate(job_id):
         job.save()
         raise
 
-    client.start(container, binds={input: {'bind': '/input', 'ro': True},
-                                   output: {'bind': '/output'}})
+    if hasattr(settings, 'CONTAINER'):
+        client.start(container,
+                     volumes_from='rodrigues_storage_1')
+    else:
+        client.start(container,
+                     binds={tempdir: {'bind': tempdir}})
 
     status = client.wait(container)
     job.log += client.logs(container).decode()
@@ -72,6 +85,3 @@ def simulate(job_id):
         job.log += msg
     job.finished = datetime.now(timezone(settings.TIME_ZONE))
     job.save()
-    shutil.rmtree(input)
-
-

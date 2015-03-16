@@ -9,6 +9,7 @@ from django.http import Http404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.contrib import messages
 
 import matplotlib
 matplotlib.use('agg')
@@ -80,19 +81,24 @@ DirItem = namedtuple('DirItem', ['fullpath', 'name', 'type', 'size',
                                  'modified', 'is_image'])
 
 
-class ListDirView(DetailView):
+class OverView(DetailView):
     model = Job
-    template_name = 'viewer/job_listdir.html'
+    template_name = 'viewer/job_overview.html'
 
     def get_context_data(self, **kwargs):
-        context = super(ListDirView, self).get_context_data(**kwargs)
+        context = super(OverView, self).get_context_data(**kwargs)
         prefix = os.path.realpath(settings.MEDIA_ROOT)
+
+        if not self.object.results_dir:
+            messages.error(self.request, 'result_dir DB field empty')
+            return context
+
         path = os.path.realpath(os.path.join(prefix,
                                              self.object.results_dir))
-        if not self.object.results_dir:
-            raise Http404('result_dir field empty')
+
         if not os.access(path, os.R_OK):
-            raise Http404('Directory doesn\'t exists')
+            messages.error(self.request, 'Directory doesn\'t exists')
+            return context
         if not path.startswith(prefix):
             raise Http404('something weird with that path')
 
@@ -150,5 +156,32 @@ class SomethingView(DetailView):
             return HttpResponseRedirect(reverse('fits',
                                                 kwargs={'pk': self.object.id,
                                                         'path': self.kwargs['path']}))
+        if context['type'].startswith("ASCII text"):
+            return HttpResponseRedirect(reverse('text',
+                                                kwargs={'pk': self.object.id,
+                                                        'path': self.kwargs['path']}))
 
         return super(SomethingView, self).render_to_response(context)
+
+
+class TextView(DetailView):
+    model = Job
+    template_name = 'viewer/job_textfile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(TextView, self).get_context_data(**kwargs)
+        path = self.kwargs['path']
+        prefix = os.path.realpath(os.path.join(settings.MEDIA_ROOT))
+        fullpath = os.path.realpath(os.path.join(settings.MEDIA_ROOT,
+                                                 self.object.results_dir,
+                                                 path))
+
+        if not fullpath.startswith(prefix):
+            raise Http404("something weird with that filename")
+        if not os.access(fullpath, os.R_OK):
+            raise Http404("can't open filename")
+
+        with open(fullpath, 'r') as f:
+            context['path'] = path
+            context['content'] = ''.join(f.readlines())
+        return context

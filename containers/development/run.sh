@@ -1,20 +1,27 @@
 #!/bin/bash -ve
 
+if [ -z "$1" ]; then
+    DATA=/
+else
+    DATA=$1
+fi
+
+
 echo
 echo "** running simulation..."
 echo "** sleeping for 3 seconds..."
 sleep 3
 echo
-ls -a /input
+ls -a $DATA/input
 echo
-ls -a /output
+ls -a $DATA/output
 echo
-cat /input/parameters.json
+cat $DATA/input/parameters.json
 echo 
-cp -av /example_files/* /output
+cp -av /example_files/* $DATA/output
 echo
-cp -av input/parameters.json /output
+cp -av $DATA/input/parameters.json $DATA/output
 echo
-cp /bin/bash /output
+cp /bin/bash $DATA/output
 echo
 echo "done"

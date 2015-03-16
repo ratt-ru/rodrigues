@@ -44,12 +44,22 @@ ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST', 'rodrigues.meqtrees.net')]
 DOCKER_URI = 'unix://var/run/docker.sock'
 
 
-CYBERSKA_URI = os.environ.get('CYBERSKA_URI', 'please set CYBERSKA_URI env var')
+#CYBERSKA_URI = os.environ.get('CYBERSKA_URI', 'please set CYBERSKA_URI env var')
+CYBERSKA_URI = "http://192.168.59.103:8081/v1/viz"
 
 
-MEDIA_ROOT = '/media/'
+
+MEDIA_ROOT = '/storage/'
 MEDIA_URL = '/media/'
 
 DOCKER_SETTINGS = {
     'base_url': 'unix://var/run/docker.sock',
 }
+
+
+# used to determine if Django is running inside the matrix
+CONTAINER = True
+
+
+#if DEBUG:
+#    INSTALLED_APPS += ['django-debug-toolbar']
