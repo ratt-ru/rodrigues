@@ -61,5 +61,5 @@ DOCKER_SETTINGS = {
 CONTAINER = True
 
 
-#if DEBUG:
-#    INSTALLED_APPS += ['django-debug-toolbar']
+if DEBUG:
+    INSTALLED_APPS += ['debug_toolbar']
