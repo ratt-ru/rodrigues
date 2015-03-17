@@ -57,6 +57,8 @@ skaviewer:
     - storage
   environment:
     - REDIRECT_URI
+  volumes:
+    - pureweb.lic:/opt/CSI/PureWeb/Server/conf/pureweb.lic
   ports:
     - 8081:80
     - 8080:8080

@@ -15,11 +15,17 @@ run:
     $ sudo apt-get install -y python-pip git
     $ sudo pip install docker-compose
     $ git clone https://github.com/ska-sa/rodrigues && cd rodrigues
+
+Copy the cyberska viewer license file into the checkout and name it `pureweb.lic`.
+
+To start RODRIGUES:
+
     $ SECRET_KEY=secretkey docker-compose up
 
-Replace `secretkey` with something secret and random, it is used to create HTTP sessions.
+This will start a webserver on port 80. Replace `secretkey` with something secret and random, it
+is used to create HTTP sessions.
 
-This will start a webserver on port 80.
+
 
 There are more environment variables you may need to set:
  - **ALLOWED_HOST** (default: rodrigues.meqtrees.net)

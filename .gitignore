@@ -61,3 +61,6 @@ uploaded/
 # Sphinx documentation
 doc/_build/
 
+src/
+pureweb.lic
+

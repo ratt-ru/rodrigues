@@ -7,39 +7,51 @@
 
     <H1>Results for job #{{ job.id }} ({{ job.name }})</H1>
 
-    <form>
-        {% csrf_token %}
-        <div class="btn-group">
-            <button type="submit"
-                    formmethod="post"
-                    formaction="{% url 'job_reschedule' object.id %}"
-                    class="btn btn-warning"
-                    {% if not object.can_reschedule %}
-                    disabled="disabled"
-                    {% endif %}
-                    >Reschedule</button>
-            <a href="{% url 'viewer' object.id %}" class="btn btn-info" role="button">Refresh</a>
-            <a href="{% url 'job_delete' object.id %}" class="btn btn-danger" role="button">Delete</a>
+    <div class="row">
+        <div class="col-md-12">
 
         </div>
-    </form>
+    </div>
 
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-heading"><b>Job properties</b></div>
                 <div class="panel-body">
-                    <ul>
-                        <li><b>status:</b> <span class="label label-{{ object.get_task_status|status_label  }}">{{ object.get_task_status }}</span></li>
-                        <li><b>start:</b> {{ object.started }}</li>
-                        <li><b>finished:</b> {% if object.finished %}{{ object.finished }}{% endif %}</li>
-                        <li><b>duration:</b> {% if object.finished %}{{ object.duration }}{% endif %}</li>
-                        <li><b>docker_image:</b> {{ object.docker_image }}</li>
-                        <li><b>results_dir:</b> {{ object.results_dir }}</li>
-                    </ul>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul>
+                                <li><b>status:</b> <span class="label label-{{ object.get_task_status|status_label  }}">{{ object.get_task_status }}</span></li>
+                                <li><b>start:</b> {{ object.started }}</li>
+                                <li><b>finished:</b> {% if object.finished %}{{ object.finished }}{% endif %}</li>
+                                <li><b>duration:</b> {% if object.finished %}{{ object.duration }}{% endif %}</li>
+                                <li><b>docker_image:</b> {{ object.docker_image }}</li>
+                                <li><b>results_dir:</b> {{ object.results_dir }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <form>
+                                {% csrf_token %}
+
+                                <button type="submit"
+                                        formmethod="post"
+                                        formaction="{% url 'job_reschedule' object.id %}"
+                                        class="btn btn-warning"
+                                        {% if not object.can_reschedule %}
+                                        disabled="disabled"
+                                        {% endif %}
+                                        >Reschedule</button>
+                                <a href="{% url 'viewer' object.id %}" class="btn btn-info" role="button">Refresh</a>
+                                <a href="{% url 'job_delete' object.id %}" class="btn btn-danger" role="button">Delete</a>
+
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
 
 
@@ -67,16 +79,19 @@
                                 <td>{{ item.size|filesizeformat }}</td>
                                 <td>{{ item.modified }}</td>
                                 <td>
-                                    <div class="btn-group">
-                                        <a href="{% url 'guesstype' pk=object.id path=item.name %}"><button class="btn">view</button></a>
-                                        <a href="{{ MEDIA_URL }}/{{ object.results_dir }}/{{ item.name }}"><button class="btn">download</button></a>
 
-                                        <form action="http://192.168.59.103:8081/v1/viz" method="post">
-                                            <input type="hidden" name="title" value="Residual image" />
-                                            <input type="hidden" name="filename" value="{{ MEDIA_ROOT }}/{{ object.results_dir }}/{{ item.name }}">
-                                            <input type="submit" class="btn" value="viewer"/>
-                                        </form>
-                                    </div>
+                                    <form action="{{ CYBERSKA_URI }}" method="post">
+
+                                        <a href="{% url 'guesstype' pk=object.id path=item.name %}"><button class="btn btn-xs">view</button></a>
+                                        <a href="{{ MEDIA_URL }}/{{ object.results_dir }}/{{ item.name }}"><button class="btn btn-xs">download</button></a>
+
+
+                                        <input type="hidden" name="title" value="Residual image" />
+                                        <input type="hidden" name="filename" value="{{ MEDIA_ROOT }}/{{ object.results_dir }}/{{ item.name }}">
+                                        <input type="submit" class="btn btn-xs" value="viewer"/>
+
+
+                                    </form>
                                 </td>
                             </tr>
                         {%  endfor %}
