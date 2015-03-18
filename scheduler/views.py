@@ -6,9 +6,9 @@ import logging
 
 from django.contrib import messages
 from django.views.generic.edit import FormView
-from django.views.generic import ListView, DetailView, DeleteView
+from django.views.generic import ListView, DeleteView
 from django.http import Http404
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.core.urlresolvers import reverse_lazy
 from django.http.response import HttpResponseRedirect
 
 import scheduler.forms
@@ -46,7 +46,7 @@ def list_forms():
     return [x[1] for x in pkgutil.iter_modules(forms_module.__path__)]
 
 
-class FormsList(ListView, LoginRequiredMixin):
+class FormsList(LoginRequiredMixin, ListView):
     template_name = "scheduler/form_list.html"
     queryset = list_forms()
 
@@ -55,12 +55,12 @@ class JobList(ListView):
     model = Job
 
 
-class JobDelete(DeleteView, LoginRequiredMixin):
+class JobDelete(LoginRequiredMixin, DeleteView):
     model = Job
     success_url = reverse_lazy('job_list')
 
 
-class JobCreate(FormView, LoginRequiredMixin):
+class JobCreate(LoginRequiredMixin, FormView):
     model = Job
     success_url = reverse_lazy('job_list')
     template_name = 'scheduler/job_create.html'
@@ -92,14 +92,21 @@ class JobCreate(FormView, LoginRequiredMixin):
             return self.form_invalid(form)
 
 
-class JobReschedule(LoginRequiredMixin, DetailView):
+class JobReschedule(LoginRequiredMixin, DeleteView):
     model = Job
+    success_url = reverse_lazy('job_list')
 
-    def get(self, request, *args, **kwargs):
-        super(JobReschedule, self).get(self, request, *args, **kwargs)
-        return HttpResponseRedirect(reverse('job_list'))
+    def reschedule(self, request, *args, **kwargs):
+        """
+        Calls the delete() method on the fetched object and then
+        redirects to the success URL.
+        """
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        schedule_simulation(self.object, request)
+        return HttpResponseRedirect(success_url)
 
+    # Add support for browsers which only accept GET and POST for now.
     def post(self, request, *args, **kwargs):
-            self.object = self.get_object()
-            schedule_simulation(self.object, request)
-            return HttpResponseRedirect(reverse('job_list'))
+        return self.reschedule(request, *args, **kwargs)
+

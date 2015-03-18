@@ -15,6 +15,13 @@ from scheduler.models import Job
 logger = logging.getLogger(__name__)
 
 
+def crashed(job, msg):
+        job.log += msg
+        job.state = job.CRASHED
+        job.save()
+        logger.error(msg)
+
+
 @shared_task
 def simulate(job_id):
     job = Job.objects.get(pk=job_id)
@@ -30,10 +37,7 @@ def simulate(job_id):
         client.version()
     except requests.exceptions.ConnectionError as e:
         msg = "Can't connect to docker daemon:\n%s\n" % str(e)
-        job.log += msg
-        job.state = job.CRASHED
-        job.save()
-        logger.error(msg)
+        crashed(job, msg)
         raise
 
     tempdir = tempfile.mkdtemp(dir=settings.MEDIA_ROOT,
@@ -61,27 +65,26 @@ def simulate(job_id):
                                             )
     except requests.exceptions.ConnectionError as e:
         msg = "cant create container: %s" % str(e)
-        logging.error(msg)
-        job.log += msg
-        job.state = job.CRASHED
-        job.save()
+        crashed(job, msg)
         raise
 
-    if hasattr(settings, 'CONTAINER'):
-        client.start(container,
-                     volumes_from='rodrigues_storage_1')
-    else:
-        client.start(container,
-                     binds={tempdir: {'bind': tempdir}})
+    try:
+        if hasattr(settings, 'CONTAINER'):
+            client.start(container,
+                         volumes_from='rodrigues_storage_1')
+        else:
+            client.start(container,
+                         binds={tempdir: {'bind': tempdir}})
+    except requests.exceptions.HTTPError as e:
+        msg = "can't start container: %s" % str(e)
+        crashed(job, msg)
+        raise
 
     state = client.wait(container)
     job.log += client.logs(container).decode()
     if state != 0:
         msg = "simulation crashed (state %s)" % state
-        logger.warning(msg)
-        job.log += msg
-        job.state = job.CRASHED
-        job.save()
+        crashed(job, msg)
         raise Exception(msg)
     else:
         msg = "simulation finished"

@@ -123,7 +123,8 @@ moresane = (
 
 
 class Form(BetterForm):
-    docker_image = 'simulation/development'
+    #docker_image = 'simulation/development'
+    docker_image = 'radioastro/simulator'
 
     class Meta:
         fieldsets = [('telescope', {'fields': telescope,
