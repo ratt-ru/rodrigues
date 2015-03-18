@@ -31,7 +31,7 @@ is used to create HTTP sessions.
 
 There are more environment variables you may need to set:
  - **ALLOWED_HOST** (default: rodrigues.meqtrees.net)
- - **CYBERSKA_URI** (no default)
+ - **CYBERSKA_URI** (default: http://ALLOWED_HOSTS:8081/v1/viz)
  - **ADMIN_EMAIL**
  - **DEBUG** set to true to enable debugging mode (default: off)
 

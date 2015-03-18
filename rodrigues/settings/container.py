@@ -38,15 +38,16 @@ DATABASES = {
 BROKER_URL = 'amqp://broker/'
 
 
-ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST', 'rodrigues.meqtrees.net')]
+ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST', ['rodrigues.meqtrees.net'])]
 
 
 DOCKER_URI = 'unix://var/run/docker.sock'
 
 
-#CYBERSKA_URI = os.environ.get('CYBERSKA_URI', 'please set CYBERSKA_URI env var')
-CYBERSKA_URI = "http://192.168.59.103:8081/v1/viz"
+CYBERSKA_URI = os.environ.get('CYBERSKA_URI', '')
 
+if not CYBERSKA_URI.strip():
+    CYBERSKA_URI =  'http://%s:8081/v1/viz' % ALLOWED_HOSTS[0]
 
 
 MEDIA_ROOT = '/storage/'

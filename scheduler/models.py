@@ -1,7 +1,6 @@
 
-from django.db.models import Model, CharField, DateTimeField, TextField
-from celery.result import AsyncResult
-import celery.states
+from django.db.models import Model, CharField, DateTimeField, TextField, ForeignKey
+from django.contrib.auth.models import User
 
 
 class Job(Model):
@@ -13,61 +12,32 @@ class Job(Model):
     config = TextField()
     docker_image = CharField(max_length=100, null=True, blank=True)
     results_dir = CharField(max_length=20, null=True, blank=True)
+    owner = ForeignKey(User)
 
     # status of the task
+    CREATED = 'I'
     SCHEDULED = 'S'
     RUNNING = 'R'
     CRASHED = 'C'
     FINISHED = 'F'
 
     STATE_TYPES = (
-        (SCHEDULED, 'scheduled'),
-        (RUNNING, 'running'),
-        (CRASHED, 'crashed'),
-        (FINISHED, 'finished'),
+        (CREATED, 'CREATED'),
+        (SCHEDULED, 'SCHEDULED'),
+        (RUNNING, 'RUNNING'),
+        (CRASHED, 'CRASHED'),
+        (FINISHED, 'FINISHED'),
     )
-    state = CharField(choices=STATE_TYPES, max_length=1, default=SCHEDULED)
+    state = CharField(choices=STATE_TYPES, max_length=1, default=CREATED)
 
     def __str__(self):
         return "<simulation name='%s' id=%s>" % (self.name, self.id)
-
-    def set_crashed(self, error):
-        self.state = self.CRASHED
-        self.log = error
-        self.started = None
-        self.finished = None
-        self.save(update_fields=["state", "log", "started", "finished"])
-
-    def set_scheduled(self):
-        self.state = self.SCHEDULED
-        self.started = None
-        self.finished = None
-        self.log = ""
-        self.save(update_fields=["state", "started", "finished"])
-
-    def get_task_status(self):
-        if not self.task_id:
-            return 'NO TASK ID'
-        try:
-            broker_status = AsyncResult(self.task_id).status
-            # somehow the job is running but status is PENDING
-            if broker_status == celery.states.PENDING and \
-                            self.state == self.RUNNING:
-                return celery.states.STARTED
-            elif broker_status == celery.states.SUCCESS and \
-                self.state == self.CRASHED:
-                return celery.states.FAILURE
-            return broker_status
-        except OSError as e:
-            return "BROKER DOWN: " + str(e)
 
     def can_reschedule(self):
         """
         We want only to be able reschedule jobs that are finished
         """
-        return self.get_task_status() in (celery.states.SUCCESS,
-                                          celery.states.FAILURE,
-                                          celery.states.REVOKED)
+        return self.state in (self.CRASHED, self.FINISHED)
 
     def duration(self):
         if self.finished and self.started:

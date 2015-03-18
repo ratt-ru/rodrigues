@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 import tempfile
-import shutil
 import os
 
 from celery import shared_task
@@ -20,16 +19,19 @@ logger = logging.getLogger(__name__)
 def simulate(job_id):
     job = Job.objects.get(pk=job_id)
     job.log = "running...\n"
+    job.state = job.RUNNING
     job.started = datetime.now(timezone(settings.TIME_ZONE))
-    job.save(update_fields=["started", "log"])
+    job.save()
     logger.info('starting job %s' % job_id)
 
     client = docker.Client(**settings.DOCKER_SETTINGS)
+
     try:
         client.version()
     except requests.exceptions.ConnectionError as e:
         msg = "Can't connect to docker daemon:\n%s\n" % str(e)
         job.log += msg
+        job.state = job.CRASHED
         job.save()
         logger.error(msg)
         raise
@@ -61,6 +63,7 @@ def simulate(job_id):
         msg = "cant create container: %s" % str(e)
         logging.error(msg)
         job.log += msg
+        job.state = job.CRASHED
         job.save()
         raise
 
@@ -71,17 +74,19 @@ def simulate(job_id):
         client.start(container,
                      binds={tempdir: {'bind': tempdir}})
 
-    status = client.wait(container)
+    state = client.wait(container)
     job.log += client.logs(container).decode()
-    if status != 0:
-        msg = "simulation crashed (status %s)" % status
+    if state != 0:
+        msg = "simulation crashed (state %s)" % state
         logger.warning(msg)
         job.log += msg
-        job.save(update_fields=["log"])
+        job.state = job.CRASHED
+        job.save()
         raise Exception(msg)
     else:
         msg = "simulation finished"
         logger.info(msg)
+        job.state = job.FINISHED
         job.log += msg
-    job.finished = datetime.now(timezone(settings.TIME_ZONE))
-    job.save()
+        job.finished = datetime.now(timezone(settings.TIME_ZONE))
+        job.save()

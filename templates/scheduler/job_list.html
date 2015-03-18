@@ -18,6 +18,7 @@
                 <th>status</th>
                 <th>started</th>
                 <th>finished</th>
+                <th>owner</th>
                 <th>actions</th>
             </tr>
             </thead>
@@ -26,9 +27,10 @@
                 <tr>
                     <td><a href="{%  url 'viewer' object.id %}">{{ object.id }}</a></td>
                     <td>{{ object.name }}</td>
-                    <td><a href="{%  url 'viewer' object.id %}"><span class="label label-{{ object.get_task_status|status_label }}"> {{ object.get_task_status }}</span></a></td>
+                    <td><a href="{%  url 'viewer' object.id %}"><span class="label label-{{ object.state|status_label }}"> {{ object.get_state_display }}</span></a></td>
                     <td>{{ object.started }}</td>
                     <td>{{ object.finished }}</td>
+                    <td>{{ object.owner }}</td>
                     <td>
                         <div class="btn-group">
                             <form>

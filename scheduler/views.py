@@ -30,23 +30,23 @@ def schedule_simulation(job, request):
     try:
         async = simulate.delay(job_id=job.id)
     except (OSError, socket.error) as e:
+        job.state = job.CRASHED
         error = "can't connect to broker %s: %s" % (job.id,
                                                    str(e))
         messages.error(request, error)
         logger.error(error)
         job.log = error
-        job.save()
     else:
         job.task_id = async.task_id
-        job.save(update_fields=["task_id"])
-        job.set_scheduled()
+        job.state = job.SCHEDULED
+    job.save()
 
 
 def list_forms():
     return [x[1] for x in pkgutil.iter_modules(forms_module.__path__)]
 
 
-class FormsList(ListView):
+class FormsList(ListView, LoginRequiredMixin):
     template_name = "scheduler/form_list.html"
     queryset = list_forms()
 
@@ -55,7 +55,7 @@ class JobList(ListView):
     model = Job
 
 
-class JobDelete(DeleteView):
+class JobDelete(DeleteView, LoginRequiredMixin):
     model = Job
     success_url = reverse_lazy('job_list')
 
@@ -81,6 +81,7 @@ class JobCreate(FormView, LoginRequiredMixin):
         form = self.get_form(form_class)
         if form.is_valid():
             self.object = Job()
+            self.object.owner = request.user
             self.object.config = json.dumps(form.cleaned_data)
             self.object.name = form.data['name']
             self.object.docker_image = form.docker_image
@@ -96,11 +97,9 @@ class JobReschedule(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         super(JobReschedule, self).get(self, request, *args, **kwargs)
-        return HttpResponseRedirect(reverse('job_detail',
-                                            args=(self.object.id,)))
+        return HttpResponseRedirect(reverse('job_list'))
 
     def post(self, request, *args, **kwargs):
             self.object = self.get_object()
             schedule_simulation(self.object, request)
-            return HttpResponseRedirect(reverse('job_detail',
-                                                args=(self.object.id,)))
+            return HttpResponseRedirect(reverse('job_list'))

@@ -22,7 +22,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <ul>
-                                <li><b>status:</b> <span class="label label-{{ object.get_task_status|status_label  }}">{{ object.get_task_status }}</span></li>
+                                <li><b>status:</b> <span class="label label-{{ object.state|status_label }}">{{ object.get_state_display }}</span></li>
                                 <li><b>start:</b> {{ object.started }}</li>
                                 <li><b>finished:</b> {% if object.finished %}{{ object.finished }}{% endif %}</li>
                                 <li><b>duration:</b> {% if object.finished %}{{ object.duration }}{% endif %}</li>
