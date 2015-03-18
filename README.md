@@ -18,6 +18,8 @@ run:
 
 Copy the cyberska viewer license file into the checkout and name it `pureweb.lic`.
 
+### running 
+
 To start RODRIGUES:
 
     $ SECRET_KEY=secretkey docker-compose up
@@ -25,7 +27,7 @@ To start RODRIGUES:
 This will start a webserver on port 80. Replace `secretkey` with something secret and random, it
 is used to create HTTP sessions.
 
-
+### configuration
 
 There are more environment variables you may need to set:
  - **ALLOWED_HOST** (default: rodrigues.meqtrees.net)
@@ -33,13 +35,15 @@ There are more environment variables you may need to set:
  - **ADMIN_EMAIL**
  - **DEBUG** set to true to enable debugging mode (default: off)
 
-
-## Initialise DB
+### Initialise DB
 
 First time you run this app you need to create and populate the database
 
     $ docker-compose run worker python3 manage.py syncdb
 
+### Fetching / creating simulation containers
+
+Note that you may need to pull or create the simulation containers.
 
 ## Development setup
 
