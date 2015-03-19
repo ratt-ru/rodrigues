@@ -38,6 +38,7 @@ observation = (
 
 # imaging settings
 imaging = (
+    'use_default_im',
     'imager',
     'im_npix',
     'im_cellsize',
@@ -149,41 +150,41 @@ class Form(BetterForm):
                      ]
 
     SKY_TYPES = (
-        ('T', 'Tigger-LSM'),
-        ('A', 'ASCII'),
-        ('F', 'FITS'),
-        ('S', 'KATALOG'),  # this is a catalog of known skies
+        ('Tigger-LSM', 'Tigger-LSM'),
+        ('ASCII', 'ASCII'),
+        ('FITS', 'FITS'),
+        ('KATALOG', 'KATALOG'),  # this is a catalog of known skies
     )
 
     OUTPUT_TYPES = (
-        ('I', 'Image'),
-        ('V', 'Visibilities'),
+        ('Image', 'Image'),
+        ('Visibilities', 'Visibilities'),
     )
 
     OBSERVATORIES = (
-        ('MK', 'MeerKAT'),
-        ('K7', 'KAT-7'),
-        ('JA', 'JVLA-A'),
+        ('MeerKAT', 'MeerKAT'),
+        ('KAT', 'KAT-7'),
+        ('JVLA-A', 'JVLA-A'),
     )
 
     KATALOG = (
-        ('NV', 'nvss6deg'),
-        ('S3', 'scubed1deg'),
-        ('K3', '3c147_field'),
-        ('K4', '3c147_field_no_core'),
+        ('nvss6deg', 'nvss6deg'),
+        ('scubed1deg', 'scubed1deg'),
+        ('3c147_field', '3c147_field'),
+        ('3c147_field_no_core', '3c147_field_no_core'),
     )
 
     # Telescope setup
     name = CharField(initial='New simulation', max_length=200)
     observatory = ChoiceField(initial='MK', choices=OBSERVATORIES)
-    output = ChoiceField(label='Output type', choices=OUTPUT_TYPES, initial='I')
+    output = ChoiceField(label='Output type', choices=OUTPUT_TYPES, initial='Image')
     sefd = FloatField(label='SEFD', required=False,
                       help_text='System defaults will be used if left blank')
 
     # sky setup
-    sky_type = ChoiceField(choices=SKY_TYPES, initial='T')
+    sky_type = ChoiceField(choices=SKY_TYPES, initial='Tigger-LSM')
     sky_model = FileField(required=False)
-    katalog_id = ChoiceField(label='KATALOG', required=False, initial='NV', choices=KATALOG,
+    katalog_id = ChoiceField(label='KATALOG', required=False, initial='nvss6deg', choices=KATALOG,
                              help_text='Choose from our sky catalogs')
     radius = FloatField(label='Radius', initial=0.5, required=False,
                         help_text='Radius of degrees')
@@ -216,36 +217,28 @@ class Form(BetterForm):
     ms_nchan = IntegerField(label='Channels', initial=1,
                             help_text='Number of frequency channels')
 
-    BEAM_TYPES = (
-        ('M', 'MeerKAT-1'),
-        ('N', 'MeerKAT-2'),
-        ('O', 'MeerKAT-3'),
-        ('K', 'KAT-7'),
-        ('W', 'WSRT'),
-        ('J', 'JVLA'),
-    )
-
-
     IMAGERS = (
-        ('LW', 'LWIMAGER'),
-        ('WS', 'WSCLEAN'),
-        ('CA', 'CASA'),
+        ('LWIMAGER', 'LWIMAGER'),
+        ('WSCLEAN', 'WSCLEAN'),
+        ('CASA', 'CASA'),
     )
 
     WEIGHTING_TYPES = (
-        ('N', 'Natural'),
-        ('U', 'Uniform'),
-        ('B', 'Briggs'),
+        ('Natural', 'Natural'),
+        ('Uniform', 'Uniform'),
+        ('Briggs', 'Briggs'),
     )
 
     IMAGING_TYPES = (
-        ('C', 'channel'),
-        ('M', 'mfs'),
-        ('V', 'velocity'),
-        ('F', 'frequency'),
+        ('channel', 'channel'),
+        ('mfs', 'mfs'),
+        ('velocity', 'velocity'),
+        ('frequency', 'frequency'),
     )
 
     # imaging settings
+    use_default_im = BooleanField(label='Use default imaging settings',
+                                  initial=True, required=False)
     imager = ChoiceField(label='Imager', initial='LW', choices=IMAGERS)
     im_npix = IntegerField(label='Image size', initial=512, help_text='in pixels')
     im_cellsize = FloatField(label='Pixel size', help_text='in arcseconds',
@@ -266,10 +259,10 @@ class Form(BetterForm):
     im_stokes = CharField(label='Stokes', initial='I', max_length=4)
 
     CLEAN_TYPES = (
-        ('C', 'csclean'),
-        ('H', 'hogbom'),
-        ('D', 'clark'),
-        ('M', 'multiscale'),
+        ('csclean', 'csclean'),
+        ('hogbom', 'hogbom'),
+        ('clark', 'clark'),
+        ('multiscale', 'multiscale'),
     )
 
 
@@ -324,19 +317,19 @@ class Form(BetterForm):
                                  max_length=32)
 
     PSF_MODE = (
-        ('CL', 'clark'),
-        ('CS', 'clarkstokes'),
-        ('H', 'hogbom'),
+        ('clark', 'clark'),
+        ('clarkstokes', 'clarkstokes'),
+        ('hogbom', 'hogbom'),
     )
 
     IMAGER_MODE = (
-        ('C', 'csclean'),
-        ('M', 'mosiac'),
+        ('csclean', 'csclean'),
+        ('mosiac', 'mosiac'),
     )
 
     GRID_MODE = (
-        ('W', 'widefield'),
-        ('A', 'aprojection'),
+        ('widefield', 'widefield'),
+        ('aprojection', 'aprojection'),
     )
 
     #casa
@@ -346,10 +339,10 @@ class Form(BetterForm):
     casa_sigmalevel = FloatField(label='Clean sigma level', initial=0,
                                  help_text='In sigma above noise')
     casa_gain = FloatField(label='Loop Gain',
-                           initial='0.1',
+                           initial=0.1,
                            help_text='Clean Loop gain')
     casa_psfmode = ChoiceField(label='PSF mode',
-                               initial='CL',
+                               initial='clark',
                                choices=PSF_MODE)
     casa_imagermode = ChoiceField(label='Imager mode',
                                   required=False,
@@ -358,7 +351,7 @@ class Form(BetterForm):
     casa_gridmode = ChoiceField(label='Grid mode',
                                 required=False,
                                 choices=GRID_MODE,
-                                initial='W',
+                                initial='widefield',
                                 help_text='A-projection only works JVLA')
     casa_nterms = IntegerField(label='NTERMS',
                                initial=1,
@@ -384,8 +377,8 @@ class Form(BetterForm):
 
     #moresane
     CONV_TYPES = (
-        ('C', 'circular'),
-        ('L', 'linear'),
+        ('circular', 'circular'),
+        ('linear', 'linear'),
     )
 
     moresane = BooleanField(label='Deconvolve with me!', required=False)
@@ -408,7 +401,7 @@ class Form(BetterForm):
     moresane_minorloopmiter = IntegerField(label='Minor loop iterations',
                                            initial=50)
     moresane_convmode = ChoiceField(label='Convolution mode',
-                                    initial='C',
+                                    initial='circular',
                                     choices=CONV_TYPES)
     moresane_enforcepositivity = BooleanField(label='Enforce Positivity',
                                               required=False)
