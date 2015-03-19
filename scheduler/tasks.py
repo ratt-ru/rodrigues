@@ -38,7 +38,7 @@ def crashed(job, msg):
         body = mail_body % ('crashed', job.id, job.name, job.started,
                             job.finished, job.duration(), job.log)
         send_mail('Your RODRIGUES job %s has crashed' % job.id, body,
-                  settings.SERVER_EMAIL, [job.owner.email], fail_silently=True)
+                  settings.SERVER_EMAIL, [job.owner.email], fail_silently=False)
 
 
 @shared_task
@@ -104,7 +104,6 @@ def simulate(job_id):
     if state != 0:
         msg = "simulation crashed (state %s)" % state
         crashed(job, msg)
-        raise Exception(msg)
     else:
         msg = "simulation finished"
         logger.info(msg)

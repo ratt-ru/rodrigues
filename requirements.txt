@@ -5,7 +5,7 @@ docker-py
 psycopg2
 uwsgi
 astropy==1.0.1
--e git://github.com/aplpy/aplpy.git@9d330feebec95bcf83bfa3aea273d295e1fdc363#egg=APLpy
+git+git://github.com/aplpy/aplpy.git@9d330feebec95bcf83bfa3aea273d295e1fdc363#egg=APLpy
 matplotlib
 filemagic
 django-debug-toolbar

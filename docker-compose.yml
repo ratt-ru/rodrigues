@@ -42,6 +42,8 @@ django:
     - CYBERSKA_URI
     - ADMIN_EMAIL
     - DEBUG
+    - EMAIL_HOST_USER
+    - EMAIL_HOST_PASSWORD
   volumes:
     - .:/code
     - /socket

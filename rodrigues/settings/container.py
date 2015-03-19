@@ -2,6 +2,7 @@
 specific config for inside container
 """
 
+import warnings
 from .base import *
 
 
@@ -64,3 +65,16 @@ CONTAINER = True
 
 if DEBUG:
     INSTALLED_APPS += ['debug_toolbar']
+
+
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.mailgun.org')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', False)
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', False)
+
+if not EMAIL_HOST_USER:
+    warnings.warn('!!! EMAIL_HOST_USER is not set !!!')
+
+if not EMAIL_HOST_PASSWORD:
+    warnings.warn('!!! EMAIL_HOST_PASSWORD is not set !!!')
