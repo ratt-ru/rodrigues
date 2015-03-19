@@ -7,6 +7,7 @@ from celery import shared_task
 from pytz import timezone
 import docker
 from django.conf import settings
+from django.core.mail import send_mail
 import requests.exceptions
 
 from scheduler.models import Job
@@ -14,12 +15,30 @@ from scheduler.models import Job
 
 logger = logging.getLogger(__name__)
 
+mail_body = """
+Your RODRIGUES job has %s.
+
+ID: %s
+name: %s
+started: %s
+finished: %s
+duration: %s
+
+
+%s
+"""
+
 
 def crashed(job, msg):
         job.log += msg
         job.state = job.CRASHED
+        job.finished = datetime.now(timezone(settings.TIME_ZONE))
         job.save()
         logger.error(msg)
+        body = mail_body % ('crashed', job.id, job.name, job.started,
+                            job.finished, job.duration(), job.log)
+        send_mail('Your RODRIGUES job %s has crashed' % job.id, body,
+                  settings.SERVER_EMAIL, [job.owner.email], fail_silently=True)
 
 
 @shared_task
@@ -93,3 +112,7 @@ def simulate(job_id):
         job.log += msg
         job.finished = datetime.now(timezone(settings.TIME_ZONE))
         job.save()
+        body = mail_body % ('finished', job.id, job.name, job.started,
+                            job.finished, job.duration(), job.log)
+        send_mail('Your RODRIGUES job %s has finished' % job.id, body,
+                  settings.SERVER_EMAIL, [job.owner.email], fail_silently=True)
