@@ -6,7 +6,7 @@ import logging
 
 from django.contrib import messages
 from django.views.generic.edit import FormView
-from django.views.generic import ListView, DeleteView
+from django.views.generic import ListView, DeleteView, DetailView
 from django.http import Http404
 from django.core.urlresolvers import reverse_lazy
 from django.http.response import HttpResponseRedirect
@@ -92,7 +92,7 @@ class JobCreate(LoginRequiredMixin, FormView):
             return self.form_invalid(form)
 
 
-class JobReschedule(LoginRequiredMixin, DeleteView):
+class JobReschedule(LoginRequiredMixin, DetailView):
     model = Job
     success_url = reverse_lazy('job_list')
 
@@ -109,4 +109,8 @@ class JobReschedule(LoginRequiredMixin, DeleteView):
     # Add support for browsers which only accept GET and POST for now.
     def post(self, request, *args, **kwargs):
         return self.reschedule(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return self.success_url
+
 
