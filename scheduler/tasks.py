@@ -89,7 +89,8 @@ def simulate(job_id):
                                             command='/run.sh ' + tempdir,
 
                                             )
-    except requests.exceptions.ConnectionError as e:
+    except (requests.exceptions.ConnectionError,
+            requests.exceptions.HTTPError) as e:
         msg = "cant create container: %s" % str(e)
         crashed(job, msg)
         raise
