@@ -28,7 +28,6 @@ worker:
   volumes_from:
     - storage
 
-
 django:
   build: .
   command: uwsgi --socket /socket/rodrigues.sock --module rodrigues.wsgi --chmod-socket=666
@@ -37,11 +36,11 @@ django:
     - broker
   environment:
     - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
-    - SECRET_KEY="change this by defining SECRET_KEY env var"
-    - ALLOWED_HOST
+    - SECRET_KEY
+    - SERVER_NAME
     - CYBERSKA_URI
-    - ADMIN_EMAIL
     - DEBUG
+    - SERVER_EMAIL
     - EMAIL_HOST_USER
     - EMAIL_HOST_PASSWORD
   volumes:
