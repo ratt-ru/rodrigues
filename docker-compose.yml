@@ -9,6 +9,7 @@ db:
 
 broker:
   image: rabbitmq:3.5
+  cmd: /usr/lib/rabbitmq/lib/rabbitmq_server-3.5.0/sbin/rabbitmq-server
 
 
 worker:
