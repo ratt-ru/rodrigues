@@ -4,10 +4,10 @@ from django.conf.urls import patterns, url
 from .views import FitsView,  OverView, SomethingView, TextView
 
 
-fits_url = url(r'^(?P<pk>\d+)/fits/(?P<path>[\w._/]+)/$', FitsView.as_view(),
+fits_url = url(r'^(?P<pk>\d+)/fits/(?P<path>[\w._/-]+)/$', FitsView.as_view(),
                name='fits')
 
-text_url = url(r'^(?P<pk>\d+)/text/(?P<path>[\w._/]+)/$', TextView.as_view(),
+text_url = url(r'^(?P<pk>\d+)/text/(?P<path>[\w._/-]+)/$', TextView.as_view(),
                name='text')
 
 overview_url = url(r'^(?P<pk>\d+)/overview/$', OverView.as_view(),

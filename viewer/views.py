@@ -113,7 +113,8 @@ class OverView(DetailView):
             type_ = filemagic.id_filename(fullpath)
             size = os.path.getsize(fullpath)
             modified = time.ctime(os.path.getmtime(fullpath))
-            is_image = type_.startswith('FITS image data')
+            is_image = type_.startswith('FITS image data') or \
+                       type_.startswith('PNG image data')
             if is_image:
                 images.append(name)
             dirlist += [DirItem(fullpath, name, type_, size, modified,
@@ -160,6 +161,10 @@ class SomethingView(DetailView):
             return HttpResponseRedirect(reverse('text',
                                                 kwargs={'pk': self.object.id,
                                                         'path': self.kwargs['path']}))
+        if context['type'].startswith('PNG image data'):
+            return HttpResponseRedirect('/'.join([settings.MEDIA_URL,
+                                                 self.object.results_dir,
+                                                 self.kwargs['path']]))
 
         return super(SomethingView, self).render_to_response(context)
 
