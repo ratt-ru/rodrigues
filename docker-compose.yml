@@ -8,7 +8,7 @@ db:
 
 
 broker:
-  image: dockerfile/rabbitmq
+  image: rabbitmq:3.5
 
 
 worker:
