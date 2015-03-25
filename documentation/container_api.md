@@ -24,31 +24,13 @@ This page describes the layout of a simulation container.
 
 
 
-## options
-
-We distinguish 2 different type of containers, split IO containers and joined IO
-containers. The only difference is that split IO has one read only `input` and
-one read/write `output` folder, while joined IO combines these in one `work`
-folder.
-
-It is important that you only write important files to the output and work
-folder, since these may be automatically processed and stored in next steps in
-the pipeline.
 
 ## commands:
-Command to run the split IO simulator:
+Example command to run the split IO simulator:
 ```
 docker run \
     -v <input_folder>/input:ro \
     -v <output_folder>/output:rw \
-    <container_name>
-    /run.sh
-```
-
-Command to run the joined IO simulator:
-```
-docker run \
-    -v <inputfiles>/work:rw \
     <container_name>
     /run.sh
 ```
