@@ -63,4 +63,6 @@ doc/_build/
 
 src/
 pureweb.lic
+ssl.crt
+ssl.key
 
