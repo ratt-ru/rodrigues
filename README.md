@@ -1,4 +1,6 @@
-# RODRIGUES - a web based radio telescope calibration simulation
+# RODRIGUES
+
+RODRIGUES stands for **R**ATT **O**nline **D**econvolved **R**adio **I**mage **G**eneration **U**sing **E**soteric **S**oftware and is a web based radio telescope calibration simulation. From a technical perspective it is a web based parameterised container scheduler with a result set viewer.
 
 ## Installation
 
@@ -16,7 +18,8 @@ run:
     $ sudo pip install docker-compose
     $ git clone https://github.com/ska-sa/rodrigues && cd rodrigues
 
-Copy the cyberska viewer license file into the checkout and name it `pureweb.lic`.
+
+To use the Cyber SKA FITS file viewer, copy the cyberska viewer license file into the checkout and name it `pureweb.lic`.
 
 ### running 
 
@@ -30,8 +33,8 @@ is used to create HTTP sessions.
 ### configuration
 
 There are more environment variables you may need to set:
- - **ALLOWED_HOST** (default: rodrigues.meqtrees.net)
- - **CYBERSKA_URI** (default: http://ALLOWED_HOSTS:8081/v1/viz)
+ - **SERVER_NAME** (default: rodrigues.meqtrees.net)
+ - **CYBERSKA_URI** (default: http://SERVER_NAME:8081/v1/viz)
  - **ADMIN_EMAIL**
  - **DEBUG** set to true to enable debugging mode (default: off)
 
