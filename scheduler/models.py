@@ -30,6 +30,9 @@ class Job(Model):
     )
     state = CharField(choices=STATE_TYPES, max_length=1, default=CREATED)
 
+    class Meta:
+        ordering = ["started"]
+
     def __str__(self):
         return "<simulation name='%s' id=%s>" % (self.name, self.id)
 
