@@ -162,7 +162,7 @@ class Form(BetterForm):
 
     OBSERVATORIES = (
         ('MeerKAT', 'MeerKAT'),
-        ('KAT', 'KAT-7'),
+        ('KAT-7', 'KAT-7'),
         ('JVLA-A', 'JVLA-A'),
     )
 
