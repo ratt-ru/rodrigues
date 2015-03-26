@@ -114,7 +114,8 @@ class OverView(DetailView):
             size = os.path.getsize(fullpath)
             modified = time.ctime(os.path.getmtime(fullpath))
             is_image = type_.startswith('FITS image data') or \
-                       type_.startswith('PNG image data')
+                       type_.startswith('PNG image data') or \
+                       type_.startswith('JPEG image data')
             if is_image:
                 images.append(name)
             dirlist += [DirItem(fullpath, name, type_, size, modified,
@@ -153,15 +154,16 @@ class SomethingView(DetailView):
         return context
 
     def render_to_response(self, context, **response_kwargs):
-        if context['type'].startswith("FITS image data"):
+        type_ = context['type']
+        if type_.startswith("FITS image data"):
             return HttpResponseRedirect(reverse('fits',
                                                 kwargs={'pk': self.object.id,
                                                         'path': self.kwargs['path']}))
-        if context['type'].startswith("ASCII text"):
+        if type_.startswith("ASCII text"):
             return HttpResponseRedirect(reverse('text',
                                                 kwargs={'pk': self.object.id,
                                                         'path': self.kwargs['path']}))
-        if context['type'].startswith('PNG image data'):
+        if type_.startswith('PNG image data') or type_.startswith('JPEG image data'):
             return HttpResponseRedirect('/'.join([settings.MEDIA_URL,
                                                  self.object.results_dir,
                                                  self.kwargs['path']]))
