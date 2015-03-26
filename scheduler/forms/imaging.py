@@ -289,7 +289,7 @@ class Form(BetterForm):
     wsclean = BooleanField(label='Deconvolve with me!', required=False)
     wsclean_niter = IntegerField(label='NITER', initial=1000)
     wsclean_gain = FloatField(label='Minor loop gain', initial=0.1)
-    wsclean_mgain = FloatField(label='Major loop gain', initial=0.1)
+    wsclean_mgain = FloatField(label='Major loop gain', initial=0.9)
     wsclean_threshold = FloatField(label='Clean Threshold', initial=0,
                                    help_text='In Jy')
     wsclean_sigmalevel = FloatField(label='Clean sigma level', initial=0,
