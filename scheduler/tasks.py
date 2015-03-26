@@ -59,28 +59,10 @@ def simulate(job_id):
         crashed(job, msg)
         raise
 
-    try:
-        tempdir = tempfile.mkdtemp(dir=os.path.realpath(settings.MEDIA_ROOT),
-                                   prefix=str(job_id))
+    tempdir = os.path.join(os.path.realpath(settings.MEDIA_ROOT),
+                           job.results_dir)
 
-        # Nginx container runs as unprivileged
-        os.chmod(tempdir, 0o0755)
-
-        input = os.path.join(tempdir, 'input')
-        output = os.path.join(tempdir, 'output')
-
-        os.mkdir(input)
-        os.mkdir(output)
-    except Exception as e:
-        msg = "Can't setup working directory:\n%s" % str(e)
-        crashed(job, msg)
-        raise
-
-
-    job.results_dir = os.path.basename(tempdir)
-    job.save(update_fields=["results_dir"])
-
-    with open(os.path.join(input, 'parameters.json'), 'w') as sims:
+    with open(os.path.join(tempdir, 'input/parameters.json'), 'w') as sims:
         sims.write((job.config))
 
     logging.info("creating container from image %s" % job.docker_image)

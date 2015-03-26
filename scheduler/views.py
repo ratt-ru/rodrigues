@@ -3,6 +3,8 @@ import json
 from importlib import import_module
 import socket
 import logging
+import os
+import tempfile
 
 from django.contrib import messages
 from django.views.generic.edit import FormView
@@ -10,6 +12,8 @@ from django.views.generic import ListView, DeleteView, DetailView
 from django.http import Http404
 from django.core.urlresolvers import reverse_lazy
 from django.http.response import HttpResponseRedirect
+from django.conf import settings
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 import scheduler.forms
 from scheduler.models import Job
@@ -60,6 +64,16 @@ class JobDelete(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('job_list')
 
 
+def format_form(cleaned_data):
+    d = {}
+    for k, v in cleaned_data.items():
+        if type(v) is InMemoryUploadedFile:
+            d[k] = v.name
+        else:
+            d[k] = v
+    return d
+
+
 class JobCreate(LoginRequiredMixin, FormView):
     model = Job
     success_url = reverse_lazy('job_list')
@@ -82,9 +96,35 @@ class JobCreate(LoginRequiredMixin, FormView):
         if form.is_valid():
             self.object = Job()
             self.object.owner = request.user
-            self.object.config = json.dumps(form.cleaned_data)
+            self.object.config = json.dumps(format_form(form.cleaned_data))
             self.object.name = form.data['name']
             self.object.docker_image = form.docker_image
+            self.object.save()
+
+            # Create the placeholder for container IO
+            try:
+                tempdir = tempfile.mkdtemp(dir=os.path.realpath(settings.MEDIA_ROOT),
+                                           prefix=str(self.object.id) + '-')
+
+                # Nginx container runs as unprivileged
+                os.chmod(tempdir, 0o0755)
+
+                input = os.path.join(tempdir, 'input')
+                output = os.path.join(tempdir, 'output')
+
+                os.mkdir(input)
+                os.mkdir(output)
+            except Exception as e:
+                msg = "Can't setup working directory:\n%s" % str(e)
+                messages.error(request, msg)
+                return self.form_invalid(form)
+
+            for filename, data in request.FILES.items():
+                with open(os.path.join(input, filename), 'wb+') as destination:
+                    for chunk in data.chunks():
+                        destination.write(chunk)
+
+            self.object.results_dir = os.path.basename(tempdir)
             self.object.save()
             schedule_simulation(self.object, request)
             return self.form_valid(form)
