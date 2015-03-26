@@ -75,8 +75,7 @@ else:
 CYBERSKA_URI = os.environ.get('CYBERSKA_URI', '')
 
 if not CYBERSKA_URI.strip():
-    CYBERSKA_URI =  'http://%s:8081/v1/viz' % ALLOWED_HOSTS[0]
-
+    CYBERSKA_URI = 'http://%s:8081/v1/viz' % ALLOWED_HOSTS[0]
 
 
 #### email settings

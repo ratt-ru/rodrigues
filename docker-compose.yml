@@ -58,7 +58,7 @@ skaviewer:
     - worker
     - storage
   environment:
-    - REDIRECT_URI
+    - SERVER_NAME
   volumes:
     - pureweb.lic:/opt/CSI/PureWeb/Server/conf/pureweb.lic
   ports:
