@@ -2,6 +2,8 @@
 
 RODRIGUES stands for **R**ATT **O**nline **D**econvolved **R**adio **I**mage **G**eneration **U**sing **E**soteric **S**oftware. It is a web based radio telescope calibration simulation. From a technical perspective it is a web based parameterised docker container scheduler with a result set viewer. Hopefully in the future it becomes less radio telescope specific and a more generic comutation scheduler. 
 
+screenshots: http://imgur.com/a/G31yY
+
 ## Installation
 
 ### On a fresh Ubuntu 14.04 machine
