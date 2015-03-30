@@ -21,6 +21,13 @@ worker:
   environment:
     - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
     - SECRET_KEY="doesn't matter"
+    - SERVER_NAME
+    - DEBUG
+    - SERVER_EMAIL
+    - EMAIL_PORT
+    - EMAIL_HOST
+    - EMAIL_HOST_USER
+    - EMAIL_HOST_PASSWORD
   volumes:
     - /var/run/docker.pid:/var/run/docker.pid
     - /var/run/docker.sock:/var/run/docker.sock
@@ -42,6 +49,8 @@ django:
     - CYBERSKA_URI
     - DEBUG
     - SERVER_EMAIL
+    - EMAIL_PORT
+    - EMAIL_HOST
     - EMAIL_HOST_USER
     - EMAIL_HOST_PASSWORD
   volumes:

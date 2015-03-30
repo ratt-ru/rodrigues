@@ -104,4 +104,4 @@ def simulate(job_id):
         body = mail_body % ('finished', job.id, job.name, job.started,
                             job.finished, job.duration(), job.log)
         send_mail('Your RODRIGUES job %s has finished' % job.id, body,
-                  settings.SERVER_EMAIL, [job.owner.email], fail_silently=True)
+                  settings.SERVER_EMAIL, [job.owner.email], fail_silently=False)
