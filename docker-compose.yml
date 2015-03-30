@@ -48,7 +48,6 @@ django:
     - .:/code
     - /socket
   volumes_from:
-    - worker
     - storage
 
 
@@ -59,6 +58,7 @@ skaviewer:
     - storage
   environment:
     - SERVER_NAME
+    - REDIRECT_URI
   volumes:
     - pureweb.lic:/opt/CSI/PureWeb/Server/conf/pureweb.lic
   ports:
