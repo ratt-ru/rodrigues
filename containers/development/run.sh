@@ -7,6 +7,7 @@ else
 fi
 
 
+
 echo
 echo "** running simulation..."
 echo "** sleeping for 3 seconds..."
@@ -23,5 +24,8 @@ echo
 cp -av $DATA/input/parameters.json $DATA/output
 echo
 cp /bin/bash $DATA/output
+echo
+echo "** checking out the new dropbox container content"
+find /data
 echo
 echo "done"

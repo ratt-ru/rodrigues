@@ -1,17 +1,37 @@
+
+# used for storing all the results
+#
 storage:
   image: ubuntu:14.04
   volumes:
     - /storage
 
+
+# https://github.com/radio-astro/docker-dropbox
+#
+# will sync with dropbox folder of associated account.
+# check output log for association URL
+#
+dropbox:
+  image: radioastro/dropbox
+  volumes:
+    - /data
+
+# The database container, used to store the Django job results
+#
 db:
   image: postgres:9.3
 
 
+# message broker, used for passing celery jobs between Django and workers
+#
 broker:
   image: rabbitmq:3.5
   command: /usr/lib/rabbitmq/lib/rabbitmq_server-3.5.0/sbin/rabbitmq-server
 
 
+# The Celery worker that wil execute the tasks (schedule compute containers)
+#
 worker:
   build: .
   command: celery worker -A rodrigues -l INFO
@@ -36,6 +56,9 @@ worker:
   volumes_from:
     - storage
 
+
+# The actual website
+#
 django:
   build: .
   command: uwsgi --socket /socket/rodrigues.sock --module rodrigues.wsgi --chmod-socket=666
@@ -60,6 +83,9 @@ django:
     - storage
 
 
+# https://github.com/radio-astro/cyberska_viewer
+# Interactive FITS file viewer
+#
 skaviewer:
   image: radioastro/cyberska_viewer
   volumes_from:
@@ -75,7 +101,8 @@ skaviewer:
     - 8080:8080
 
 
-
+# A reverse proxy that acts like a frontend to the rest of the application
+#
 nginx:
   image: nginx:latest
   volumes:

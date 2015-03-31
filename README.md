@@ -50,6 +50,11 @@ First time you run this app you need to create and populate the database
 
 Note that you may need to pull or create the simulation containers.
 
+### Dropbox container
+
+The dropbox container needs to be associated with a dropbox account. Check the logs
+of the dropbox container for an association URL (docker-compose logs dropbox).
+
 ## Development setup
 
 You need:

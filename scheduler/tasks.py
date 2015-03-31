@@ -80,7 +80,8 @@ def simulate(job_id):
     try:
         if hasattr(settings, 'CONTAINER'):
             client.start(container,
-                         volumes_from='rodrigues_storage_1')
+                         volumes_from=['rodrigues_storage_1',
+                                       'rodrigues_dropbox_1'])
         else:
             client.start(container,
                          binds={tempdir: {'bind': tempdir}})

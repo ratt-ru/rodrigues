@@ -97,6 +97,6 @@ if not SERVER_EMAIL:
     warnings.warn('!!! SERVER_EMAIL is not set !!!')
 
 
-ADMINS = (('RODRIGUES', SERVER_EMAIL),)
+ADMINS = (('Rodrigues Calibratori', SERVER_EMAIL),)
 
 
