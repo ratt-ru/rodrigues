@@ -26,8 +26,6 @@ sky = (
 # observation setup
 observation = (
     'ms_synthesis',
-    'ms_scan_length',
-    'ms_start_time',
     'ms_dtime',
     'ms_freq0',
     'ms_dfreq',
@@ -205,10 +203,6 @@ class Form(BetterForm):
     # observation setup
     ms_synthesis = FloatField(label='Synthesis time', initial=0.25,
                               help_text='in hours')
-    ms_scan_length = FloatField(label='Scan length', required=False, initial=0.25,
-                                help_text='in hours')
-    ms_start_time = FloatField(label='Initial hour angle', required=False, initial=-0.125,
-                               help_text='in hours')
     ms_dtime = IntegerField(label='Integration time', initial=10,
                             help_text='in seconds')
     ms_freq0 = FloatField(label='Start frequency', initial=700, help_text='in MHz')
@@ -371,7 +365,7 @@ class Form(BetterForm):
                                    required=False,
                                    max_length=32)
     casa_cyclefactor = FloatField(label='Cycle factor', initial=1.5)
-    casa_cyclespeedup = FloatField(label='Cycle speed up', initial=-1)
+    casa_cyclespeedup = IntegerField(label='Cycle speed up', initial=-1)
 
 
     #moresane
