@@ -119,7 +119,8 @@ class JobCreate(LoginRequiredMixin, FormView):
                 messages.error(request, msg)
                 return self.form_invalid(form)
 
-            for filename, data in request.FILES.items():
+            for fieldname, data in request.FILES.items():
+                filename = request.FILES[fieldname].name
                 with open(os.path.join(input, filename), 'wb+') as destination:
                     for chunk in data.chunks():
                         destination.write(chunk)
