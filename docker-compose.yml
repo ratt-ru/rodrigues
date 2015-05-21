@@ -3,6 +3,7 @@
 #
 storage:
   image: ubuntu:14.04
+  command: tail -f /var/log/dmesg
   volumes:
     - /storage
 
@@ -27,7 +28,6 @@ db:
 #
 broker:
   image: rabbitmq:3.5
-  command: /usr/lib/rabbitmq/lib/rabbitmq_server-3.5.0/sbin/rabbitmq-server
 
 
 # The Celery worker that wil execute the tasks (schedule compute containers)
