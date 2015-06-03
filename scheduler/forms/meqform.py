@@ -138,7 +138,7 @@ imaging = (
 )
 
 
-
+)
 
 class Form(BetterForm):
     docker_image = 'tariqblecher/meqsilhouette'
@@ -187,8 +187,8 @@ class Form(BetterForm):
     fitsname=FileField(label='fitsfile',initial='test.fits',required=True,
 				help_text='if blank a default image will be chosen')
     # Output visibilities
-    exportms = BooleanField(label='Export Measurement Set', required=False,initial=True)
-    exportuvfits = BooleanField(label='Export UV FITS', required=False,initial=False)
+	exportms = BooleanField(label='Export Measurement Set', required=False,initial=True)
+	exportuvfits = BooleanField(label='Export UV FITS', required=False,initial=False)
 
 
     # observation setup
@@ -308,14 +308,14 @@ class Form(BetterForm):
     
     # imaging settings
    
-    im_npix = IntegerField(label='Image size', required=True,initial=128,help_text='in pixels (default is input image size)')
-    im_cellsize = FloatField(label='Pixel size', required=True,initial=1,help_text='in micro arcseconds (default is input pixel size)')
+    im_npix = IntegerField(label='Image size', help_text='in pixels (default is input image size)')
+    im_cellsize = FloatField(label='Pixel size', help_text='in micro arcseconds (default is input pixel size)')
     
    
-    im_uvweight=ChoiceField(label='UV weight',required=False,choices=UV_WEIGHT,initial='uniform')
-    im_robust=FloatField(label='robust',initial=0)
-    im_operation=ChoiceField(label='Clean operation',choices=OPERATION,initial='clark')
-    im_niter=FloatField(label='Number of iterations',required=False,initial=0, help_text='for a dirty image set this to zero')
+    im_uvweight=ChoiceField(Choices=UV_WEIGHT,initial=uniform,label='Pixel size')
+    im_robust= FloatField(label='Robust',initial=0)
+    im_operation=ChoiceField(Choices=OPERATION,intial=clark)
+    im_niter=FloatField(label='Number of iterations', help_text='for a dirty image set this to zero')
     im_gain=FloatField(label='Loop Gain',initial=0.1)
     im_threshold=FloatField(label='Clean Threshold', initial=0)
     im_stokes=CharField(label='STOKES',initial='I')
