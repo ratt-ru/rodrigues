@@ -315,8 +315,8 @@ class Form(BetterForm):
     
     # imaging settings
    
-    im_npix = IntegerField(label='Image size',required=True, help_text='in pixels (default is input image size)')
-    im_cellsize = FloatField(label='Pixel size',required=True, help_text='in micro arcseconds (default is input pixel size)')
+    im_npix = IntegerField(label='Image size', required=True,initial=128,help_text='in pixels ')
+    im_cellsize = FloatField(label='Pixel size', required=True,initial=1,help_text='in micro arcseconds ')
     
    
     im_uvweight=ChoiceField(Choices=UV_WEIGHT,initial=uniform,label='Pixel size')
