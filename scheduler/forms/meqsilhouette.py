@@ -237,7 +237,7 @@ class Form(BetterForm):
 		('csclean','csclean'),
 		('clark','clark'),
 		('hogbom','hogbom'),
-		('multiscale','multiscale')
+		('multiscale','multiscale'),
 		)
    
 
@@ -319,9 +319,9 @@ class Form(BetterForm):
     im_cellsize = FloatField(label='Pixel size', required=True,initial=1,help_text='in micro arcseconds ')
     
    
-    im_uvweight=ChoiceField(choices=UV_WEIGHT,initial=uniform,label='Pixel size')
+    im_uvweight=ChoiceField(label='pixel size',choices=UV_WEIGHT,initial='uniform')
     im_robust= FloatField(label='Robust',initial=0)
-    im_operation=ChoiceField(label='Clean operation',choices=OPERATION,initial=clark)
+    im_operation=ChoiceField(label='Clean operation',choices=OPERATION,initial='clark')
     im_niter=FloatField(label='Number of iterations', help_text='for a dirty image set this to zero')
     im_gain=FloatField(label='Loop Gain',initial=0.1)
     im_threshold=FloatField(label='Clean Threshold', initial=0)
