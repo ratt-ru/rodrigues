@@ -141,7 +141,7 @@ imaging = (
 )
 
 
-)
+
 
 class Form(BetterForm):
     docker_image = 'tariqblecher/meqsilhouette'
