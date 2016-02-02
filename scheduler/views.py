@@ -1,58 +1,27 @@
-import pkgutil
-import json
-from importlib import import_module
-import socket
 import logging
-import os
-import tempfile
 
-from django.contrib import messages
-from django.views.generic.edit import FormView
-from django.views.generic import ListView, DeleteView, DetailView
-from django.http import Http404
-from django.core.urlresolvers import reverse_lazy
-from django.http.response import HttpResponseRedirect
+import docker
+
+from kliko.django import generate_form
+from kliko.docker import extract_params
+from kliko.validate import validate_kliko
+
 from django.conf import settings
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.contrib import messages
+from django.core.urlresolvers import reverse_lazy, reverse
+from django.http.response import HttpResponseRedirect
+from django.views.generic import ListView, DeleteView, DetailView
+from django.shortcuts import render
 
-import scheduler.forms
-from scheduler.models import Job
 from scheduler.mixins import LoginRequiredMixin
-from scheduler.tasks import simulate
-
+from scheduler.models import Job, Image
+from scheduler.scheduling import schedule_simulation, create_job
 
 logger = logging.getLogger(__name__)
 
 
-forms_module = scheduler.forms
-
-
-def schedule_simulation(job, request):
-    """
-    schedule a simulation task, catch error if problem, log in all cases.
-    """
-    try:
-        async = simulate.delay(job_id=job.id)
-    except (OSError, socket.error) as e:
-        job.state = job.CRASHED
-        error = "can't connect to broker %s: %s" % (job.id,
-                                                   str(e))
-        messages.error(request, error)
-        logger.error(error)
-        job.log = error
-    else:
-        job.task_id = async.task_id
-        job.state = job.SCHEDULED
-    job.save()
-
-
-def list_forms():
-    return [x[1] for x in pkgutil.iter_modules(forms_module.__path__)]
-
-
-class FormsList(LoginRequiredMixin, ListView):
-    template_name = "scheduler/form_list.html"
-    queryset = list_forms()
+class ImageList(ListView):
+    model = Image
 
 
 class JobList(ListView):
@@ -64,73 +33,26 @@ class JobDelete(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('job_list')
 
 
-def format_form(cleaned_data):
-    d = {}
-    for k, v in cleaned_data.items():
-        if type(v) is InMemoryUploadedFile:
-            d[k] = v.name
-        else:
-            d[k] = v
-    return d
+def schedule_image(request, image_id):
+    image = Image.objects.get(pk=image_id)
+    client = docker.Client(**settings.DOCKER_SETTINGS)
+    params = extract_params(client, image.name)
+    parsed = validate(params)
+    Form = generate_form(parsed)
 
-
-class JobCreate(LoginRequiredMixin, FormView):
-    model = Job
-    success_url = reverse_lazy('job_list')
-    template_name = 'scheduler/job_create.html'
-
-    def get_form_class(self):
-        forms = list_forms()
-        form = self.kwargs['form']
-        if form not in forms:
-            raise Http404
-
-        form_module = forms_module.__name__ + "." + form
-        module = import_module(form_module)
-        return module.Form
-
-    def post(self, request, *args, **kwargs):
-        self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
+    if request.method == 'POST':
+        form = Form(request.POST)
         if form.is_valid():
-            self.object = Job()
-            self.object.owner = request.user
-            self.object.config = json.dumps(format_form(form.cleaned_data))
-            self.object.name = form.data['name']
-            self.object.docker_image = form.docker_image
-            self.object.save()
+            status, error = create_job(form, request, image=image.name)
+            if not status:
+                messages.error(request, error)
+            else:
+                return HttpResponseRedirect(reverse('job_list'))
+    else:
+        form = Form()
 
-            # Create the placeholder for container IO
-            try:
-                tempdir = tempfile.mkdtemp(dir=os.path.realpath(settings.MEDIA_ROOT),
-                                           prefix=str(self.object.id) + '-')
+    return render(request, 'scheduler/job_create.html', {'form': form})
 
-                # Nginx container runs as unprivileged
-                os.chmod(tempdir, 0o0755)
-
-                input = os.path.join(tempdir, 'input')
-                output = os.path.join(tempdir, 'output')
-
-                os.mkdir(input)
-                os.mkdir(output)
-            except Exception as e:
-                msg = "Can't setup working directory:\n%s" % str(e)
-                messages.error(request, msg)
-                return self.form_invalid(form)
-
-            for fieldname, data in request.FILES.items():
-                filename = request.FILES[fieldname].name
-                with open(os.path.join(input, filename), 'wb+') as destination:
-                    for chunk in data.chunks():
-                        destination.write(chunk)
-
-            self.object.results_dir = os.path.basename(tempdir)
-            self.object.save()
-            schedule_simulation(self.object, request)
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
 
 
 class JobReschedule(LoginRequiredMixin, DetailView):
@@ -153,5 +75,4 @@ class JobReschedule(LoginRequiredMixin, DetailView):
 
     def get_success_url(self):
         return self.success_url
-
 

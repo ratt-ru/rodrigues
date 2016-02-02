@@ -159,7 +159,7 @@ class SomethingView(DetailView):
             return HttpResponseRedirect(reverse('fits',
                                                 kwargs={'pk': self.object.id,
                                                         'path': self.kwargs['path']}))
-        if type_.startswith("ASCII text"):
+        if type_.startswith("ASCII text") or type_.startswith('UTF-8 Unicode text'):
             return HttpResponseRedirect(reverse('text',
                                                 kwargs={'pk': self.object.id,
                                                         'path': self.kwargs['path']}))

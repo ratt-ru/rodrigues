@@ -1,11 +1,12 @@
-django-form-utils==1.0.2
-django>=1.7,<=1.8
+django-form-utils==1.0.3
+django>=1.9,<=1.10
 celery
 docker-py
 psycopg2
 uwsgi
 astropy==1.0.1
-git+git://github.com/aplpy/aplpy.git@9d330feebec95bcf83bfa3aea273d295e1fdc363#egg=APLpy
+APLpy
 matplotlib
 filemagic
 django-debug-toolbar
+kliko>=0.3

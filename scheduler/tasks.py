@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
-import tempfile
-import os
+from os import path
 
 from celery import shared_task
 from pytz import timezone
@@ -30,15 +29,18 @@ duration: %s
 
 
 def crashed(job, msg):
-        job.log += msg
-        job.state = job.CRASHED
-        job.finished = datetime.now(timezone(settings.TIME_ZONE))
-        job.save()
-        logger.error(msg)
-        body = mail_body % ('crashed', job.id, job.name, job.started,
-                            job.finished, job.duration(), job.log)
+    job.log += msg
+    job.state = job.CRASHED
+    job.finished = datetime.now(timezone(settings.TIME_ZONE))
+    job.save()
+    logger.error(msg)
+    body = mail_body % ('crashed', job.id, job.name, job.started,
+                        job.finished, job.duration(), job.log)
+    try:
         send_mail('Your RODRIGUES job %s has crashed' % job.id, body,
                   settings.SERVER_EMAIL, [job.owner.email], fail_silently=False)
+    except ConnectionRefusedError as e:
+        logging.error("Job crashed, but can't send email: " + str(e))
 
 
 @shared_task
@@ -59,18 +61,19 @@ def simulate(job_id):
         crashed(job, msg)
         raise
 
-    tempdir = os.path.join(os.path.realpath(settings.MEDIA_ROOT),
-                           job.results_dir)
+    tempdir = path.join(path.realpath(settings.MEDIA_ROOT), job.results_dir)
 
-    with open(os.path.join(tempdir, 'input/parameters.json'), 'w') as sims:
-        sims.write((job.config))
+    with open(path.join(tempdir, 'input/parameters.json'), 'w') as f:
+        f.write((job.config))
 
     logging.info("creating container from image %s" % job.docker_image)
     try:
         container = client.create_container(image=job.docker_image,
-                                            command='/run.sh ' + tempdir,
-
-                                            )
+                                            host_config=client.create_host_config(
+                                                binds=[
+                                                    tempdir + '/input:/input:ro',
+                                                    tempdir + '/output:/output:rw',
+                                                    ]))
     except (requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError) as e:
         msg = "cant create container: %s" % str(e)
@@ -79,12 +82,9 @@ def simulate(job_id):
 
     try:
         if hasattr(settings, 'CONTAINER'):
-            client.start(container,
-                         volumes_from=['rodrigues_storage_1',
-                                       'rodrigues_dropbox_1'])
+            client.start(container)
         else:
-            client.start(container,
-                         binds={tempdir: {'bind': tempdir}})
+            client.start(container)
     except requests.exceptions.HTTPError as e:
         msg = "can't start container: %s" % str(e)
         crashed(job, msg)

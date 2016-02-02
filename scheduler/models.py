@@ -45,3 +45,16 @@ class Job(Model):
     def duration(self):
         if self.finished and self.started:
             return str(self.finished - self.started)
+
+
+class Image(Model):
+    """
+    A container image
+    """
+    name = CharField(blank=False, max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return str(self.id)

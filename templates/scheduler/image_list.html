@@ -11,7 +11,7 @@
             <div class="container center-block text-center">
             {% for object in object_list %}
                 <tr>
-                    <h3><a href="{%  url 'job_create' object %}">{{ object }}</a></h3>
+                    <h3><a href="{%  url 'job_create' object.id %}">{{ object.name }}</a></h3>
                 </tr>
             {% endfor %}
             </div>

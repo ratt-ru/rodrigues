@@ -13,7 +13,7 @@ text_url = url(r'^(?P<pk>\d+)/text/(?P<path>[\w._/-]+)/$', TextView.as_view(),
 overview_url = url(r'^(?P<pk>\d+)/overview/$', OverView.as_view(),
                   name='viewer')
 
-something_url = url(r'^something_url/(?P<pk>\d+)/(?P<path>[\w._/-]+)/$',
+something_url = url(r'^something/(?P<pk>\d+)/(?P<path>[\w._/-]+)/$',
                     SomethingView.as_view(), name='guesstype')
 
 all_ = (
