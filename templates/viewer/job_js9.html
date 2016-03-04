@@ -1,0 +1,38 @@
+
+{% extends "base.html" %}
+
+{% block extrahead %}
+    <script>
+        function loadImage() {
+            JS9.Load('{{ MEDIA_URL }}/{{ path }}');
+        }
+    </script>
+
+    <link type="text/css" rel="stylesheet" href="http://js9.si.edu/js9/js9-allinone.css">
+
+{% endblock %}
+
+{% block bodyprops %} onload="loadImage();"{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><b>{{ path }}</b></div>
+                <div class="panel-body">
+                    <div class="well" style="font-family:monospace;">
+                        <div class="JS9Menubar" data-width="1024px"></div>
+                        <div class="JS9"  data-width="1024px" data-height="1024px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{%  endblock %}
+
+
+{% block extrajavascript %}
+<script type="text/javascript" src="http://js9.si.edu/js9/js9-allinone.js"></script>
+{% endblock %}

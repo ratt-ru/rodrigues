@@ -20,9 +20,6 @@ run:
     $ sudo pip install docker-compose
     $ git clone https://github.com/ska-sa/rodrigues && cd rodrigues
 
-
-To use the Cyber SKA FITS file viewer, copy the cyberska viewer license file into the checkout and name it `pureweb.lic`.
-
 ### running 
 
 To start RODRIGUES:
@@ -36,7 +33,6 @@ is used to create HTTP sessions.
 
 There are more environment variables you may need to set:
  - **SERVER_NAME** (default: rodrigues.meqtrees.net)
- - **CYBERSKA_URI** (default: http://SERVER_NAME:8081/v1/viz)
  - **ADMIN_EMAIL**
  - **DEBUG** set to true to enable debugging mode (default: off)
 
@@ -49,11 +45,6 @@ First time you run this app you need to create and populate the database
 ### Fetching / creating simulation containers
 
 Note that you may need to pull or create the simulation containers.
-
-### Dropbox container
-
-The dropbox container needs to be associated with a dropbox account. Check the logs
-of the dropbox container for an association URL (docker-compose logs dropbox).
 
 ## Development setup
 

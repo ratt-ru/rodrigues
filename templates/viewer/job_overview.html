@@ -1,150 +1,142 @@
 
-    {% extends "base.html" %}
+{% extends "base.html" %}
 
-    {%  load status %}
+{%  load status %}
 
-    {% block content %}
+{% block content %}
 
-        <H3>Results for job #{{ job.id }} ({{ job.name }})</H3>
+    <H3>Results for job #{{ job.id }} ({{ job.name }})</H3>
 
-        <div class="row">
-            <div class="col-md-12">
+    <div class="row">
+        <div class="col-md-12">
 
-            </div>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading"><b>Job properties</b></div>
-                    <div class="panel-body">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading"><b>Job properties</b></div>
+                <div class="panel-body">
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <ul>
-                                    <li><b>status:</b> <span class="label label-{{ object.state|status_label }}">{{ object.get_state_display }}</span></li>
-                                    <li><b>start:</b> {{ object.started }}</li>
-                                    <li><b>finished:</b> {% if object.finished %}{{ object.finished }}{% endif %}</li>
-                                    <li><b>duration:</b> {% if object.finished %}{{ object.duration }}{% endif %}</li>
-                                    <li><b>docker_image:</b> {{ object.docker_image }}</li>
-                                    <li><b>results_dir:</b> {{ object.results_dir }}</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <form>
-                                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul>
+                                <li><b>status:</b> <span class="label label-{{ object.state|status_label }}">{{ object.get_state_display }}</span></li>
+                                <li><b>start:</b> {{ object.started }}</li>
+                                <li><b>finished:</b> {% if object.finished %}{{ object.finished }}{% endif %}</li>
+                                <li><b>duration:</b> {% if object.finished %}{{ object.duration }}{% endif %}</li>
+                                <li><b>docker_image:</b> {{ object.docker_image }}</li>
+                                <li><b>results_dir:</b> {{ object.results_dir }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <form>
+                                {% csrf_token %}
 
-                                    <button type="submit"
-                                            formmethod="post"
-                                            formaction="{% url 'job_reschedule' object.id %}"
-                                            class="btn btn-warning"
-                                            {% if not object.can_reschedule %}
-                                            disabled="disabled"
-                                            {% endif %}
-                                            >Reschedule</button>
-                                    <a href="{% url 'viewer' object.id %}" class="btn btn-info" role="button">Refresh</a>
-                                    <a href="{% url 'job_delete' object.id %}" class="btn btn-danger" role="button">Delete</a>
+                                <button type="submit"
+                                        formmethod="post"
+                                        formaction="{% url 'job_reschedule' object.id %}"
+                                        class="btn btn-warning"
+                                        {% if not object.can_reschedule %}
+                                        disabled="disabled"
+                                        {% endif %}
+                                >Reschedule</button>
+                                <a href="{% url 'viewer' object.id %}" class="btn btn-info" role="button">Refresh</a>
+                                <a href="{% url 'job_delete' object.id %}" class="btn btn-danger" role="button">Delete</a>
 
-                                </form>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
 
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading"><b>Result files</b></div>
+    </div>
 
 
-                    <table class="table table-striped table-condensed">
-                        <thead>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading"><b>Result files</b></div>
+
+
+                <table class="table table-striped table-condensed">
+                    <thead>
+                    <tr>
+                        <th>name</th>
+                        <th>type</th>
+                        <th>size</th>
+                        <th>modified</th>
+                        <th>actions</th>
+                    </tr>
+                    </thead>
+                    {% for item in dirlist %}
                         <tr>
-                            <th>name</th>
-                            <th>type</th>
-                            <th>size</th>
-                            <th>modified</th>
-                            <th>actions</th>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.type|truncatechars:60 }}</td>
+                            <td>{{ item.size|filesizeformat }}</td>
+                            <td>{{ item.modified }}</td>
+                            <td>
+                                <a href="{% url 'guesstype' pk=object.id path=item.name %}"><button class="btn btn-xs">view</button></a>
+                                <a href="{{ MEDIA_URL }}/{{ object.results_dir }}/{{ item.name }}"><button class="btn btn-xs">download</button></a>
+
+                            </td>
                         </tr>
-                        </thead>
-                        {% for item in dirlist %}
-                            <tr>
-                                <td>{{ item.name }}</td>
-                                <td>{{ item.type|truncatechars:60 }}</td>
-                                <td>{{ item.size|filesizeformat }}</td>
-                                <td>{{ item.modified }}</td>
-                                <td>
-                                    <a href="{% url 'guesstype' pk=object.id path=item.name %}"><button class="btn btn-xs">view</button></a>
-                                    <a href="{{ MEDIA_URL }}/{{ object.results_dir }}/{{ item.name }}"><button class="btn btn-xs">download</button></a>
+                    {%  endfor %}
+                </table>
 
-                                </td>
-                            </tr>
-                        {%  endfor %}
-                    </table>
-
-                </div>
             </div>
         </div>
+    </div>
 
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading"><b>Images</b></div>
-                    <div class="panel-body">
-                        <div class="row">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading"><b>Images</b></div>
+                <div class="panel-body">
+                    <div class="row">
                         {% for item in dirlist %}
-                        {% if item.is_image %}
-                          <div class="col-xs-6 col-md-4">
-                            <a href="#" class="thumbnail">
-                               <img src="{% url 'guesstype' pk=object.id path=item.name %}">
-                                <div class="caption">
-
-
-                                    <p>{{ item.name }}</p>
-                                    <div class="row">
-                                         <div class="col-md-4">
-                                            <form action="{{ CYBERSKA_URI }}" method="post">
-
-                                                <input type="hidden" name="title" value="{{ item.name }}" />
-                                                <input type="hidden" name="filename" value="{{ MEDIA_ROOT }}/{{ object.results_dir }}/{{ item.name }}">
-                                                <input type="submit" class="btn btn-xs" value="SKA viewer"/>
-
-                                            </form>
-                                         </div>
-                                         <div class="col-md-4">
-                                            <form action="{% url 'guesstype' pk=object.id path=item.name %}"><button class="btn btn-xs">view</button></form>
-                                         </div>
-                                         <div class="col-md-4">
-                                            <form action="{{ MEDIA_URL }}/{{ object.results_dir }}/{{ item.name }}"><button class="btn btn-xs">download</button></form></p>
+                            {% if item.is_image %}
+                                <div class="col-xs-6 col-md-4">
+                                    <div class="thumbnail">
+                                        <img src="{% url 'guesstype' pk=object.id path=item.name %}">
+                                        <div class="caption">
+                                            <p>{{ item.name }}</p>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <a href="{% url 'js9' pk=object.id path=item.name %}"><button class="btn">JS9</button></a>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <a href="{% url 'guesstype' pk=object.id path=item.name %}"><button class="btn">view</button></a>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <a href="{{ MEDIA_URL }}/{{ object.results_dir }}/{{ item.name }}"><button class="btn">download</button></a>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                   </div>
-                                </a>
-                          </div>
-                          {%  endif %}
+                                </div>
+                            {%  endif %}
                         {% endfor %}
-                      </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading"><b>Console output</b></div>
-                    <div class="panel-body">
-                        <div class="well" style="font-family:monospace;">{{ object.log|linebreaksbr }}</div>
-                    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading"><b>Console output</b></div>
+                <div class="panel-body">
+                    <div class="well" style="font-family:monospace;">{{ object.log|linebreaksbr }}</div>
                 </div>
             </div>
         </div>
+    </div>
 
-    {%  endblock %}
+{%  endblock %}
 

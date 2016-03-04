@@ -8,16 +8,6 @@ storage:
     - /storage
 
 
-# https://github.com/radio-astro/docker-dropbox
-#
-# will sync with dropbox folder of associated account.
-# check output log for association URL
-#
-dropbox:
-  image: radioastro/dropbox
-  volumes:
-    - /data
-
 # The database container, used to store the Django job results
 #
 db:
@@ -69,7 +59,6 @@ django:
     - DJANGO_SETTINGS_MODULE=rodrigues.settings.container
     - SECRET_KEY
     - SERVER_NAME
-    - CYBERSKA_URI
     - DEBUG
     - SERVER_EMAIL
     - EMAIL_PORT
@@ -83,24 +72,6 @@ django:
     - storage
 
 
-# https://github.com/radio-astro/cyberska_viewer
-# Interactive FITS file viewer
-#
-skaviewer:
-  image: radioastro/cyberska_viewer
-  volumes_from:
-    - worker
-    - storage
-  environment:
-    - SERVER_NAME
-    - REDIRECT_URI
-  volumes:
-    - pureweb.lic:/opt/CSI/PureWeb/Server/conf/pureweb.lic
-  ports:
-    - 8081:80
-    - 8080:8080
-
-
 # A reverse proxy that acts like a frontend to the rest of the application
 #
 nginx:
@@ -111,8 +82,6 @@ nginx:
     - ssl.key:/etc/nginx/ssl.key:ro
   volumes_from:
     - django
-  links:
-    - skaviewer
   ports:
     - 80:80
     - 443:443 

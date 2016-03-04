@@ -192,3 +192,18 @@ class TextView(DetailView):
             context['path'] = path
             context['content'] = ''.join(f.readlines())
         return context
+
+
+class Js9View(DetailView):
+    """
+    Will redirect to correct view according to file type.
+
+    Will render error page if file type is not understood.
+    """
+    model = Job
+    template_name = 'viewer/job_js9.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(DetailView, self).get_context_data(**kwargs)
+        context['path'] = os.path.join(self.object.results_dir, self.kwargs['path'])
+        return context
