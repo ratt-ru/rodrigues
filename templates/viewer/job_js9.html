@@ -2,17 +2,14 @@
 {% extends "base.html" %}
 
 {% block extrahead %}
-    <script>
-        function loadImage() {
-            JS9.Load('{{ MEDIA_URL }}/{{ path }}');
-        }
-    </script>
-
-    <link type="text/css" rel="stylesheet" href="http://js9.si.edu/js9/js9-allinone.css">
-
+  <link type="text/css" rel="stylesheet" href="http://js9.si.edu/js9/js9support.css">
+  <link type="text/css" rel="stylesheet" href="http://js9.si.edu/js9/js9.css">
+  <script type="text/javascript" src="http://js9.si.edu/js9/js9support.min.js"></script>
+  <script type="text/javascript" src="http://js9.si.edu/js9/js9.min.js"></script>
+  <script type="text/javascript" src="http://js9.si.edu/js9/js9plugins.js"></script>
 {% endblock %}
 
-{% block bodyprops %} onload="loadImage();"{% endblock %}
+{% block bodyprops %} onload="JS9.Load('{{ MEDIA_URL }}{{ path }}', {zoom: 'toFit', scale:'log'});"{% endblock %}
 
 {% block content %}
 
@@ -31,8 +28,3 @@
     </div>
 
 {%  endblock %}
-
-
-{% block extrajavascript %}
-<script type="text/javascript" src="http://js9.si.edu/js9/js9-allinone.js"></script>
-{% endblock %}
