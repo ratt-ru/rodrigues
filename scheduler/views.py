@@ -37,7 +37,7 @@ def schedule_image(request, image_id):
     image = Image.objects.get(pk=image_id)
     client = docker.Client(**settings.DOCKER_SETTINGS)
     params = extract_params(client, image.name)
-    parsed = validate(params)
+    parsed = validate_kliko(params)
     Form = generate_form(parsed)
 
     if request.method == 'POST':
