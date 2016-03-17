@@ -9,4 +9,4 @@ APLpy
 matplotlib
 filemagic
 django-debug-toolbar
-kliko>=0.3
+kliko>=0.5

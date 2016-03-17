@@ -2,7 +2,8 @@ import logging
 
 import docker
 
-from kliko.django import generate_form
+import yaml
+from kliko.django_form import generate_form
 from kliko.docker import extract_params
 from kliko.validate import validate_kliko
 
@@ -12,6 +13,7 @@ from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import HttpResponseRedirect
 from django.views.generic import ListView, DeleteView, DetailView
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 from scheduler.mixins import LoginRequiredMixin
 from scheduler.models import Job, Image
@@ -33,11 +35,13 @@ class JobDelete(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('job_list')
 
 
+@login_required
 def schedule_image(request, image_id):
     image = Image.objects.get(pk=image_id)
     client = docker.Client(**settings.DOCKER_SETTINGS)
     params = extract_params(client, image.name)
-    parsed = validate_kliko(params)
+    parsed = yaml.load(params)
+    validate_kliko(parsed)
     Form = generate_form(parsed)
 
     if request.method == 'POST':
