@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED 1
 # allow the worker to run as root
 ENV C_FORCE_ROOT true
 
-RUN apt-get update && apt-get install -qy \
+RUN apt-get update && apt-get install -qy --no-install-recommends \
 		python3-numpy \
 		python3-pip \
 		python3-psycopg2 \
@@ -14,19 +14,20 @@ RUN apt-get update && apt-get install -qy \
 		git \
         gcc \
         libpython3-dev \
-	    --no-install-recommends && rm -rf /var/lib/apt/lists/*
+	    && rm -rf /var/lib/apt/lists/*
 
 # nginx connection
 RUN mkdir /socket
-VOLUME /socket
 
 ## mount the django code here
 RUN mkdir /code
-WORKDIR /code
 
 # fix broker pip
-RUN easy_install3 -U pip
-
+RUN pip3 install --upgrade pip
 
 ADD requirements.txt /
 RUN pip install -r /requirements.txt
+
+WORKDIR /code
+
+CMD ./manage.py runserver

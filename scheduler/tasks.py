@@ -61,9 +61,10 @@ def simulate(job_id):
         crashed(job, msg)
         raise
 
-    tempdir = path.join(path.realpath(settings.MEDIA_ROOT), job.results_dir)
+    storage = path.join(path.realpath(settings.MEDIA_ROOT), job.results_dir)
+    host_storage = path.join(path.realpath(settings.HOST_STORAGE), job.results_dir)
 
-    with open(path.join(tempdir, 'input/parameters.json'), 'w') as f:
+    with open(path.join(storage, 'input/parameters.json'), 'w') as f:
         f.write((job.config))
 
     logging.info("creating container from image %s" % job.docker_image)
@@ -71,8 +72,8 @@ def simulate(job_id):
         container = client.create_container(image=job.docker_image,
                                             host_config=client.create_host_config(
                                                 binds=[
-                                                    tempdir + '/input:/input:ro',
-                                                    tempdir + '/output:/output:rw',
+                                                    host_storage + '/input:/input:ro',
+                                                    host_storage + '/output:/output:rw',
                                                     ]))
     except (requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError) as e:

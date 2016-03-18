@@ -1,13 +1,4 @@
 
-# used for storing all the results
-#
-storage:
-  image: ubuntu:14.04
-  command: tail -f /var/log/dmesg
-  volumes:
-    - /storage
-
-
 # The database container, used to store the Django job results
 #
 db:
@@ -38,13 +29,13 @@ worker:
     - EMAIL_HOST
     - EMAIL_HOST_USER
     - EMAIL_HOST_PASSWORD
+    - STORAGE
   volumes:
     - /var/run/docker.pid:/var/run/docker.pid
     - /var/run/docker.sock:/var/run/docker.sock
     - /var/lib/docker:/var/lib/docker
     - .:/code
-  volumes_from:
-    - storage
+    - ./storage:/storage
 
 
 # The actual website
@@ -52,6 +43,7 @@ worker:
 django:
   build: .
   command: uwsgi --socket /socket/rodrigues.sock --module rodrigues.wsgi --chmod-socket=666
+  #command: gunicorn rodrigues.wsgi:application -w 2 -b :8000 --reload
   links:
     - db
     - broker
@@ -65,25 +57,23 @@ django:
     - EMAIL_HOST
     - EMAIL_HOST_USER
     - EMAIL_HOST_PASSWORD
+    - STORAGE
   volumes:
+    - /var/run/docker.pid:/var/run/docker.pid
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /var/lib/docker:/var/lib/docker
     - .:/code
     - /socket
-  volumes_from:
-    - storage
+    - ./storage:/storage
 
 
 # A reverse proxy that acts like a frontend to the rest of the application
 #
 nginx:
-  image: nginx:latest
+  image: nginx:1.8
   volumes:
-    - nginx.conf:/etc/nginx/nginx.conf:ro
-    - ssl.crt:/etc/nginx/ssl.crt:ro
-    - ssl.key:/etc/nginx/ssl.key:ro
+    - ./nginx.conf:/etc/nginx/nginx.conf:ro
   volumes_from:
     - django
   ports:
     - 80:80
-    - 443:443 
-
-

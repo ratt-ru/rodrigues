@@ -10,3 +10,4 @@ matplotlib
 filemagic
 django-debug-toolbar
 kliko>=0.5
+gunicorn

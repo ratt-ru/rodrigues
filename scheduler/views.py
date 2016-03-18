@@ -58,7 +58,6 @@ def schedule_image(request, image_id):
     return render(request, 'scheduler/job_create.html', {'form': form})
 
 
-
 class JobReschedule(LoginRequiredMixin, DetailView):
     model = Job
     success_url = reverse_lazy('job_list')

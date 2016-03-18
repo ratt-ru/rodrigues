@@ -61,6 +61,12 @@ MEDIA_ROOT = '/storage/'
 MEDIA_URL = '/media/'
 
 
+# TODO: workaround for storing data on the host
+HOST_STORAGE = os.environ.get('STORAGE', False)
+
+if not HOST_STORAGE:
+    warnings.warn('!!! STORAGE is not set !!!')
+
 
 #### server name settings
 
@@ -72,10 +78,6 @@ if SERVER_NAME:
 else:
     warnings.warn('!!! SERVER_NAME is not set !!!')
 
-CYBERSKA_URI = os.environ.get('CYBERSKA_URI', '')
-
-if not CYBERSKA_URI.strip():
-    CYBERSKA_URI = 'http://%s:8081/v1/viz' % ALLOWED_HOSTS[0]
 
 
 #### email settings

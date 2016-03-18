@@ -68,3 +68,4 @@ ssl.key
 
 
 .virtualenv/
+storage/*

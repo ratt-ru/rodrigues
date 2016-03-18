@@ -40,7 +40,7 @@ There are more environment variables you may need to set:
 
 First time you run this app you need to create and populate the database
 
-    $ docker-compose run worker python3 manage.py syncdb
+    $ docker-compose run worker python3 manage.py migrate
 
 ### Fetching / creating simulation containers
 
