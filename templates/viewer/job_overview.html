@@ -26,7 +26,7 @@
                                 <li><b>start:</b> {{ object.started }}</li>
                                 <li><b>finished:</b> {% if object.finished %}{{ object.finished }}{% endif %}</li>
                                 <li><b>duration:</b> {% if object.finished %}{{ object.duration }}{% endif %}</li>
-                                <li><b>docker_image:</b> {{ object.docker_image }}</li>
+                                <li><b>image:</b> {{ object.image }}</li>
                                 <li><b>results_dir:</b> {{ object.results_dir }}</li>
                             </ul>
                         </div>
@@ -34,14 +34,12 @@
                             <form>
                                 {% csrf_token %}
 
-                                <button type="submit"
-                                        formmethod="post"
-                                        formaction="{% url 'job_reschedule' object.id %}"
+                                <a href="{% url 'job_reschedule' object.id %}"
                                         class="btn btn-warning"
                                         {% if not object.can_reschedule %}
                                         disabled="disabled"
                                         {% endif %}
-                                >Reschedule</button>
+                                >Reschedule</a>
                                 <a href="{% url 'viewer' object.id %}" class="btn btn-info" role="button">Refresh</a>
                                 <a href="{% url 'job_delete' object.id %}" class="btn btn-danger" role="button">Delete</a>
 

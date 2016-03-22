@@ -68,9 +68,9 @@ def run_job(job_id):
     with open(path.join(storage, 'input/parameters.json'), 'w') as f:
         f.write((job.config))
 
-    logging.info("creating container from image %s" % job.docker_image)
+    logging.info("creating container from image %s" % job.image.repository)
     try:
-        container = client.create_container(image=job.docker_image,
+        container = client.create_container(image=job.image.repository,
                                             host_config=client.create_host_config(
                                                 binds=[
                                                     host_storage + '/input:/input:ro',

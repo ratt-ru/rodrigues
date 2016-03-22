@@ -71,7 +71,7 @@ def create_job(form, request, image):
     job.owner = request.user
     job.config = json.dumps(format_form(form.cleaned_data))
     job.name = form.data['name']
-    job.docker_image = image
+    job.image = image
     job.save()
 
     # Create the placeholder for container IO

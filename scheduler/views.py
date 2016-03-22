@@ -3,6 +3,7 @@ import logging
 import docker
 
 import yaml
+import json
 from kliko.django_form import generate_form
 from kliko.docker import extract_params
 from kliko.validate import validate_kliko
@@ -36,7 +37,7 @@ class JobDelete(LoginRequiredMixin, DeleteView):
 
 
 @login_required
-def schedule_image(request, image_id):
+def schedule_image(request, image_id, template=None):
     image = KlikoImage.objects.get(pk=image_id)
     client = docker.Client(**settings.DOCKER_SETTINGS)
     params = extract_params(client, image.repository)
@@ -47,35 +48,22 @@ def schedule_image(request, image_id):
     if request.method == 'POST':
         form = Form(request.POST)
         if form.is_valid():
-            status, error = create_job(form, request, image=image.repository)
+            status, error = create_job(form, request, image=image)
             if not status:
                 messages.error(request, error)
             else:
                 return HttpResponseRedirect(reverse('job_list'))
     else:
-        form = Form()
+        if template:
+            form = Form(template)
+        else:
+            form = Form()
 
     return render(request, 'scheduler/job_create.html', {'form': form})
 
 
-class JobReschedule(LoginRequiredMixin, DetailView):
-    model = Job
-    success_url = reverse_lazy('job_list')
-
-    def reschedule(self, request, *args, **kwargs):
-        """
-        Calls the delete() method on the fetched object and then
-        redirects to the success URL.
-        """
-        self.object = self.get_object()
-        success_url = self.get_success_url()
-        run_job(self.object, request)
-        return HttpResponseRedirect(success_url)
-
-    # Add support for browsers which only accept GET and POST for now.
-    def post(self, request, *args, **kwargs):
-        return self.reschedule(request, *args, **kwargs)
-
-    def get_success_url(self):
-        return self.success_url
-
+@login_required
+def reschedule_image(request, template_job_id):
+    job = Job.objects.get(pk=template_job_id)
+    template = json.loads(job.config)
+    return schedule_image(request, job.image.id, template)
