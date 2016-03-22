@@ -5,11 +5,12 @@ from os import path
 from celery import shared_task
 from pytz import timezone
 import docker
+import json
 from django.conf import settings
 from django.core.mail import send_mail
 import requests.exceptions
 
-from scheduler.models import Job
+from scheduler.models import Job, KlikoImage
 
 
 logger = logging.getLogger(__name__)
@@ -44,7 +45,7 @@ def crashed(job, msg):
 
 
 @shared_task
-def simulate(job_id):
+def run_job(job_id):
     job = Job.objects.get(pk=job_id)
     job.log = "running...\n"
     job.state = job.RUNNING
@@ -105,5 +106,44 @@ def simulate(job_id):
         job.save()
         body = mail_body % ('finished', job.id, job.name, job.started,
                             job.finished, job.duration(), job.log)
-        send_mail('Your RODRIGUES job %s has finished' % job.id, body,
-                  settings.SERVER_EMAIL, [job.owner.email], fail_silently=False)
+        try:
+            send_mail('Your RODRIGUES job %s has finished' % job.id, body,
+                    settings.SERVER_EMAIL, [job.owner.email], fail_silently=False)
+        except ConnectionRefusedError as e:
+            logger.error("can't sent email: " + str(e))
+
+
+@shared_task
+def pull_image(kliko_image_id):
+    client = docker.Client(**settings.DOCKER_SETTINGS)
+
+    try:
+        client.version()
+    except requests.exceptions.ConnectionError as e:
+        msg = "Can't connect to docker daemon:\n%s\n" % str(e)
+        logger.error(msg)
+        raise
+
+    kliko_image = KlikoImage.objects.get(pk=kliko_image_id)
+    kliko_image.state = kliko_image.PULLING
+    kliko_image.save()
+
+    errors = ""
+
+    for line in client.pull(kliko_image.repository, kliko_image.tag, stream=True):
+        line = json.loads(line.decode('utf-8'))
+        if 'error' in line:
+            errors += line['error']
+            logging.error(line['error'])
+        elif 'status' in line:
+            logging.info(line['status'])
+        else:
+            raise Exception('unknown return code')
+
+    if errors:
+        kliko_image.state = kliko_image.NOT_PULLED
+        kliko_image.error_message = errors
+    else:
+        kliko_image.last_updated = datetime.now(timezone(settings.TIME_ZONE))
+        kliko_image.state = kliko_image.PULLED
+    kliko_image.save()

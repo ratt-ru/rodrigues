@@ -26,7 +26,6 @@ INSTALLED_APPS += [
 ]
 
 
-
 BROKER_URL = 'amqp://localhost/'
 
 
@@ -38,3 +37,6 @@ DOCKER_URI = 'tcp://192.168.59.103:2375'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+# outside a container the host storage is the same as media_root
+HOST_STORAGE = MEDIA_ROOT

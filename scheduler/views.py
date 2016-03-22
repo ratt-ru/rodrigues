@@ -16,14 +16,14 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
 from scheduler.mixins import LoginRequiredMixin
-from scheduler.models import Job, Image
-from scheduler.scheduling import schedule_simulation, create_job
+from scheduler.models import Job, KlikoImage
+from scheduler.scheduling import run_job, create_job
 
 logger = logging.getLogger(__name__)
 
 
 class ImageList(ListView):
-    model = Image
+    model = KlikoImage
 
 
 class JobList(ListView):
@@ -37,9 +37,9 @@ class JobDelete(LoginRequiredMixin, DeleteView):
 
 @login_required
 def schedule_image(request, image_id):
-    image = Image.objects.get(pk=image_id)
+    image = KlikoImage.objects.get(pk=image_id)
     client = docker.Client(**settings.DOCKER_SETTINGS)
-    params = extract_params(client, image.name)
+    params = extract_params(client, image.repository)
     parsed = yaml.load(params)
     validate_kliko(parsed)
     Form = generate_form(parsed)
@@ -47,7 +47,7 @@ def schedule_image(request, image_id):
     if request.method == 'POST':
         form = Form(request.POST)
         if form.is_valid():
-            status, error = create_job(form, request, image=image.name)
+            status, error = create_job(form, request, image=image.repository)
             if not status:
                 messages.error(request, error)
             else:
@@ -69,7 +69,7 @@ class JobReschedule(LoginRequiredMixin, DetailView):
         """
         self.object = self.get_object()
         success_url = self.get_success_url()
-        schedule_simulation(self.object, request)
+        run_job(self.object, request)
         return HttpResponseRedirect(success_url)
 
     # Add support for browsers which only accept GET and POST for now.

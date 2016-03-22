@@ -71,7 +71,7 @@ if not HOST_STORAGE:
 #### server name settings
 
 
-SERVER_NAME = os.environ.get('SERVER_NAME', 'False')
+SERVER_NAME = os.environ.get('SERVER_NAME', 'rodrigues.meqtrees.net')
 
 if SERVER_NAME:
     ALLOWED_HOSTS = [SERVER_NAME]

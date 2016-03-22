@@ -8,13 +8,13 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from scheduler.models import Job
-from scheduler.tasks import simulate
+from scheduler.tasks import run_job
 
 
 logger = logging.getLogger(__name__)
 
 
-def schedule_simulation(job, request):
+def schedule_job(job, request):
     """
     schedule a simulation task, catch error if problem, log in all cases.
     args:
@@ -22,7 +22,7 @@ def schedule_simulation(job, request):
         request: a Django request
     """
     try:
-        async = simulate.delay(job_id=job.id)
+        async = run_job.delay(job_id=job.id)
     except (OSError, socket.error) as e:
         job.state = job.CRASHED
         error = "can't connect to broker %s: %s" % (job.id, str(e))
@@ -36,6 +36,15 @@ def schedule_simulation(job, request):
 
 
 def format_form(cleaned_data):
+    """
+    Workaround to set the uploaded file name for a InMemoryUploadedFile corrrectly.
+    Args:
+        cleaned_data (dict):
+
+    Returns:
+        dict:
+
+    """
     d = {}
     for k, v in cleaned_data.items():
         if type(v) is InMemoryUploadedFile:
@@ -46,6 +55,18 @@ def format_form(cleaned_data):
 
 
 def create_job(form, request, image):
+    """
+    Create a job, prepare the run but don't run yet.
+
+    Args:
+        form (django.forms.Form): A Django form
+        request (django.http.request.HttpRequest): A Django HTTP request
+        image (str): The image to use for the job
+
+    Returns:
+        tuple: (bool indicating success, error string)
+
+    """
     job = Job()
     job.owner = request.user
     job.config = json.dumps(format_form(form.cleaned_data))
@@ -77,5 +98,5 @@ def create_job(form, request, image):
 
     job.results_dir = os.path.basename(tempdir)
     job.save()
-    schedule_simulation(job, request)
+    schedule_job(job, request)
     return True, ""

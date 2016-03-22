@@ -1,6 +1,12 @@
 
 from django.db.models import Model, CharField, DateTimeField, TextField, ForeignKey
 from django.contrib.auth.models import User
+from django.conf import settings
+
+import docker
+
+
+docker_client = docker.Client(**settings.DOCKER_SETTINGS)
 
 
 class Job(Model):
@@ -47,14 +53,38 @@ class Job(Model):
             return str(self.finished - self.started)
 
 
-class Image(Model):
+class KlikoImage(Model):
     """
-    A container image
+    A kliko image
     """
-    name = CharField(blank=False, max_length=255)
+    repository = CharField(blank=False, max_length=255)
+    tag = CharField(default='latest', max_length=255)
+
+    last_updated = DateTimeField(blank=True, null=True)
+    error_message = TextField(blank=True, null=True)
+
+    # status of the image
+    NOT_PULLED = 'N'  # image not pulled yet
+    PULLING = 'G'     # image is being pulled from the docker hub
+    PULLED = 'P'      # image is downloaded, not verified yet
+    INVALID = 'I'     # image is not a kliko container
+    VALID = 'V'       # image is a valid kliko container and ready to use
+
+    STATE_TYPES = (
+        (NOT_PULLED, 'NOT_PULLED'),
+        (PULLING, 'PULLING'),
+        (PULLED, 'PULLED'),
+        (INVALID, 'INVALID'),
+        (VALID, 'VALID'),
+    )
+    state = CharField(choices=STATE_TYPES, max_length=1, default=NOT_PULLED)
 
     def __str__(self):
-        return self.name
+        return self.repository
 
     def __repr__(self):
         return str(self.id)
+
+    def pulled(self):
+        images = docker_client.images(self.repository + ":" + self.tag, quiet=True)
+        return bool(images)

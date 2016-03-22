@@ -6,13 +6,15 @@
 {%  block content %}
 
     {% if object_list %}
-        <h1>List of forms</h1>
+        <h1>List of available compute jobs</h1>
         <div class="jumbotron">
             <div class="container center-block text-center">
             {% for object in object_list %}
                 <tr>
-                    <h3><a href="{%  url 'job_create' object.id %}">{{ object.name }}</a></h3>
+                    <h3><a href="{%  url 'job_create' object.id %}">{{ object.repository }}</a></h3>
                 </tr>
+                {% empty %}
+                    <h3>No compute jobs available. The administrator needs to add some in the admin view.</h3>
             {% endfor %}
             </div>
         </div>
