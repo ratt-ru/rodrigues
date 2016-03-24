@@ -34,6 +34,7 @@ is used to create HTTP sessions.
 There are more environment variables you may need to set:
  - **SERVER_NAME** (default: rodrigues.meqtrees.net)
  - **ADMIN_EMAIL**
+ - **STORAGE** host result storage. typically `pwd`/storage
  - **DEBUG** set to true to enable debugging mode (default: off)
 
 ### Initialise DB
@@ -41,6 +42,10 @@ There are more environment variables you may need to set:
 First time you run this app you need to create and populate the database
 
     $ docker-compose run worker python3 manage.py migrate
+
+### Creating admin user
+
+    $ docker-compose run worker python3 ./manage.py createsuperuser
 
 ### Fetching / creating simulation containers
 
