@@ -116,15 +116,18 @@ def run_job(job_id):
 @shared_task
 def pull_image(kliko_image_id):
     client = docker.Client(**settings.DOCKER_SETTINGS)
+    kliko_image = KlikoImage.objects.get(pk=kliko_image_id)
 
     try:
         client.version()
     except requests.exceptions.ConnectionError as e:
         msg = "Can't connect to docker daemon:\n%s\n" % str(e)
         logger.error(msg)
-        raise
+        kliko_image.state = kliko_image.NOT_PULLED
+        kliko_image.error_message = msg
+        kliko_image.save()
+        return False
 
-    kliko_image = KlikoImage.objects.get(pk=kliko_image_id)
     kliko_image.state = kliko_image.PULLING
     kliko_image.save()
 
@@ -147,3 +150,5 @@ def pull_image(kliko_image_id):
         kliko_image.last_updated = datetime.now(timezone(settings.TIME_ZONE))
         kliko_image.state = kliko_image.PULLED
     kliko_image.save()
+    return True
+
