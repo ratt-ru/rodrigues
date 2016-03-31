@@ -41,7 +41,13 @@
                                         {% endif %}
                                 >Reschedule</a>
                                 <a href="{% url 'viewer' object.id %}" class="btn btn-info" role="button">Refresh</a>
-                                <a href="{% url 'job_delete' object.id %}" class="btn btn-danger" role="button">Delete</a>
+
+                                 <a href="{% url 'job_delete' object.id %}"
+                                        class="btn btn-danger"
+                                        {% if not object.owner == user %}
+                                        disabled="disabled"
+                                        {% endif %}
+                                ><span class="glyphicon glyphicon-remove"></span> Delete</a>
 
                             </form>
                         </div>

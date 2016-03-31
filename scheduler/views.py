@@ -16,8 +16,9 @@ from django.views.generic import ListView, DeleteView
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.forms import CharField
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
 
-from scheduler.mixins import LoginRequiredMixin
 from scheduler.models import Job, KlikoImage
 from scheduler.scheduling import create_job
 
@@ -25,7 +26,7 @@ from scheduler.scheduling import create_job
 logger = logging.getLogger(__name__)
 
 
-class ImageList(ListView):
+class ImageList(LoginRequiredMixin, ListView):
     model = KlikoImage
 
 
@@ -36,6 +37,13 @@ class JobList(ListView):
 class JobDelete(LoginRequiredMixin, DeleteView):
     model = Job
     success_url = reverse_lazy('job_list')
+
+    def get_object(self, queryset=None):
+        """ Hook to ensure object is owned by request.user. """
+        obj = super(JobDelete, self).get_object()
+        if not obj.owner == self.request.user:
+            raise Http404
+        return obj
 
 
 @login_required

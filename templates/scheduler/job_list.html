@@ -37,12 +37,12 @@
                         <div class="btn-group">
                             <form>
                                 {% csrf_token %}
-
-                                <a href="{% url 'job_delete' object.id %}">
-                                    <button type="button" class="btn btn-danger btn-sm">
-                                        <span class="glyphicon glyphicon-remove"></span>
-                                    </button>
-                                </a>
+                                 <a href="{% url 'job_delete' object.id %}"
+                                        class="btn btn-danger btn-sm"
+                                        {% if not object.owner == user %}
+                                        disabled="disabled"
+                                        {% endif %}
+                                ><span class="glyphicon glyphicon-remove"></span></a>
 
                                 <a href="{% url 'job_reschedule' object.id %}">
                                     <button type="button"class="btn btn-warning btn-sm">
