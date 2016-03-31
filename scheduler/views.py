@@ -12,13 +12,15 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import HttpResponseRedirect
-from django.views.generic import ListView, DeleteView, DetailView
+from django.views.generic import ListView, DeleteView
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.forms import CharField
 
 from scheduler.mixins import LoginRequiredMixin
 from scheduler.models import Job, KlikoImage
-from scheduler.scheduling import run_job, create_job
+from scheduler.scheduling import create_job
+
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +46,10 @@ def schedule_image(request, image_id, template=None):
     parsed = yaml.load(params)
     validate_kliko(parsed)
     Form = generate_form(parsed)
+
+    # inject some kliko specific fields
+    Form.declared_fields['kliko_name'] = CharField(max_length=200, label='Job description')
+    Form.Meta.fieldsets.append(('kliko', {'description': 'Job Parameters', 'fields': ('kliko_name',)}))
 
     if request.method == 'POST':
         form = Form(request.POST)

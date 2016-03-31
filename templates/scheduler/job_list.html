@@ -14,7 +14,8 @@
             <thead>
             <tr>
                 <th>id</th>
-                <th>name</th>
+                <th>description</th>
+                <th>image</th>
                 <th>status</th>
                 <th>started</th>
                 <th>finished</th>
@@ -26,7 +27,8 @@
             {% for object in object_list %}
                 <tr>
                     <td><a href="{%  url 'viewer' object.id %}">{{ object.id }}</a></td>
-                    <td>{{ object.name }}</td>
+                    <td><a href="{%  url 'viewer' object.id %}">{{ object.name }}</a></td>
+                    <td>{{ object.image.repository }}</td>
                     <td><a href="{%  url 'viewer' object.id %}"><span class="label label-{{ object.state|status_label }}"> {{ object.get_state_display }}</span></a></td>
                     <td>{{ object.started }}</td>
                     <td>{{ object.finished }}</td>
@@ -42,9 +44,11 @@
                                     </button>
                                 </a>
 
-                                <button type="submit" formmethod="post" formaction="{% url 'job_reschedule' object.id %}" class="btn btn-warning btn-sm">
-                                    <span class="glyphicon glyphicon-repeat"></span>
-                                </button>
+                                <a href="{% url 'job_reschedule' object.id %}">
+                                    <button type="button"class="btn btn-warning btn-sm">
+                                        <span class="glyphicon glyphicon-repeat"></span>
+                                    </button>
+                                </a>
                             </form>
                         </div>
                     </td>

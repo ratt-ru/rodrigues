@@ -70,7 +70,7 @@ def create_job(form, request, image):
     job = Job()
     job.owner = request.user
     job.config = json.dumps(format_form(form.cleaned_data))
-    job.name = form.data['name']
+    job.name = form.data['kliko_name']
     job.image = image
     job.save()
 
