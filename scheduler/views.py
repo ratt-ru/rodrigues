@@ -5,7 +5,7 @@ import docker
 import yaml
 import json
 from kliko.django_form import generate_form
-from kliko.docker import extract_params
+from kliko.kliko_docker import extract_params
 from kliko.validate import validate_kliko
 
 from django.conf import settings
@@ -57,10 +57,11 @@ def schedule_image(request, image_id, template=None):
 
     # inject some kliko specific fields
     Form.declared_fields['kliko_name'] = CharField(max_length=200, label='Job description')
-    Form.Meta.fieldsets.append(('kliko', {'description': 'Job Parameters', 'fields': ('kliko_name',)}))
+    Form.Meta.fieldsets.append(('kliko', {'description': 'Job Parameters',
+                                          'fields': ('kliko_name',)}))
 
     if request.method == 'POST':
-        form = Form(request.POST)
+        form = Form(request.POST, request.FILES)
         if form.is_valid():
             status, error = create_job(form, request, image=image)
             if not status:

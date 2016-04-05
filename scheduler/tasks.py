@@ -65,7 +65,7 @@ def run_job(job_id):
     storage = path.join(path.realpath(settings.MEDIA_ROOT), job.results_dir)
     host_storage = path.join(path.realpath(settings.HOST_STORAGE), job.results_dir)
 
-    with open(path.join(storage, 'input/parameters.json'), 'w') as f:
+    with open(path.join(storage, 'parameters.json'), 'w') as f:
         f.write((job.config))
 
     logging.info("creating container from image %s" % job.image.repository)
@@ -73,9 +73,11 @@ def run_job(job_id):
         container = client.create_container(image=job.image.repository,
                                             host_config=client.create_host_config(
                                                 binds=[
+                                                    host_storage + '/parameters.json:/parameters.json:ro',
                                                     host_storage + '/input:/input:ro',
                                                     host_storage + '/output:/output:rw',
-                                                    ]))
+                                                    ]),
+                                            command='/kliko')
     except (requests.exceptions.ConnectionError,
             requests.exceptions.HTTPError) as e:
         msg = "cant create container: %s" % str(e)
@@ -83,10 +85,7 @@ def run_job(job_id):
         raise
 
     try:
-        if hasattr(settings, 'CONTAINER'):
-            client.start(container)
-        else:
-            client.start(container)
+        client.start(container)
     except requests.exceptions.HTTPError as e:
         msg = "can't start container: %s" % str(e)
         crashed(job, msg)

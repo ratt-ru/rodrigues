@@ -1,8 +1,5 @@
 from django.conf.urls import patterns, url
-
-
 from .views import (schedule_image, ImageList, JobDelete, reschedule_image,  JobList)
-
 
 images_list_url = url(r'^images/$', ImageList.as_view(), name='container_list')
 

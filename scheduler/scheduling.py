@@ -6,7 +6,7 @@ import logging
 
 from django.conf import settings
 from django.contrib import messages
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 from scheduler.models import Job
 from scheduler.tasks import run_job
 
@@ -47,7 +47,7 @@ def format_form(cleaned_data):
     """
     d = {}
     for k, v in cleaned_data.items():
-        if type(v) is InMemoryUploadedFile:
+        if type(v) in (InMemoryUploadedFile, TemporaryUploadedFile):
             d[k] = v.name
         else:
             d[k] = v
@@ -69,7 +69,9 @@ def create_job(form, request, image):
     """
     job = Job()
     job.owner = request.user
-    job.config = json.dumps(format_form(form.cleaned_data))
+    formatted = format_form(form.cleaned_data)
+    formatted.pop('kliko_name')   # inserted by rodrigues
+    job.config = json.dumps(formatted)
     job.name = form.data['kliko_name']
     job.image = image
     job.save()
