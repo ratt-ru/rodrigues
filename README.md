@@ -74,8 +74,11 @@ First you need to inform Django that you want to use the development settings:
 Now you are ready to start the pipeline. To start the django server you first
 need to populate the database:
 
-    $ python3 ./manage.py syncdb
+    $ python3 ./manage.py migrate
 
+and create a superuser:
+
+    $ python3 ./manage.py createsuperuser
 
 Now you can run a development webserver using:
 
