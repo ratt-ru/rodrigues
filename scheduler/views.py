@@ -5,7 +5,7 @@ import docker
 import yaml
 import json
 from kliko.django_form import generate_form
-from kliko.kliko_docker import extract_params
+from kliko.docker import extract_params
 from kliko.validate import validate_kliko
 
 from django.conf import settings
