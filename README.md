@@ -58,12 +58,13 @@ You need:
    * Python 3
    * Python PIP (`$ sudo apt-get install python3-pip`)
    * RabbitMQ (`$ sudo apt-get install rabbitmq-server`)
+   * for matplotlib libfreetype and libpng (`$ sudo apt-get install libfreetype6-dev libpng12-dev`)
    * postgres (`$ sudo apt-get install postgresql postgresql-server-dev-all`)
 
 
 Now to install the required libraries run inside the rodrigues folder:
 
-    $ pip3 install -r requirements.txt
+    $ sudo pip3 install -r requirements.txt
 
 
 First you need to inform Django that you want to use the development settings:
