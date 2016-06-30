@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+
+{%  block content %}
+
+    <h1>Confirm deletion of kliko image {{ object.name }} ({{ object.id }})</h1>
+
+    <div class="jumbotron">
+        <div class="container center-block text-center">
+            <h3>Are you sure you want to delete image {{ object.name }} ({{ object.id }})?</h3>
+            <form action="" method="post">{% csrf_token %}
+                <input class="btn btn-danger" type="submit" value="Confirm" />
+            </form>
+        </div>
+    </div>
+
+
+{%  endblock %}

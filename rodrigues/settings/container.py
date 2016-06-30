@@ -39,16 +39,6 @@ DATABASES = {
 }
 
 
-
-#### Docker settings
-
-DOCKER_URI = 'unix://var/run/docker.sock'
-
-
-DOCKER_SETTINGS = {
-    'base_url': 'unix://var/run/docker.sock',
-}
-
 # used to determine if Django is running inside the matrix
 CONTAINER = True
 

@@ -113,3 +113,13 @@ LOGGING = {
 
 
 LOGIN_REDIRECT_URL = '/'
+
+
+#### Docker settings
+
+DOCKER_URI = 'unix://var/run/docker.sock'
+
+
+DOCKER_SETTINGS = {
+    'base_url': 'unix://var/run/docker.sock',
+}

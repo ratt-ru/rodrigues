@@ -12,16 +12,17 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import HttpResponseRedirect
-from django.views.generic import ListView, DeleteView
+from django.views.generic import ListView, DeleteView, CreateView, RedirectView, DetailView
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.forms import CharField
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
+from .tasks import pull_image
 
 from scheduler.models import Job, KlikoImage
 from scheduler.scheduling import create_job
-
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import permission_required
 
 logger = logging.getLogger(__name__)
 
@@ -30,20 +31,40 @@ class ImageList(LoginRequiredMixin, ListView):
     model = KlikoImage
 
 
+@method_decorator(permission_required('scheduler.create_klikoimage'), name='dispatch')
+class ImageCreate(LoginRequiredMixin, CreateView):
+    model = KlikoImage
+    fields = ['repository', 'tag']
+    success_url = reverse_lazy('image_list')
+
+
+@method_decorator(permission_required('scheduler.delete_klikoimage'), name='dispatch')
+class ImageDelete(LoginRequiredMixin, DeleteView):
+    model = KlikoImage
+    success_url = reverse_lazy('image_list')
+
+
+@method_decorator(permission_required('scheduler.change_klikoimage'), name='dispatch')
+class ImagePull(LoginRequiredMixin, DeleteView):
+    model = KlikoImage
+    success_url = reverse_lazy('image_list')
+    template_name_suffix = '_pull'
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        pull_image.delay(kliko_image_id=self.object.id)
+        return HttpResponseRedirect(success_url)
+
+
 class JobList(ListView):
     model = Job
 
 
+@method_decorator(permission_required('scheduler.change_job'), name='dispatch')
 class JobDelete(LoginRequiredMixin, DeleteView):
     model = Job
     success_url = reverse_lazy('job_list')
-
-    def get_object(self, queryset=None):
-        """ Hook to ensure object is owned by request.user. """
-        obj = super(JobDelete, self).get_object()
-        if not obj.owner == self.request.user:
-            raise Http404
-        return obj
 
 
 @login_required

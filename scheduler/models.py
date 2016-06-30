@@ -27,11 +27,11 @@ class KlikoImage(Model):
     VALID = 'V'       # image is a valid kliko container and ready to use
 
     STATE_TYPES = (
-        (NOT_PULLED, 'NOT_PULLED'),
-        (PULLING, 'PULLING'),
-        (PULLED, 'PULLED'),
-        (INVALID, 'INVALID'),
-        (VALID, 'VALID'),
+        (NOT_PULLED, 'Not Pulled yet'),
+        (PULLING, 'Pulling'),
+        (PULLED, 'Pulled'),
+        (INVALID, 'Invalid'),
+        (VALID, 'Valid'),
     )
     state = CharField(choices=STATE_TYPES, max_length=1, default=NOT_PULLED)
 
