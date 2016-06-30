@@ -1,3 +1,6 @@
+"""
+All celery tasks that are ran asynchronous
+"""
 import logging
 from datetime import datetime
 from os import path

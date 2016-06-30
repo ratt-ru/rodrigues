@@ -27,7 +27,7 @@ class KlikoImage(Model):
     VALID = 'V'       # image is a valid kliko container and ready to use
 
     STATE_TYPES = (
-        (NOT_PULLED, 'Not Pulled yet'),
+        (NOT_PULLED, 'Not Pulled'),
         (PULLING, 'Pulling'),
         (PULLED, 'Pulled'),
         (INVALID, 'Invalid'),
@@ -41,7 +41,7 @@ class KlikoImage(Model):
     def __repr__(self):
         return str(self.id)
 
-    def pulled(self):
+    def available(self):
         images = docker_client.images(self.repository + ":" + self.tag, quiet=True)
         return bool(images)
 

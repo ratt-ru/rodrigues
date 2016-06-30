@@ -12,17 +12,13 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 BROKER_URL = 'amqp://broker/'
 
 
-
 #### Debug settings
 
-DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
-
-
+DEBUG = os.environ.get('DEBUG', 'false').lower() in ('true', 'on')
 TEMPLATE_DEBUG = DEBUG
 
 if DEBUG:
     INSTALLED_APPS += ['debug_toolbar']
-
 
 
 #### Database settings
@@ -50,24 +46,19 @@ CONTAINER = True
 MEDIA_ROOT = '/storage/'
 MEDIA_URL = '/media/'
 
-
-# TODO: workaround for storing data on the host
-HOST_STORAGE = os.environ.get('STORAGE', False)
-
-if not HOST_STORAGE:
-    warnings.warn('!!! STORAGE is not set !!!')
+# NOTE: this should be the path to storage on the HOST, not inside the container
+HOST_STORAGE = os.environ.get('STORAGE')
 
 
 #### server name settings
 
+SERVER_NAME = os.environ.get('SERVER_NAME', False)
 
-SERVER_NAME = os.environ.get('SERVER_NAME', 'rodrigues.meqtrees.net')
+if not SERVER_NAME:
+    SERVER_NAME = 'rodrigues.meqtrees.net'
+    warnings.warn('!!! SERVER_NAME is not set, using rodrigues.meqtrees.net !!!')
 
-if SERVER_NAME:
-    ALLOWED_HOSTS = [SERVER_NAME]
-else:
-    warnings.warn('!!! SERVER_NAME is not set !!!')
-
+ALLOWED_HOSTS = [SERVER_NAME]
 
 
 #### email settings
@@ -78,17 +69,16 @@ SERVER_EMAIL = os.environ.get('SERVER_EMAIL', False)
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.mailgun.org')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', False)
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', False)
-
-if not EMAIL_HOST_USER:
-    warnings.warn('!!! EMAIL_HOST_USER is not set !!!')
-
-if not EMAIL_HOST_PASSWORD:
-    warnings.warn('!!! EMAIL_HOST_PASSWORD is not set !!!')
-
-if not SERVER_EMAIL:
-    warnings.warn('!!! SERVER_EMAIL is not set !!!')
-
-
 ADMINS = (('Rodrigues Calibratori', SERVER_EMAIL),)
+
+
+#### show the settings
+
+print("******* RODRIGUES SETTINGS *******")
+for v in ['DEBUG', 'SERVER_NAME', 'ALLOWED_HOSTS', 'SECRET_KEY',
+            'SERVER_EMAIL', 'EMAIL_HOST', 'EMAIL_HOST_USER',
+            'EMAIL_HOST_PASSWORD', 'HOST_STORAGE']:
+    print("%s:\t%s" % (v, str(globals().get(v, 'not set'))))
+
 
 

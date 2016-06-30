@@ -24,7 +24,7 @@ run:
 
 To start RODRIGUES:
 
-    $ SECRET_KEY=secretkey docker-compose up
+    $ SECRET_KEY=secretkey STORAGE=`pwd`/storage SERVER_NAME=localhost docker-compose up
 
 This will start a webserver on port 80. Replace `secretkey` with something secret and random, it
 is used to create HTTP sessions.
