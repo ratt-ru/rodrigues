@@ -1,6 +1,7 @@
 import logging
 
 import docker
+import docker.errors
 
 import yaml
 import json
@@ -17,8 +18,9 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.forms import CharField
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .tasks import pull_image
+from django.http import Http404
 
+from scheduler.tasks import pull_image
 from scheduler.models import Job, KlikoImage
 from scheduler.scheduling import create_job
 from django.utils.decorators import method_decorator
@@ -71,6 +73,10 @@ class JobDelete(LoginRequiredMixin, DeleteView):
 def schedule_image(request, image_id, template=None):
     image = KlikoImage.objects.get(pk=image_id)
     client = docker.Client(**settings.DOCKER_SETTINGS)
+
+    if not image.available:
+        raise Http404('That image is not available (yet)')
+
     params = extract_params(client, image.repository)
     parsed = yaml.load(params)
     validate_kliko(parsed)
