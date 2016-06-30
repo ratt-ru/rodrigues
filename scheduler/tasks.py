@@ -6,7 +6,6 @@ from celery import shared_task
 from pytz import timezone
 import docker
 import json
-from json.decoder import JSONDecodeError
 from django.conf import settings
 from django.core.mail import send_mail
 import requests.exceptions
@@ -136,7 +135,7 @@ def pull_image(kliko_image_id):
     for line in client.pull(kliko_image.repository, kliko_image.tag, stream=True):
         try:
             line = json.loads(line.decode('utf-8'))
-        except JSONDecodeError as e:
+        except ValueError as e:
             errors = "cant parse docker output: " + str(e)
         else:
             if 'error' in line:
