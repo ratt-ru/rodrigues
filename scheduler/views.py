@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.http.response import HttpResponseRedirect
-from django.views.generic import ListView, DeleteView, CreateView, RedirectView, DetailView
+from django.views.generic import ListView, DeleteView, CreateView
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.forms import CharField

@@ -7,7 +7,7 @@
 
     <div class="jumbotron">
         <div class="container center-block text-center">
-            <h3>Are you sure you want to pull kliko image {{ object.name }} ({{ object.id }})?</h3>
+            <h3>Are you sure you want to pull kliko image {{ object.name }} ({{ object.id }}) from the docker hub?</h3>
             <form action="" method="post">{% csrf_token %}
                 <input class="btn btn-danger" type="submit" value="Confirm" />
             </form>

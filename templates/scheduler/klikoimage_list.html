@@ -5,7 +5,7 @@
 
 {%  block content %}
 
-            <h1>List of kliko images</h1>
+    <h1>List of kliko images</h1>
 
     {% if object_list %}
 
@@ -55,13 +55,20 @@
             {% endfor %}
         </table>
     {%  else %}
-
-
         <div class="jumbotron">
             <div class="container center-block text-center">
                 <h1>no images yet!</h1>
             </div>
         </div>
     {%  endif %}
+
+         <div class="row">
+        <div class="col-md-12">
+               {% if user.is_staff %}
+                <a href="{% url 'image_create' %}"  class="btn btn-info btn-lg"><span class="glyphicon glyphicon-plus-sign"></span> Add Kliko Image</a>
+            {%  endif %}
+        </div>
+    </div>
+
 
 {%  endblock %}
