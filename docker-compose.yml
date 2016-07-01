@@ -29,7 +29,7 @@ worker:
     - EMAIL_HOST
     - EMAIL_HOST_USER
     - EMAIL_HOST_PASSWORD
-    - STORAGE
+    - STORAGE=${PWD}/storage
   volumes:
     - /var/run/docker.pid:/var/run/docker.pid
     - /var/run/docker.sock:/var/run/docker.sock
@@ -57,7 +57,7 @@ django:
     - EMAIL_HOST
     - EMAIL_HOST_USER
     - EMAIL_HOST_PASSWORD
-    - STORAGE
+    - STORAGE=${PWD}/storage
   volumes:
     - /var/run/docker.pid:/var/run/docker.pid
     - /var/run/docker.sock:/var/run/docker.sock
