@@ -69,3 +69,6 @@ ssl.key
 
 .virtualenv/
 storage/*
+
+assets/bundles/
+node_modules/

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load render_bundle from webpack_loader %}
 
 {% block list %}active{% endblock %}
 
@@ -62,11 +63,19 @@
         </div>
     {%  endif %}
 
-         <div class="row">
+   {% if user.is_staff %}
+    <div class="row">
         <div class="col-md-12">
-               {% if user.is_staff %}
-                <a href="{% url 'image_create' %}"  class="btn btn-info btn-lg"><span class="glyphicon glyphicon-plus-sign"></span> Add Kliko Image</a>
-            {%  endif %}
+            <a href="{% url 'image_create' %}"  class="btn btn-info btn-lg"><span class="glyphicon glyphicon-plus-sign"></span> Add Kliko Image</a>
+        </div>
+    </div>
+    {%  endif %}
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div id="container"></div>
+            {% render_bundle 'main' %}
         </div>
     </div>
 

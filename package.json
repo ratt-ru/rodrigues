@@ -1,0 +1,30 @@
+{
+  "name": "rodrigues",
+  "version": "1.0.0",
+  "description": "RODRIGUES stands for **R**ATT **O**nline **D**econvolved **R**adio **I**mage **G**eneration **U**sing **E**soteric **S**oftware. It is a web based radio telescope simulation and reduction tool. From a technical perspective it is a web based parameterised docker container scheduler with a result set viewer. Hopefully in the future it becomes less radio telescope specific and a more generic comutation scheduler.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ska-sa/rodrigues.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ska-sa/rodrigues/issues"
+  },
+  "homepage": "https://github.com/ska-sa/rodrigues#readme",
+  "devDependencies": {
+    "babel-core": "^6.10.4",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.11.1",
+    "jquery": "^3.0.0",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
+    "webpack": "^1.13.1",
+    "webpack-bundle-tracker": "0.0.93"
+  }
+}
