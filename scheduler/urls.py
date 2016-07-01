@@ -1,33 +1,23 @@
 from django.conf.urls import patterns, url
-from .views import (schedule_image, ImageList, ImageDelete, ImagePull,
-                    JobDelete, ImageCreate, reschedule_image,  JobList)
-
-image_list_url = url(r'^images/$', ImageList.as_view(), name='image_list')
-
-image_create_url = url(r'^image/create/$', ImageCreate.as_view(), name='image_create')
-
-image_delete_url = url(r'^image/delete/(?P<pk>\d+)/$', ImageDelete.as_view(), name='image_delete')
-
-image_pull_url = url(r'^image/pull/(?P<pk>\d+)/$', ImagePull.as_view(), name='image_pull')
-
-job_create_url = url(r'^job/create/(?P<image_id>\d+)/$', schedule_image, name='job_create')
-
-job_reschedule_url = url(r'^job/reschedule/(?P<template_job_id>\d+)/$', reschedule_image, name='job_reschedule')
-
-job_delete_url = url(r'^job/delete/(?P<pk>\d+)/$', JobDelete.as_view(), name='job_delete')
-
-job_list_url = url(r'^$', JobList.as_view(), name='job_list')
+from scheduler import views
+from django.conf.urls import include
+from rest_framework import routers
 
 
-all_ = (
-    image_list_url,
-    image_create_url,
-    image_delete_url,
-    image_pull_url,
-    job_create_url,
-    job_delete_url,
-    job_reschedule_url,
-    job_list_url,
+router = routers.DefaultRouter()
+router.register(r'images', views.KlikoImageViewSet)
+router.register(r'jobs', views.JobViewSet)
+
+
+urlpatterns = patterns('',
+    url(r'^images/$', views.ImageList.as_view(), name='image_list'),
+    url(r'^image/create/$', views.ImageCreate.as_view(), name='image_create'),
+    url(r'^image/delete/(?P<pk>\d+)/$', views.ImageDelete.as_view(), name='image_delete'),
+    url(r'^image/pull/(?P<pk>\d+)/$', views.ImagePull.as_view(), name='image_pull'),
+    url(r'^job/create/(?P<image_id>\d+)/$', views.schedule_image, name='job_create'),
+    url(r'^job/reschedule/(?P<template_job_id>\d+)/$', views.reschedule_image, name='job_reschedule'),
+    url(r'^job/delete/(?P<pk>\d+)/$', views.JobDelete.as_view(), name='job_delete'),
+    url(r'^$', views.JobList.as_view(), name='job_list'),
+    url(r'^rest/', include(router.urls)),
+    url(r'^rest/auth/', include('rest_framework.urls', namespace='rest_framework'))
 )
-
-urlpatterns = patterns('', *all_)

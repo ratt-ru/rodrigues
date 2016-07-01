@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'scheduler',
+    'rest_framework',
 ]
 
 MIDDLEWARE_CLASSES = (
@@ -122,4 +123,16 @@ DOCKER_URI = 'unix://var/run/docker.sock'
 
 DOCKER_SETTINGS = {
     'base_url': 'unix://var/run/docker.sock',
+}
+
+
+#### Django REST settings
+
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
 }

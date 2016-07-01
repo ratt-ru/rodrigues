@@ -7,14 +7,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
-admin_url = url(r'^admin/', include(admin.site.urls))
-login_url = url(r'^accounts/login/$', login, name='login')
-logout_url = url(r'^accounts/logout/$', logout, name='logout')
-scheduler_url = url(r'^scheduler/', include('scheduler.urls'))
-root_url = url(r'^$', RedirectView.as_view(url=reverse_lazy('job_list')),
-               name='root')
-viewer_url = url(r'^viewer/', include('viewer.urls'))
+urlpatterns = patterns('',
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^accounts/login/$', login, name='login'),
+    url(r'^accounts/logout/$', logout, name='logout'),
+    url(r'^scheduler/', include('scheduler.urls')),
+    url(r'^$', RedirectView.as_view(url=reverse_lazy('job_list')), name='root'),
+    url(r'^viewer/', include('viewer.urls')),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+)
 
-all_ = (admin_url, login_url, logout_url, scheduler_url, root_url, viewer_url)
-urlpatterns = patterns('', *all_)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -19,12 +19,15 @@ from django.contrib.auth.decorators import login_required
 from django.forms import CharField
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
-
-from scheduler.tasks import pull_image
-from scheduler.models import Job, KlikoImage
-from scheduler.scheduling import create_job
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required
+
+from rest_framework import viewsets
+
+from .tasks import pull_image
+from .models import Job, KlikoImage
+from .serializers import JobSerializer, KlikoImageSerializer
+from .scheduling import create_job
 
 logger = logging.getLogger(__name__)
 
@@ -109,3 +112,13 @@ def reschedule_image(request, template_job_id):
     job = Job.objects.get(pk=template_job_id)
     template = json.loads(job.config)
     return schedule_image(request, job.image.id, template)
+
+
+class JobViewSet(viewsets.ModelViewSet):
+    queryset = Job.objects.all()
+    serializer_class = JobSerializer
+
+
+class KlikoImageViewSet(viewsets.ModelViewSet):
+    queryset = KlikoImage.objects.all()
+    serializer_class = KlikoImageSerializer

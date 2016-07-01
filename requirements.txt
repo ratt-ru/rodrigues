@@ -11,3 +11,6 @@ filemagic
 django-debug-toolbar
 kliko==0.6.1
 gunicorn
+djangorestframework
+markdown
+django-filter
