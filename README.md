@@ -24,18 +24,21 @@ run:
 
 To start RODRIGUES:
 
-    $ SECRET_KEY=secretkey STORAGE=`pwd`/storage SERVER_NAME=localhost docker-compose up
+    $ SECRET_KEY=secretkey SERVER_NAME=localhost docker-compose up
 
-This will start a webserver on port 80. Replace `secretkey` with something secret and random, it
-is used to create HTTP sessions.
+This will start a webserver on port 80. Replace `SECRET_KEY` with something secret and random, it
+is used to create HTTP sessions. you can use the `-d` flag to fork
+docker-compose to the background.
 
 ### configuration
 
 There are more environment variables you may need to set:
  - **SERVER_NAME** (default: rodrigues.meqtrees.net)
- - **ADMIN_EMAIL**
- - **STORAGE** host result storage. typically `pwd`/storage
  - **DEBUG** set to true to enable debugging mode (default: off)
+
+If things are not working, make sure the SERVER\_NAME matches the
+host name you use to connect to rodrigues. If that doesn't help
+turn on debug (DEBUG=true) or examine the log files (docker-compose logs).
 
 ### Initialise DB
 
