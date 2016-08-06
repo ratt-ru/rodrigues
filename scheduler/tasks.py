@@ -79,6 +79,7 @@ def run_job(job_id):
                                                     host_storage + '/parameters.json:/parameters.json:ro',
                                                     host_storage + '/input:/input:ro',
                                                     host_storage + '/output:/output:rw',
+                                                    host_storage + '/param_files:/param_files:ro',
                                                     ]),
                                             command='/kliko')
     except (requests.exceptions.ConnectionError,

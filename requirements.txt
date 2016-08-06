@@ -9,7 +9,7 @@ APLpy
 matplotlib
 filemagic
 django-debug-toolbar
-kliko==0.6.1
+kliko>=0.7,<0.8
 gunicorn
 djangorestframework
 markdown

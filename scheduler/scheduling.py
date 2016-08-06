@@ -37,7 +37,7 @@ def schedule_job(job, request):
 
 def format_form(cleaned_data):
     """
-    Workaround to set the uploaded file name for a InMemoryUploadedFile corrrectly.
+    Workaround to set the uploaded file name for a InMemoryUploadedFile correctly.
     Args:
         cleaned_data (dict):
 
@@ -86,15 +86,18 @@ def create_job(form, request, image):
 
         input_ = os.path.join(tempdir, 'input')
         output = os.path.join(tempdir, 'output')
+        param_files = os.path.join(tempdir, 'param_files')
 
         os.mkdir(input_)
         os.mkdir(output)
+        os.mkdir(param_files)
+
     except Exception as e:
         return False, "Can't setup working directory:\n%s" % str(e)
 
     for fieldname, data in request.FILES.items():
         filename = request.FILES[fieldname].name
-        with open(os.path.join(input_, filename), 'wb+') as destination:
+        with open(os.path.join(param_files, filename), 'wb+') as destination:
             for chunk in data.chunks():
                 destination.write(chunk)
 
