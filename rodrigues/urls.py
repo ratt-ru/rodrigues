@@ -14,7 +14,6 @@ urlpatterns = patterns('',
     url(r'^scheduler/', include('scheduler.urls')),
     url(r'^$', RedirectView.as_view(url=reverse_lazy('job_list')), name='root'),
     url(r'^viewer/', include('viewer.urls')),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 )
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

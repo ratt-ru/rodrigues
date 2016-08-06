@@ -30,3 +30,5 @@ MEDIA_URL = '/media/'
 
 # outside a container the host storage is the same as media_root
 HOST_STORAGE = MEDIA_ROOT
+
+CORS_ORIGIN_ALLOW_ALL = True

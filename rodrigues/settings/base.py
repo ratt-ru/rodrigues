@@ -20,10 +20,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'scheduler',
     'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
