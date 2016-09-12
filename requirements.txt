@@ -14,3 +14,7 @@ gunicorn
 djangorestframework
 markdown
 django-filter
+
+# otherwise pykwalify doesn't install
+python-dateutil==2.4.2
+PyYAML==3.11
