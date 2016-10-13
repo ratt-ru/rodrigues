@@ -8,7 +8,7 @@ astropy==1.0.1
 APLpy
 matplotlib
 filemagic
-django-debug-toolbar
+django-debug-toolbar>=1.6,<1.7
 kliko>=0.7,<0.8
 gunicorn
 djangorestframework
