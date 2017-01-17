@@ -15,7 +15,8 @@ BROKER_URL = 'amqp://broker/'
 #### Debug settings
 
 DEBUG = os.environ.get('DEBUG', 'false').lower() in ('true', 'on')
-TEMPLATE_DEBUG = DEBUG
+TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
+
 
 if DEBUG:
     INSTALLED_APPS += ['debug_toolbar']

@@ -5,7 +5,7 @@ from docker.utils import kwargs_from_env
 SECRET_KEY = "something stupid"
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
 
 DATABASES = {
     'default': {
@@ -14,10 +14,9 @@ DATABASES = {
     }
 }
 
-INSTALLED_APPS += [
-    'debug_toolbar',
-]
-
+# enable the debug toolbar
+INSTALLED_APPS += ['debug_toolbar']
+MIDDLEWARE_CLASSES += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 BROKER_URL = 'amqp://localhost/'
 

@@ -62,6 +62,7 @@ You need:
    * Python PIP (`$ sudo apt-get install python3-pip`)
    * RabbitMQ (`$ sudo apt-get install rabbitmq-server`)
    * for matplotlib libfreetype and libpng (`$ sudo apt-get install libfreetype6-dev libpng12-dev`)
+   # libmagic for the magic python module (`$ sudo apt-get install libmagic1`)
    * postgres (`$ sudo apt-get install postgresql postgresql-server-dev-all`)
 
 

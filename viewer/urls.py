@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 
 from .views import FitsView,  OverView, SomethingView, TextView, Js9View
@@ -19,7 +19,7 @@ something_url = url(r'^something/(?P<pk>\d+)/(?P<path>[\w._/-]+)/$',
 js9_url = url(r'^js9/(?P<pk>\d+)/(?P<path>[\w._/-]+)/$',
                     Js9View.as_view(), name='js9')
 
-all_ = (
+urlpatterns = (
     fits_url,
     overview_url,
     something_url,
@@ -27,4 +27,3 @@ all_ = (
     js9_url,
 )
 
-urlpatterns = patterns('', *all_)

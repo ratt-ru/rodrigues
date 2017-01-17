@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from scheduler import views
 from django.conf.urls import include
 from rest_framework import routers
@@ -9,7 +9,7 @@ router.register(r'images', views.KlikoImageViewSet)
 router.register(r'jobs', views.JobViewSet)
 
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^images/$', views.ImageList.as_view(), name='image_list'),
     url(r'^image/create/$', views.ImageCreate.as_view(), name='image_create'),
     url(r'^image/delete/(?P<pk>\d+)/$', views.ImageDelete.as_view(), name='image_delete'),
@@ -20,4 +20,4 @@ urlpatterns = patterns('',
     url(r'^$', views.JobList.as_view(), name='job_list'),
     url(r'^rest/', include(router.urls)),
     url(r'^rest/auth/', include('rest_framework.urls', namespace='rest_framework'))
-)
+]
